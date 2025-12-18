@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Share+Tech+Mono&family=VT323&display=swap");
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --font-display: "Satoshi", "sans-serif";
+  --font-vt323: "VT323", monospace;
+  --font-pixelify: "Pixelify Sans", sans-serif;
+  --font-sharetech: "Share Tech Mono", monospace;
+  --breakpoint-3xl: 120rem;
+  --color-darkText: #FDFFD6;
+  --color-darkPrimary: #0B010A;
+  --color-darkSecondary: #2B164D;
+  --color-darkAccent: #60457E;
+  --color-darkBorder: #4E024B;
+  --color-darkDetail: #8B2661;
+  --color-darkWarning: #C9320C;
+  --color-darkSuccess: #367814;
+  --color-lightText: #37382A;
+  --color-lightPrimary: #F2F2F2;
+  --color-lightSecondary: #A6968D;
+  --color-lightAccent: #BF9393;
+  --color-lightBorder: #D9C1BF;
+  --color-lightDetail: #D9C6BA;
+  --color-lightWarning: #D44C4C;
+  --color-lightSuccess: #BDF5A2;
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+  /* ... */
+}
+.center {
+  @apply flex flex-row gap-1 justify-center items-center;
+}
+.centerUp {
+  @apply flex flex-row gap-1 justify-center items-start;
+}
+.centerBottom {
+  @apply flex flex-row gap-1 justify-center items-end;
+}
+.centerLeft {
+  @apply flex flex-row gap-1 justify-start items-center;
+}
+.centerRight {
+  @apply flex flex-row gap-1 justify-end items-center;
+}

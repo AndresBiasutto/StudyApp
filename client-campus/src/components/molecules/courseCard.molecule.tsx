@@ -1,0 +1,20 @@
+import type { cardProps } from "../../interfaces/cardProps";
+import H2 from "../atoms/h2.atom";
+import Image from "../atoms/image.atom";
+import Ptxt from "../atoms/P.atom";
+
+const CourseCard: React.FC<cardProps> = ({ title, text, image }) => {
+  return (
+    <div className="cursor-pointer flex flex-col items-center justify-start p-1 bg-lightSecondary dark:bg-darkSecondary rounded-md shadow">
+      <div className="w-auto h-60 rounded border border-lightBorder dark:bg-darkBorder">
+        <Image src={image} alt={title} className="" />
+      </div>
+      <div className="flex flex-col items-start justify-start w-full">
+        <H2 text={title} />
+        <Ptxt text={text} />
+      </div>
+    </div>
+  );
+};
+
+export default CourseCard;
