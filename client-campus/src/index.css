@@ -42,3 +42,6 @@
 .centerRight {
   @apply flex flex-row gap-1 justify-end items-center;
 }
+.shadowDN {
+  @apply  hover:border-lightBorder border-lightText dark:border-darkText border dark:hover:border-darkBorder transition ;
+}

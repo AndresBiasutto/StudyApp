@@ -9,7 +9,7 @@ const ButtonRounded: React.FC<IButtonProps> = ({
 }) => {
   return (
     <button
-      className={`h-10 w-10 cursor-pointer center p-2 m-1 ${bgLight} ${bgDark} font-pixelify text-lightText dark:text-darkText rounded-full`}
+      className={`group h-7 w-7 cursor-pointer center p-2 m-1 ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText rounded-full shadowDN`}
       onClick={action}
     >
       <i className=" md:group-hover:scale-105 text-2xl">{icon} </i>

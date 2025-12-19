@@ -1,16 +1,14 @@
-// import { useState } from "react";
-// import Sidebar from "../components/templates/sidebar.template";
-
+import CourseCards from "../components/organisms/courseCards.organism";
+import Hero from "../components/organisms/hero.organism";
 import Content from "../components/templates/content.template";
 
-const Landing= ()=> {
-//   const [sidebarOpen, setSidebarOpen] = useState(false);
-//   const [notificationOpen, setNotificationOpen] = useState(false);
-//   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+const Landing = () => {
   return (
-    <Content />
+    <Content title="pagina de inicio">
+      <Hero />
+      <CourseCards />
+    </Content>
   );
-}
+};
 
 export default Landing;

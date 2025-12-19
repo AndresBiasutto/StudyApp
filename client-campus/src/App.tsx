@@ -7,7 +7,7 @@ import {  useSelector } from "react-redux";
 function App() {
   const { isDark } = useSelector((state: RootState) => state.ui);
   return (
-    <div className={`${isDark? "dark": ""} min-h-screen flex flex-col `}>
+    <div className={`${isDark? "dark": ""} transition-all min-h-screen flex flex-col `}>
       <Header />
       <Sidebar />
       <Routes>

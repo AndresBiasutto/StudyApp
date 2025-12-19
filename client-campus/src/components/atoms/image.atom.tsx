@@ -8,7 +8,7 @@ interface ImageProps {
 
 const Image: React.FC<ImageProps> = ({ src, alt, className = "" }) => {
   return (
-    <div className="flex justify-center items-center w-full">
+    <div className="flex justify-center items-center w-full overflow-hidden transition-all">
       <img
         src={src}
         alt={alt}

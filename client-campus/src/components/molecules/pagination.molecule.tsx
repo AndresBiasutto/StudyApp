@@ -11,6 +11,7 @@ const Pagination: React.FC<paginationProps> = ({
   totalPages,
 }) => {
   return (
+    <div className=" w-full center">
     <div className="flex items-center justify-center gap-4 mt-6">
       <ButtonRounded
         action={back}
@@ -27,7 +28,9 @@ const Pagination: React.FC<paginationProps> = ({
         bgLight="bg-lightAccent"
         bgDark="dark:bg-darkAccent"
       />
+    </div>      
     </div>
+
   );
 };
 

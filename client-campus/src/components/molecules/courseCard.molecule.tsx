@@ -5,8 +5,8 @@ import Ptxt from "../atoms/P.atom";
 
 const CourseCard: React.FC<cardProps> = ({ title, text, image }) => {
   return (
-    <div className="cursor-pointer flex flex-col items-center justify-start p-1 bg-lightSecondary dark:bg-darkSecondary rounded-md shadow">
-      <div className="w-auto h-60 rounded border border-lightBorder dark:bg-darkBorder">
+    <div className="shadowDN cursor-pointer flex flex-col items-center justify-start p-1 bg-lightSecondary dark:bg-darkSecondary transition-all rounded-md">
+      <div className="max-h-40 overflow-hidden center">
         <Image src={image} alt={title} className="" />
       </div>
       <div className="flex flex-col items-start justify-start w-full">

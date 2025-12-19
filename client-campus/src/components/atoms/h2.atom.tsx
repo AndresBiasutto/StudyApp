@@ -3,7 +3,7 @@ import type { textProps } from "../../interfaces/textProps";
 
 const H2: React.FC<textProps> = ({ text }) => {
   return (
-    <h2 className="text-2xl font-semibold font-pixelify text-lightText dark:text-darkText">
+    <h2 className="text-2xl font-semibold font-pixelify text-lightText dark:text-darkText transition-all">
       {text}
     </h2>
   );
