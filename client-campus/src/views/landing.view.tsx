@@ -4,7 +4,7 @@ import Content from "../components/templates/content.template";
 
 const Landing = () => {
   return (
-    <Content title="pagina de inicio">
+    <Content title="">
       <Hero />
       <CourseCards />
     </Content>

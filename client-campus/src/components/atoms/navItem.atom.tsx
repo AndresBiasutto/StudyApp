@@ -6,8 +6,12 @@ const NavItem: React.FC<navItemProps> = ({ to, text }) => (
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `block py-2 pr-4 pl-2 rounded md:p-0 hover:underline  p-1 font-pixelify transition-all
-        ${isActive ? "text-lightDetail dark:text-darkDetail underline" : "text-lightText dark:text-darkText transition-all "}`
+        `block py-1 rounded md:p-0 hover:underline font-pixelify transition-all
+        ${
+          isActive
+            ? "text-lightDetail dark:text-darkDetail underline"
+            : "text-lightText dark:text-darkText transition-all "
+        }`
       }
     >
       {text}
@@ -15,4 +19,4 @@ const NavItem: React.FC<navItemProps> = ({ to, text }) => (
   </li>
 );
 
-export default NavItem
+export default NavItem;

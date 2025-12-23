@@ -14,7 +14,7 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="centerLeft px-2 sm:px-4 py-2.5 rounded  shadow w-auto ">
+    <nav className="flex flex-row justify-end items-end py-1 w-auto ">
       <div className="container flex flex-wrap justify-end items-center mx-auto">
         <div className="flex items-center md:hidden">
           <ButtonRounded
@@ -51,8 +51,8 @@ const NavBar = () => {
                   close={() => setOpen(false)}
                 />
                 <MobileNavItem
-                  to="/unitone"
-                  text="Unidad 1"
+                  to="/dashboard/userdashboard"
+                  text="dashboard"
                   close={() => setOpen(false)}
                 />
                 <MobileNavItem
@@ -90,6 +90,11 @@ const NavBar = () => {
                 bgLight="bg-lightAccent"
                 bgDark="bg-darkAccent"
               />
+              <MobileNavItem
+                to="auth/register"
+                text="REGISTRATE"
+                close={() => setOpen(false)}
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -111,7 +116,14 @@ const MobileNavItem = ({ to, text, close }: Props) => (
     <NavLink
       to={to}
       onClick={close}
-      className="block hover:underline hover:bg-blue-900 rounded-2xl p-1 font-vt323 text-2xl text-blue-500 transition"
+      className={({ isActive }) =>
+        `block py-1 rounded md:p-0 hover:underline font-pixelify transition-all
+        ${
+          isActive
+            ? "text-lightDetail dark:text-darkDetail underline"
+            : "text-lightText dark:text-darkText transition-all "
+        }`
+      }
     >
       {text}
     </NavLink>

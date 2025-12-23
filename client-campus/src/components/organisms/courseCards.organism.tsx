@@ -3,6 +3,7 @@ import CourseCard from "../molecules/courseCard.molecule";
 import { courses } from "../../Data";
 import Pagination from "../molecules/pagination.molecule";
 import Section from "../molecules/section.molecule";
+import GridSection from "../molecules/gridSection.molecule";
 
 const ITEMS_PER_PAGE = 3;
 
@@ -20,7 +21,7 @@ const CourseCards = () => {
   };
   return (
     <Section title="Materias mas vistas">
-      <div className="grid grid-cols-1 gap-6 mt-6 md:grid-cols-3">
+      <GridSection gridCols="3">
         {visibleCourses.map((course, index) => (
           <CourseCard
             key={index}
@@ -29,7 +30,7 @@ const CourseCards = () => {
             image={course.image}
           />
         ))}
-      </div>
+      </GridSection>
       <Pagination
         back={handleBack}
         next={handleNext}

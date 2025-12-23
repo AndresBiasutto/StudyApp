@@ -1,14 +1,12 @@
 import type { contentProps } from "../../interfaces/contentProps";
-import H1 from "../atoms/h1.atom";
+import H2 from "../atoms/h2.atom";
 
-const Content:React.FC<contentProps> = ({title, children}) => {
+const Content: React.FC<contentProps> = ({ title, children }) => {
   return (
-    <div className=" dark:bg-darkPrimary bg-avocado-200 flex flex-col flex-1 overflow-hidden">
-      <main className="flex-1 overflow-y-auto  p-6">
-        <H1 text={title} />
-        {children}
-      </main>
-    </div>
+    <main className="bg-lightPrimary dark:bg-darkPrimary flex flex-col justify-start items-center w-full min-h-screen overflow-y-auto  p-6">
+      <H2 text={title} />
+      {children}
+    </main>
   );
 };
 

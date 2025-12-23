@@ -6,11 +6,13 @@ const Button: React.FC<IButtonProps> = ({
   action,
   icon,
   bgLight,
-  bgDark
+  bgDark,
+  type
 }) => {
   return (
           <button
-            className={`shadowDN cursor-pointer rounded center px-4 text-nowrap py-2 m-1 ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText`}
+          type={type}
+            className={`shadowDN cursor-pointer rounded center px-4 text-nowrap py-2 my-2 ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText`}
             onClick={action}
           >
             <i className=" md:group-hover:scale-105 text-2xl">{icon} </i> {btnName}
