@@ -1,4 +1,4 @@
 export interface textProps {
-  text: string;
+  text: string | undefined;
   aditionalStyle?: string | undefined;
 }

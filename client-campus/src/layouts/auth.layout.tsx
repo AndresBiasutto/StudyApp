@@ -1,4 +1,4 @@
-import Content from '../components/templates/content.template'
+import Content from '../components/molecules/content.molecule'
 import { Outlet } from 'react-router-dom'
 
 const Auth = () => {

@@ -45,3 +45,22 @@
 .shadowDN {
   @apply  hover:border-lightBorder border-lightText dark:border-darkText border dark:hover:border-darkBorder transition ;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e5e7eb; /* gray-200 */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #64290d; /* gray-400 */
+  border-radius: 9999px;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #37382A #ffffff00
+}
