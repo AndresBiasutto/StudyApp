@@ -7,6 +7,7 @@ import Register from "./views/register.view";
 import Auth from "./layouts/auth.layout";
 import Dashboard from "./layouts/dashboard.layout";
 import CreatorDashboard from "./views/creatorDashboard";
+import StudentDashboard from "./components/templates/student.template";
 function App() {
   const { isDark } = useSelector((state: RootState) => state.ui);
   return (
@@ -15,7 +16,7 @@ function App() {
         isDark ? "dark" : ""
       } transition-all min-h-screen flex flex-col `}
     >
-      <Header />
+      {/* <Header /> */}
       <Routes>
         <Route path="/" element={<Landing />} />
         {/* <Route path="/register" element={<Register />} /> */}
@@ -24,6 +25,7 @@ function App() {
         </Route>
         <Route element={<Dashboard />}>
           <Route path="dashboard/userdashboard" element={<CreatorDashboard />} />
+          <Route path="dashboard/studentdashboard" element={<StudentDashboard />} />
         </Route>
       </Routes>
     </div>

@@ -52,14 +52,15 @@ const NavBar = () => {
                 />
                 <MobileNavItem
                   to="/dashboard/userdashboard"
-                  text="dashboard"
+                  text="crear"
                   close={() => setOpen(false)}
                 />
                 <MobileNavItem
-                  to="/unittwo"
-                  text="Unidad 2"
+                  to="/dashboard/studentdashboard"
+                  text="estudiar"
                   close={() => setOpen(false)}
                 />
+
                 <MobileNavItem
                   to="/unitthree"
                   text="Unidad 3"

@@ -11,8 +11,8 @@ const Dashboard = () => {
   return (
     <div className="flex flex-row items-start justify-start">
       <Sidebar />
-      <div className="bg-lightPrimary dark:bg-darkPrimary flex flex-col justify-start items-center w-full min-h-screen overflow-y-auto">
-        <div className="w-full flex justify-start items-center p-6">
+      <div className=" bg-lightPrimary dark:bg-darkPrimary flex flex-col justify-start items-center w-full min-h-screen overflow-y-auto">
+        <div className="fixed py-2 px-8 opacity-50 hover:opacity-100 transition-all w-full flex items-center justify-end">
           <ButtonRounded
             btnName="mostrar menu"
             action={() => dispatch(toggleSidebar())}

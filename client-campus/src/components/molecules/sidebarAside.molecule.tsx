@@ -10,9 +10,9 @@ const SidebarAside: React.FC<sidebar> = ({ isOpen, logo }) => {
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
-      <div className="flex items-center justify-center mt-8">
+      <div className=" flex items-center justify-start mt-2 ml-8">
         <NavLink to="/" className="flex items-center">
-          <img className=" w-14 " src={logo} alt="logo" />
+          <img className="w-8" src={logo} alt="logo" />
         </NavLink>
       </div>
       <SidebarNav />
