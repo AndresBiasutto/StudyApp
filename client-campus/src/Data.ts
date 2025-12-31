@@ -46,11 +46,13 @@ const subjectInProgress = {
           id: 1,
           name: "primer capitulo",
           chapterOrder: 1,
+          description: "la cosa quepasa"
         },
         {
           id: 2,
           name: "segundo capitulo",
-          chapterOrder: 1,
+          chapterOrder: 2,
+          description: "la cosa quepasa"
         },
       ],
     },

@@ -1,8 +1,8 @@
 import Content from "../molecules/content.molecule";
 
-import NewSubject from "../organisms/newSubject.organism";
+import NewSubject from "../organisms/creatorCards/newSubject.organism";
 
-const CreatorDashboard = () => {
+const CreatorDashboardT = () => {
   return (
     <Content title="">
       <NewSubject />
@@ -10,4 +10,4 @@ const CreatorDashboard = () => {
   );
 };
 
-export default CreatorDashboard;
+export default CreatorDashboardT;

@@ -1,5 +1,6 @@
 export interface subjectCardHeader {
-    title:string;
-    text:string;
-    image: string;
+  title: string;
+  text?: string;
+  image?: string;
+
 }

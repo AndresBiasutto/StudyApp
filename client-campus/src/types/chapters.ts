@@ -1,8 +1,9 @@
-export interface chapterCards {
-    chapters: {
-    id: number;
-    name: string;
-    chapterOrder: number;
-}[]| undefined
+import type React from "react";
 
+export interface chapterCard {
+  id: number;
+  title: string;
+  text: string;
+  chapterOrder: number;
+  icon?: React.ReactNode;
 }
