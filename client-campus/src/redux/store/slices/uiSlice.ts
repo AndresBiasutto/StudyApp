@@ -4,6 +4,7 @@ import type { UiState } from "../../../interfaces/uiState";
 
 const initialState: UiState = {
   sidebarOpen: false,
+  modalOpen: false,
   isDark: false,
 };
 
@@ -19,6 +20,15 @@ const uiSlice = createSlice({
     },
     closeSidebar: (state) => {
       state.sidebarOpen = false;
+    },
+    toggleModal: (state) => {
+      state.modalOpen = !state.modalOpen;
+    },
+    openModal: (state) => {
+      state.modalOpen = true;
+    },
+    closeModal: (state) => {
+      state.modalOpen = false;
     },
     toggleTheme: (state) => {
       state.isDark = !state.isDark;
@@ -36,6 +46,9 @@ export const {
   toggleSidebar,
   openSidebar,
   closeSidebar,
+  toggleModal,
+  openModal,
+  closeModal,
   toggleTheme,
   setDark,
   setLight,

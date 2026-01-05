@@ -12,7 +12,7 @@ const Sidebar = () => {
       {sidebarOpen && (
         <div
           onClick={() => dispatch(toggleSidebar())}
-          className="fixed inset-0 z-20 bg-lightSecondary dark:bg-darkSecondary opacity-20 hover:opacity-45 transition-all duration-200"
+          className="fixed inset-0 z-20 bg-lightSecondary dark:bg-darkSecondary opacity-20 hover:opacity-45 cursor-pointer transition-all duration-200"
         />
       )}
       <SidebarAside isOpen={sidebarOpen} logo={logo} />

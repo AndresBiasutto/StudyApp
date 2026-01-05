@@ -1,6 +1,9 @@
+import type { Chapter } from "./chapter";
+
 export interface Unit {
-  id: string | number;
+  id: number;
   name: string;
-  description?: string;
-  unitOrder?: number;
+  description: string;
+  unitOrder: number;
+  chapters: Chapter[];
 }

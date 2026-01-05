@@ -1,6 +1,6 @@
 import Content from "../molecules/content.molecule";
 
-import NewSubject from "../organisms/creatorCards/newSubject.organism";
+import NewSubject from "../organisms/creator/newSubject.organism";
 
 const CreatorDashboardT = () => {
   return (

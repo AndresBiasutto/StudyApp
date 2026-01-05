@@ -5,7 +5,7 @@ const UlNavItem = () => {
     <ul className="flex flex-row md:space-x-4 md:text-sm md:font-medium">
 
       <NavItem to="/" text="Inicio" />
-      <NavItem to="/dashboard/userdashboard" text="crear" />
+      <NavItem to="/dashboard/creatordashboard" text="crear" />
       <NavItem to="/dashboard/studentdashboard" text="estudiar" />
       <NavItem to="/unittwo" text="Unidad 2" />
       <NavItem to="/unitthree" text="Unidad 3" />

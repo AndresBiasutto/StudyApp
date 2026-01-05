@@ -51,7 +51,7 @@ const NavBar = () => {
                   close={() => setOpen(false)}
                 />
                 <MobileNavItem
-                  to="/dashboard/userdashboard"
+                  to="/dashboard/creatordashboard"
                   text="crear"
                   close={() => setOpen(false)}
                 />
