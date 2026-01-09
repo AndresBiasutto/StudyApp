@@ -1,4 +1,4 @@
-import type { chapterReader } from "../../../types/chapterReader";
+import type { chapterReader } from "../../../interfaces/chapterReader";
 import H3 from "../../atoms/h3.atom";
 import VideoModal from "../../molecules/videoModal.molecule";
 import videoImage from "../../../assets/monopc.svg";

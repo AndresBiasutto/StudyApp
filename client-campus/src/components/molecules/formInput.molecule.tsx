@@ -26,7 +26,7 @@ const FormInput: React.FC<FormInputProps> = ({
   errorTextStyles,
 }) => {
   return (
-    <div className="mb-4">
+    <div className="mb-1">
       <Label text={label} />
       <Input
         name={name}

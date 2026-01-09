@@ -1,7 +1,7 @@
 import React from "react";
 import type { IButtonProps } from "../../interfaces/buttonProps";
 
-const ButtonRounded: React.FC<IButtonProps> = ({
+const ButtonSquare: React.FC<IButtonProps> = ({
   btnName,
   action,
   icon,
@@ -10,7 +10,7 @@ const ButtonRounded: React.FC<IButtonProps> = ({
 }) => {
   return (
     <button
-      className={`group h-7 w-7 cursor-pointer flex justify-center items-center ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText rounded-full shadowDN`}
+      className={`group h-6 w-6 cursor-pointer flex justify-center items-center ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText border border-lightText dark:border-darkText rounded shadowDN`}
       onClick={action}
       title={btnName}
     >
@@ -19,4 +19,4 @@ const ButtonRounded: React.FC<IButtonProps> = ({
   );
 };
 
-export default ButtonRounded;
+export default ButtonSquare;

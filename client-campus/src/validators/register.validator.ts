@@ -1,5 +1,5 @@
 // src/validators/register.validator.ts
-import type { RegisterFormData } from "../types/registerForm";
+import type { RegisterFormData } from "../interfaces/registerForm";
 
 export const validateRegister = (
   data: RegisterFormData

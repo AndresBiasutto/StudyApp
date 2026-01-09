@@ -5,7 +5,7 @@ import Button from "../../atoms/button.atom";
 
 import { useForm } from "../../../hooks/UseForm";
 import { validateRegister } from "../../../validators/register.validator";
-import type { RegisterFormData } from "../../../types/registerForm";
+import type { RegisterFormData } from "../../../interfaces/registerForm";
 
 const initialState: RegisterFormData = {
   firstName: "",

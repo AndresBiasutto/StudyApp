@@ -12,10 +12,10 @@ const Button: React.FC<IButtonProps> = ({
   return (
           <button
           type={type}
-            className={`shadowDN group cursor-pointer rounded center px-4 text-nowrap py-1 my-2 ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText`}
+            className={`w-full shadowDN group cursor-pointer rounded flex items-center gap-2 justify-start px-4 text-nowrap py-1 my-2 ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText`}
             onClick={action}
           >
-            <i className=" md:group-hover:scale-105">{icon} </i> {btnName}
+            <i className=" md:group-hover:scale-110">{icon} </i> {btnName}
           </button>
   )
 }

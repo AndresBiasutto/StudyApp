@@ -1,6 +1,6 @@
 import React from "react";
 import H3 from "../../atoms/h3.atom";
-import type { formHeader } from "../../../types/registerFormHeader";
+import type { formHeader } from "../../../interfaces/registerFormHeader";
 import Image from "../../atoms/image.atom";
 
 const FormHeader: React.FC<formHeader> = ({ title, image }) => {

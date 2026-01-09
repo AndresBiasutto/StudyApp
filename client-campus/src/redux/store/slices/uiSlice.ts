@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { UiState } from "../../../interfaces/uiState";
 
-
 const initialState: UiState = {
   sidebarOpen: false,
   modalOpen: false,
+  settingsMenuOpen: false,
   isDark: false,
 };
 
@@ -30,6 +30,15 @@ const uiSlice = createSlice({
     closeModal: (state) => {
       state.modalOpen = false;
     },
+    toggleSettingsMenu: (state) => {
+      state.settingsMenuOpen = !state.settingsMenuOpen;
+    },
+    openSettingsMenu: (state) => {
+      state.settingsMenuOpen = true;
+    },
+    closeSettingsMenu: (state) => {
+      state.settingsMenuOpen = false;
+    },
     toggleTheme: (state) => {
       state.isDark = !state.isDark;
     },
@@ -52,6 +61,7 @@ export const {
   toggleTheme,
   setDark,
   setLight,
+  toggleSettingsMenu
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

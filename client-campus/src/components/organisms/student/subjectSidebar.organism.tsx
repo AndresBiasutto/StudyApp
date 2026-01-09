@@ -1,4 +1,4 @@
-import type { subjectSidebar } from "../../../types/subjectSidebar";
+import type { subjectSidebar } from "../../../interfaces/subjectSidebar";
 import H1 from "../../atoms/h1.atom";
 
 // interface Chapter {

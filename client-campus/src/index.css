@@ -15,6 +15,7 @@
   --color-darkDetail: #8B2661;
   --color-darkWarning: #C9320C;
   --color-darkSuccess: #367814;
+  --color-darkLink: #90D5F0;
   --color-lightText: #37382A;
   --color-lightPrimary: #F2F2F2;
   --color-lightSecondary: #A6968D;
@@ -23,44 +24,39 @@
   --color-lightDetail: #D9C6BA;
   --color-lightWarning: #D44C4C;
   --color-lightSuccess: #BDF5A2;
+  --color-lightLink: #55B0D4;
   --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
   --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
   /* ... */
 }
-.center {
-  @apply flex flex-row gap-1 justify-center items-center;
-}
-.centerUp {
-  @apply flex flex-row gap-1 justify-center items-start;
-}
-.centerBottom {
-  @apply flex flex-row gap-1 justify-center items-end;
-}
-.centerLeft {
-  @apply flex flex-row gap-1 justify-start items-center;
-}
-.centerRight {
-  @apply flex flex-row gap-1 justify-end items-center;
-}
-.shadowDN {
-  @apply  hover:border-lightBorder border-lightText dark:border-darkText border dark:hover:border-darkBorder transition ;
-}
 
+
+/* Scrollbar base (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
+/* Fondo de la barra */
 ::-webkit-scrollbar-track {
-  background: #e5e7eb; /* gray-200 */
+  background: transparent; /* o var(--color-primary) */
 }
 
+/* Barra deslizable */
 ::-webkit-scrollbar-thumb {
-  background-color: #64290d; /* gray-400 */
+  background-color: rgba(100, 116, 139, 0.5); /* slate-500 aprox */
   border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #37382A #ffffff00
+/* Hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.8);
 }
+
+/* Eliminar flechas */
+::-webkit-scrollbar-button {
+  display: none;
+}
+

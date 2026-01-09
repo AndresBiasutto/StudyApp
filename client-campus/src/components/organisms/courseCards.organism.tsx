@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CourseCard from "../molecules/cards/courseCard.molecule";
+import CourseCard from "../molecules/cards/chapterCard.molecule";
 import { courses } from "../../Data";
 import Pagination from "../molecules/pagination.molecule";
 import Section from "../molecules/section.molecule";

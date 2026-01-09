@@ -1,5 +1,5 @@
-import type { Chapter } from "./chapter";
-import type { Subject } from "./subject";
+import type { Chapter } from "../types/chapter";
+import type { Subject } from "../types/subject";
 
 export interface subjectSidebar{
   subject: Subject;
