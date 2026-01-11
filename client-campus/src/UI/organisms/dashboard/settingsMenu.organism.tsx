@@ -1,15 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store/store";
+import type { RootState } from "../../../redux/store/store";
 import {
   toggleSettingsMenu,
   toggleTheme,
-} from "../../redux/store/slices/uiSlice";
+} from "../../../redux/store/slices/uiSlice";
 import { FaRegLightbulb } from "react-icons/fa";
 import { BiLogOut } from "react-icons/bi";
 
-import CloseBackground from "../commons/closeBackground.common";
-import Navigation from "../molecules/navigation.molecule";
-import Button from "../atoms/button.atom";
+import CloseBackground from "../../commons/closeBackground.common";
+import Navigation from "../../molecules/navigation.molecule";
+import Button from "../../atoms/button.atom";
 const navItems = [{ navLink: "/settings", name: "settings" }];
 const SettingsMenu = () => {
   const dispatch = useDispatch();

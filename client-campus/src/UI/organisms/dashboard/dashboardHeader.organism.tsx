@@ -1,9 +1,9 @@
-import { toggleSidebar } from "../../redux/store/slices/uiSlice";
-import ButtonRounded from "../atoms/buttonRounded.atom";
+import { toggleSidebar } from "../../../redux/store/slices/uiSlice";
+import ButtonRounded from "../../atoms/buttonRounded.atom";
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 import { useDispatch } from "react-redux";
-import image from "../../assets/monopc.svg";
-import { toggleSettingsMenu } from "../../redux/store/slices/uiSlice";
+import image from "../../../assets/monopc.svg";
+import { toggleSettingsMenu } from "../../../redux/store/slices/uiSlice";
 
 const DashboardHeader = () => {
   const dispatch = useDispatch();

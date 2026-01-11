@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "../components/organisms/sidebar.organism";
-import DashboardHeader from "../components/organisms/dashboardHeader.organism";
-import SettingsMenu from "../components/organisms/settingsMenu.organism";
-import DashboardFooter from "../components/organisms/dashboardFooter.organism";
+import Sidebar from "../organisms/dashboard/sidebar.organism";
+import DashboardHeader from "../organisms/dashboard/dashboardHeader.organism";
+import SettingsMenu from "../organisms/dashboard/settingsMenu.organism";
+import DashboardFooter from "../organisms/dashboard/dashboardFooter.organism";
 const Dashboard = () => {
   return (
     <div className="flex flex-row items-start justify-start">

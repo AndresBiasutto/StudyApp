@@ -4,8 +4,8 @@ import Landing from "./views/landing.view";
 import type { RootState } from "./redux/store/store";
 import { useSelector } from "react-redux";
 import Register from "./views/register.view";
-import Auth from "./layouts/auth.layout";
-import Dashboard from "./layouts/dashboard.layout";
+import Auth from "./UI/templates/auth.layout";
+import Dashboard from "./UI/templates/dashboard.template";
 import CreatorDashboard from "./views/creatorDashboard";
 import StudentDashboard from "./views/studentDashboard.view";
 function App() {

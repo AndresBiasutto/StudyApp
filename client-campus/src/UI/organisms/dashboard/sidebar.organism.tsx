@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store/store";
-import { toggleSidebar } from "../../redux/store/slices/uiSlice";
-import CloseBackground from "../commons/closeBackground.common";
-import Navigation from "../molecules/navigation.molecule";
+import type { RootState } from "../../../redux/store/store";
+import { toggleSidebar } from "../../../redux/store/slices/uiSlice";
+import CloseBackground from "../../commons/closeBackground.common";
+import Navigation from "../../molecules/navigation.molecule";
 
 const navItems = [
   { navLink: "/", name: "inicio" },

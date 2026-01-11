@@ -1,5 +1,5 @@
-import Ptxt from "../atoms/P.atom"
-import LinkTxt from "../atoms/link.atom"
+import Ptxt from "../../atoms/P.atom"
+import LinkTxt from "../../atoms/link.atom"
 
 const DashboardFooter = () => {
   return (
