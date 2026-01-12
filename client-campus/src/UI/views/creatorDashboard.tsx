@@ -1,9 +1,9 @@
 import { useDispatch } from "react-redux";
-import Content from "../UI/molecules/content.molecule";
-import Button from "../UI/atoms/button.atom";
-import { toggleSidebar } from "../redux/store/slices/uiSlice";
+import Content from "../molecules/content.molecule";
+import Button from "../atoms/button.atom";
+import { toggleSidebar } from "../../redux/store/slices/uiSlice";
 import { FaBook } from "react-icons/fa";
-import NewSubject from "../UI/organisms/creator/newSubject.organism";
+import NewSubject from "../organisms/creator/newSubject.organism";
 
 const CreatorDashboard = () => {
   const dispatch = useDispatch();

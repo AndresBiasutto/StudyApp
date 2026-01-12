@@ -1,13 +1,13 @@
 import { Route, Routes } from "react-router-dom";
-import Landing from "./views/landing.view";
+import Landing from "./UI/views/landing.view";
 // import Header from "./components/templates/header.template";
 import type { RootState } from "./redux/store/store";
 import { useSelector } from "react-redux";
-import Register from "./views/register.view";
+import Register from "./UI/views/register.view";
 import Auth from "./UI/templates/auth.layout";
 import Dashboard from "./UI/templates/dashboard.template";
-import CreatorDashboard from "./views/creatorDashboard";
-import StudentDashboard from "./views/studentDashboard.view";
+import CreatorDashboard from "./UI/views/creatorDashboard";
+import StudentDashboard from "./UI/views/studentDashboard.view";
 function App() {
   const { isDark } = useSelector((state: RootState) => state.ui);
   return (

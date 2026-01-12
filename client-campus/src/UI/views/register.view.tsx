@@ -1,9 +1,9 @@
-import NavItem from "../UI/atoms/navItem.atom";
-import GridSection from "../UI/molecules/gridSection.molecule";
-import FormFooter from "../UI/organisms/forms/formFooter.organism";
-import FormHeader from "../UI/organisms/forms/formHeader.organism";
-import RegisterForm from "../UI/organisms/forms/registerForm.organism";
-import logo from "../assets/logo.svg"
+import NavItem from "../atoms/navItem.atom";
+import GridSection from "../molecules/gridSection.molecule";
+import FormFooter from "../organisms/forms/formFooter.organism";
+import FormHeader from "../organisms/forms/formHeader.organism";
+import RegisterForm from "../organisms/forms/registerForm.organism";
+import logo from "../../assets/logo.svg"
 const Register = () => {
   return (
           <div className="flex flex-col items-center-safe justify-center p-6 rounded bg-lightSecondary dark:bg-darkSecondary">  

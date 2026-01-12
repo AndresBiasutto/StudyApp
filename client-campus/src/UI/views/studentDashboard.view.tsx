@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { subject } from "../Data";
-import type { Chapter } from "../types/chapter";
-import SubjectSidebar from "../UI/organisms/student/subjectSidebar.organism";
-import ChapterReader from "../UI/organisms/student/chapterReader.organism";
+import { subject } from "../../Data";
+import type { Chapter } from "../../types/chapter";
+import SubjectSidebar from "../organisms/student/subjectSidebar.organism";
+import ChapterReader from "../organisms/student/chapterReader.organism";
 
 const StudentDashboard = () => {
   const [openUnit, setOpenUnit] = useState<number | null>(null);
