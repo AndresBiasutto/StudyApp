@@ -4,7 +4,7 @@ import FormInput from "../../molecules/formInput.molecule";
 import Button from "../../atoms/button.atom";
 
 import { useForm } from "../../../hooks/UseForm";
-import { validateRegister } from "../../../validators/register.validator";
+import { validateRegister } from "../../../BR/domain/services/validators/register.validator";
 import type { RegisterFormData } from "../../../interfaces/registerForm";
 
 const initialState: RegisterFormData = {

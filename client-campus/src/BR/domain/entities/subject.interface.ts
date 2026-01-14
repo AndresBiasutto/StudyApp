@@ -5,5 +5,5 @@ export interface Subject {
   name: string;
   description: string;
   units: Unit[];
-  subjectState: "pending" | "published";
+  subjectState?: "pending" | "published";
 }

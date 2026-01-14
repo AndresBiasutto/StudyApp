@@ -1,5 +1,5 @@
 import type { SubjectRepository } from "../../domain/services/subjectRepository";
-import type { Subject } from "../../types/subject";
+import type { Subject } from "../../../types/subject";
 
 export class GetSubjectByIdUseCase {
   private repository: SubjectRepository;
