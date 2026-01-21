@@ -1,8 +1,8 @@
-import NavItem from "../atoms/navItem.atom";
-import GridSection from "../molecules/gridSection.molecule";
-import FormFooter from "../organisms/forms/formFooter.organism";
-import FormHeader from "../organisms/forms/formHeader.organism";
-import RegisterForm from "../organisms/forms/registerForm.organism";
+import NavItem from "../components/atoms/navItem.atom";
+import GridSection from "../components/molecules/gridSection.molecule";
+import FormFooter from "../components/organisms/forms/formFooter.organism";
+import FormHeader from "../components/organisms/forms/formHeader.organism";
+import RegisterForm from "../components/organisms/forms/registerForm.organism";
 import logo from "../../assets/logo.svg"
 const Register = () => {
   return (

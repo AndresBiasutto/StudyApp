@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Share+Tech+Mono&family=VT323&display=swap");
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --font-display: "Satoshi", "sans-serif";
+  --font-vt323: "VT323", monospace;
+  --font-pixelify: "Pixelify Sans", sans-serif;
+  --font-sharetech: "Share Tech Mono", monospace;
+  --breakpoint-3xl: 120rem;
+  --color-darkText: #fdffd6;
+  --color-darkPrimary: #0b010a;
+  --color-darkSecondary: #2b164d;
+  --color-darkAccent: #60457e;
+  --color-darkBorder: #4e024b;
+  --color-darkDetail: #8b2661;
+  --color-darkWarning: #c9320c;
+  --color-darkSuccess: #367814;
+  --color-darkLink: #90d5f0;
+  --color-lightText: #37382a;
+  --color-lightPrimary: #f2f2f2;
+  --color-lightSecondary: #a6968d;
+  --color-lightAccent: #bf9393;
+  --color-lightBorder: #d9c1bf;
+  --color-lightDetail: #d9c6ba;
+  --color-lightWarning: #d44c4c;
+  --color-lightSuccess: #bdf5a2;
+  --color-lightLink: #55b0d4;
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+  /* ... */
+}
+
+/* Scrollbar base (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Fondo de la barra */
+::-webkit-scrollbar-track {
+  background: transparent; /* o var(--color-primary) */
+}
+
+/* Barra deslizable */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.5); /* slate-500 aprox */
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* Hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.8);
+}
+
+/* Eliminar flechas */
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+.blurred-element {
+  /* 1. Add a semi-transparent background color (using rgba for transparency) */
+  background: rgba(255, 255, 255, 0.5);
+
+  /* 2. Apply the blur effect to the background behind this element */
+  backdrop-filter: blur(8px);
+
+  /* Optional: vendor prefix for Safari compatibility */
+  -webkit-backdrop-filter: blur(8px);
+
+  /* Other styling for demonstration */
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.blur-filter {
+  background: #4e024b;
+  background: linear-gradient(
+    144deg,
+    rgba(78, 2, 75, 0.7) 0%,
+    rgba(191, 147, 147, 0.42) 50%,
+    rgba(96, 69, 126, 0.8) 100%
+  );
+  backdrop-filter: blur(1px);
+}

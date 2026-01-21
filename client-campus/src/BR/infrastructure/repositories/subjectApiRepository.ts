@@ -3,6 +3,7 @@ import type { SubjectRepository } from "../../domain/services/subjectRepository"
 import { httpClient } from "../services/httpClient";
 
 export class SubjectApiRepository implements SubjectRepository {
+  
   async getAll(): Promise<Subject[]> {
     const { data } = await httpClient.get<Subject[]>("/subjects");
     return data;
