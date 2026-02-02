@@ -1,9 +1,14 @@
 import { useState } from "react";
 import AdminSidebar from "../components/organisms/admin/adminSidebar.organism";
-// import AdminWindow from "../components/organisms/admin/adminWindow.organism";
-import AdminUsersTab from "../components/organisms/admin/adminUsersTab.organism";
+import { Outlet } from "react-router-dom";
+import ButtonRounded from "../components/atoms/buttonRounded.atom";
+import { TbLayoutSidebarRightExpand } from "react-icons/tb";
 
-const tabItems = ["usuarios", "materias", "mensajes"];
+const navItems = [
+  { name: "usuarios", navLink: "/dashboard/admin/users" },
+  { name: "materias", navLink: "/dashboard/admin/subjects" },
+  { name: "mensajes", navLink: "/dashboard/admin/message" },
+];
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -12,25 +17,22 @@ const AdminDashboard = () => {
       <AdminSidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        tabItems={tabItems}
+        navItems={navItems}
         sidebarOpen={sidebarOpen}
         onCloseSidebar={() => setSidebarOpen(false)}
       />
-      {/* <AdminWindow activeTab={activeTab} /> */}
-    <div className="bg-lightPrimary dark:bg-darkPrimary flex flex-col w-full min-h-screen overflow-y-auto md:ml-64">
-      {activeTab === 0 ? (
-        <AdminUsersTab />
-      ) : activeTab === 1 ? (
-        <div className="w-full  flex flex-row justify-center items-center font-sharetech text-lightText dark:text-darkText bg-lightAccent">
-          subjects
-        </div>
-      ) : (
-        <div className="w-full  flex flex-row justify-center items-center font-sharetech text-lightText dark:text-darkText bg-lightAccent">
-          messjes
-        </div>
-      )}
+      <div className="fixed top-1/2 bottom-1/2 left-2 md:hidden">
+        <ButtonRounded
+          btnName={"menu administrador"}
+          bgLight="bg-lightSecondary"
+          bgDark="dark:bg-darkSecondary"
+          action={() => setSidebarOpen(true)}
+          icon={<TbLayoutSidebarRightExpand />}
+        />
       </div>
-
+      <div className="w-full md:mr-64">
+        <Outlet />
+      </div>
     </div>
   );
 };

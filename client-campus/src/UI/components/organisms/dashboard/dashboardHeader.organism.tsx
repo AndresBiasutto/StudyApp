@@ -8,7 +8,7 @@ import { toggleSettingsMenu } from "../../../../store/slices/uiSlice";
 const DashboardHeader = () => {
   const dispatch = useDispatch();
   return (
-    <div className="fixed py-2 px-6 transition-all w-full flex items-center justify-between bg-lightSecondary dark:bg-darkSecondary border-b border-lightBorder dark:border-darkBorder z-30">
+    <div className="fixed py-2 px-6 transition-all w-full flex items-center justify-between bg-lightSecondary dark:bg-darkSecondary border-b border-lightBorder dark:border-darkBorder z-20">
       <ButtonRounded
         btnName="mostrar menu"
         action={() => dispatch(toggleSidebar())}

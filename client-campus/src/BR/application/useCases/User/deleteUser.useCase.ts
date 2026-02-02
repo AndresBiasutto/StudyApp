@@ -10,7 +10,7 @@ export class DeleteUserUseCase {
     this.repository = repository;
   }
 
-  execute(id: number): Promise<void> {
-    return this.repository.delete(id);
+  execute(id_user: string): Promise<void> {
+    return this.repository.delete(id_user);
   }
 }

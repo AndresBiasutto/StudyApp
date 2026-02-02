@@ -9,7 +9,6 @@ class UserRepository {
   async registerUser(data: any) {
     return User.create(data);
   }
-
   async getUser(id_user: string) {
     const data: any = await User.findByPk(id_user, {
       include: [
@@ -20,7 +19,7 @@ class UserRepository {
         {
           model: Subject,
           as: "createdSubjects",
-          attributes: ["name"],
+          attributes: ["id_subject","name", "description"],
         },
       ],
     });
@@ -35,12 +34,26 @@ class UserRepository {
       // password: data.password,
       contact_number: data.contact_number,
       image: data.image,
-      role: data.Role.name,
+      Role: data.Role,
       subjects: data.createdSubjects,
     };
     return formatedData;
   }
-
+  async getSelectedUser(id_user: string) {
+    const selectedUser = await this.getUser(id_user);
+    const formatedData = {
+      id_user: selectedUser.id_user,
+      name: selectedUser.name,
+      last_name: selectedUser.last_name,
+      description: selectedUser.description,
+      e_mail: selectedUser.e_mail,
+      contact_number: selectedUser.contact_number,
+      image: selectedUser.image,
+      Role: selectedUser.Role,
+      subjects: selectedUser.subjects,
+    };
+    return formatedData;
+  }
   async getAllUsers() {
     return User.findAll({
       include: [
@@ -55,6 +68,19 @@ class UserRepository {
         },
       ],
     });
+  }
+  async getAllLiDataUsers() {
+    const users = await this.getAllUsers();
+    const listedUsers = users.map((user: any) => {
+      return {
+        id_user: user.id_user,
+        name: user.name,
+        last_name: user.last_name, 
+        image: user.image,
+        Role: user.Role
+      };
+    });
+    return listedUsers;
   }
 
   async getUserByName(name: string) {
@@ -81,13 +107,11 @@ class UserRepository {
       ],
     });
   }
-
   async updateUser(id_user: string, data: any) {
     const user = await User.findByPk(id_user);
     if (!user) return null;
     return user.update(data);
   }
-
   async deleteUser(id_user: string) {
     return User.destroy({ where: { id_user } });
   }

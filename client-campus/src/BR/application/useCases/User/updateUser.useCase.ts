@@ -8,7 +8,7 @@ export class UpdateUserUseCase {
     this.repository = repository;
   }
 
-  execute(id: number, user: Partial<User>): Promise<User> {
+  execute(id: string, user: Partial<User>): Promise<User> {
     return this.repository.update(id, user);
   }
 }

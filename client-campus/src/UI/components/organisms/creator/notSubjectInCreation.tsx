@@ -10,7 +10,7 @@ const NotSubjectInCreation = () => {
   const dispatch = useDispatch();
 
   return (
-    <div className="w-full flex justify-center items-center">
+    <div className="w-full h-screen flex flex-col justify-start items-center gap-4">
       <H2 text="¿Querés crear una nueva materia?" />
       <Button
         btnName="nueva materia"

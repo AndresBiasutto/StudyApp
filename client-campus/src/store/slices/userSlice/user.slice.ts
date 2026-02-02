@@ -6,6 +6,8 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  fetchListedUsers,
+  fetchSelectedUser
 } from "./user.thunk";
 
 const initialState: UserState = {
@@ -34,11 +36,17 @@ const userSlice = createSlice({
         state.loading = false;
         state.items = action.payload;
       })
+      .addCase(fetchListedUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
+      })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message ?? "Error al obtener subjects";
       })
-
+      .addCase(fetchSelectedUser.fulfilled, (state, action) => {
+        state.selected = action.payload;
+      })
       /* FETCH BY ID */
       .addCase(fetchUserById.fulfilled, (state, action) => {
         state.selected = action.payload;
@@ -52,7 +60,7 @@ const userSlice = createSlice({
       /* UPDATE */
       .addCase(updateUser.fulfilled, (state, action) => {
         const index = state.items.findIndex(
-          (s) => s.id === action.payload.id
+          (s) => s.id_user === action.payload.id_user
         );
         if (index !== -1) {
           state.items[index] = action.payload;
@@ -62,7 +70,7 @@ const userSlice = createSlice({
       /* DELETE */
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.items = state.items.filter(
-          (s) => s.id !== action.payload
+          (s) => s.id_user !== action.payload
         );
       });
   },

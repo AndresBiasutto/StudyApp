@@ -23,7 +23,7 @@ class UserController {
     }
     const matchPassword = await comparePassword(
       data.password,
-      userFound.password
+      userFound.password,
     );
     if (!matchPassword) {
       throw new Error("Contraseña inválida");
@@ -49,8 +49,14 @@ class UserController {
   getUser(id_user: string) {
     return userService.getUser(id_user);
   }
+  getSelectedUser(id_user: string) {
+    return userService.getSelectedUser(id_user);
+  }
   getAllUsers() {
     return userService.getAllUsers();
+  }
+  getAllLiDataUsers() {
+    return userService.getAllLiDataUsers();
   }
   getUserByName(name: string) {
     return userService.getUserByName(name);

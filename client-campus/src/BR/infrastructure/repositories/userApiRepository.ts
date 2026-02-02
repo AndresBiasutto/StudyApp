@@ -8,9 +8,17 @@ export class UserApiRepository implements UserRepository {
     const { data } = await httpClient.get<User[]>("/users");
     return data;
   }
+  async getListed(): Promise<User[]> {
+    const { data } = await httpClient.get<User[]>("/users/liData");
+    return data;
+  }
+  async getUserData(id_user: string): Promise<User>{
+    const { data } = await httpClient.get<User>(`/users/liData/${id_user}`);
+    return data;
+  }
 
-  async getById(id: number): Promise<User> {
-    const { data } = await httpClient.get<User>(`/users/${id}`);
+  async getById(id_user: string): Promise<User> {
+    const { data } = await httpClient.get<User>(`/users/${id_user}`);
     return data;
   }
 
@@ -19,12 +27,12 @@ export class UserApiRepository implements UserRepository {
     return data;
   }
 
-  async update(id: number, user: Partial<User>): Promise<User> {
-    const { data } = await httpClient.put<User>(`/users/${id}`, user);
+  async update(id_user: string, user: Partial<User>): Promise<User> {
+    const { data } = await httpClient.put<User>(`/users/${id_user}`, user);
     return data;
   }
 
-  async delete(id: number): Promise<void> {
-    await httpClient.delete(`/users/${id}`);
+  async delete(id_user: string): Promise<void> {
+    await httpClient.delete(`/users/${id_user}`);
   }
 }

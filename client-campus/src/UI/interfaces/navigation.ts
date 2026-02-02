@@ -1,4 +1,6 @@
+import { navInfo } from "./navInfo";
+
 export interface navigation {
-  navInfo: { navLink: string; name: string; }[];
+  navInfo: navInfo[];
   action: () => void;
 }

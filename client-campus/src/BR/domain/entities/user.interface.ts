@@ -2,13 +2,14 @@ import type { Role } from "./role.interface";
 import type { Subject } from "./subject.interface";
 
 export interface User{
-    id:number;
+    id_user:string;
     name: string;
     last_name: string;
     e_mail: string;
-    contactNumber: string;
+    contact_number: string;
+    description: string;
     image: string;
     Role: Role
-    createdSubjects: Subject[] | [];
+    subjects: Subject[] | [];
     enroledSubjects: Subject[] | [];
 }

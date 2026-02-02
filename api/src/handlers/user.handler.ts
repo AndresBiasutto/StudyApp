@@ -27,35 +27,53 @@ class UserHandler {
       res.status(400).json({ error: err.message });
     }
   }
-async verifyToken(req: Request, res: Response) {
-  try {
-    const token = req.query.token as string;
+  async verifyToken(req: Request, res: Response) {
+    try {
+      const token = req.query.token as string;
 
-    if (!token) {
-      return res.status(400).json({ error: "Token requerido" });
+      if (!token) {
+        return res.status(400).json({ error: "Token requerido" });
+      }
+
+      const message = await userController.verify(token);
+      res.status(200).json({ message });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
     }
+  }
 
-    const message = await userController.verify(token);
-    res.status(200).json({ message });
-
+async getAllUsers(req: Request, res: Response) {
+  try {
+    const users = await userController.getAllUsers();
+    res.json(users);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 }
 
-  async getUser(req: Request, res: Response) {
-    try {
-      const user = await userController.getUser(req.params.id_user);
-      res.json(user);
-    } catch (err: any) {
-      res.status(404).json({ error: err.message });
-    }
+async getUserById(req: Request, res: Response) {
+  try {
+    const user = await userController.getUser(req.params.id_user);
+    res.json(user);
+  } catch (err: any) {
+    res.status(404).json({ error: err.message });
   }
-  async getAllUsers(req: Request, res: Response) {
+}
+async getSelectedUser(req: Request, res: Response) {
+  try {
+    const user = await userController.getSelectedUser(req.params.id_user);
+    res.json(user);
+  } catch (err: any) {
+    res.status(404).json({ error: err.message });
+  }
+}
+
+  async getAllLiDataUsers(req: Request, res: Response) {
     try {
-      const users = await userController.getAllUsers();
-      res.json(users);
+      const li_data = await userController.getAllLiDataUsers();      
+      res.json(li_data);
     } catch (err: any) {
+      console.log(err);
       res.status(404).json({ error: err.message });
     }
   }
@@ -68,7 +86,7 @@ async verifyToken(req: Request, res: Response) {
     try {
       const updated = await userController.updateUser(
         req.params.id_user,
-        req.body
+        req.body,
       );
       res.json(updated);
     } catch (err: any) {

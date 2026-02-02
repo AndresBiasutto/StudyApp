@@ -10,11 +10,11 @@ const ButtonRounded: React.FC<IButtonProps> = ({
 }) => {
   return (
     <button
-      className={`group h-7 w-7 cursor-pointer flex justify-center items-center ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText rounded-full shadowDN`}
+      className={`group h-12 w-12 md:h-7 md:w-7 cursor-pointer flex justify-center items-center ${bgLight} ${bgDark} transition-all font-pixelify text-lightText dark:text-darkText rounded-full shadowDN`}
       onClick={action}
       title={btnName}
     >
-      <i className=" md:group-hover:scale-110">{icon} </i>
+      <i className=" md:group-hover:scale-110 text-2xl md:text-base">{icon} </i>
     </button>
   );
 };

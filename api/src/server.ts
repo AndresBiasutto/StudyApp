@@ -1,4 +1,3 @@
-// src/server.ts
 import app from "./app";
 import { initDb } from "./config/initDb";
 import dotenv from "dotenv";

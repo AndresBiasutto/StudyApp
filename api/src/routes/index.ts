@@ -8,9 +8,9 @@ import MediaRoutes from "./media.route";
 import roleRoutes from "./role.route";
 
 const router = Router();
+router.use("/users", userRoutes);
 
 router.get("/health", healthCheck);
-router.use("/users", userRoutes);
 router.use("/subjects", subjectRoutes);
 router.use("/units", UnitRoutes);
 router.use("/chapters", ChapterRoutes);

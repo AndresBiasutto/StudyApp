@@ -7,7 +7,7 @@ const SearchBar = () => {
       <input
         className="w-full font-vt323 placeholder:italic placeholder:text-gray-600 dark:placeholder:text-gray-400"
         type="search"
-        placeholder="buscar usuario"
+        placeholder="buscar"
       />
       <ButtonSquare
         btnName={"buscar"}

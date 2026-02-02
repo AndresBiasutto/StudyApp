@@ -20,7 +20,6 @@ const SettingsMenu = () => {
         isOpen={settingsMenuOpen}
         action={() => dispatch(toggleSettingsMenu())}
       />
-
       <aside
         className={`fixed right-6 top-14 z-50 flex flex-col justify-end items-end p-2 overflow-y-auto bg-lightPrimary dark:bg-darkPrimary rounded-2xl border border-lightBorder dark:border-darkBorder transform transition duration-300  ${
           settingsMenuOpen ? "translate-x-0" : "translate-x-64"

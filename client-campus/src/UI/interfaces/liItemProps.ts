@@ -1,6 +1,6 @@
-import type {User} from "../../BR/domain/entities/user.interface"
+import { LiItemConfig } from "./liItemConfig";
 
-export interface liItemProps{
-    index: number;
-    item: User;
+export interface liItemProps {
+  index: number;
+  item: LiItemConfig;
 }

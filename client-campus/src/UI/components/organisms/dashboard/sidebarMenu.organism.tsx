@@ -6,9 +6,9 @@ import Navigation from "../../molecules/navigation.molecule";
 
 const navItems = [
   { navLink: "/", name: "inicio" },
-  { navLink: "/dashboard/creatordashboard", name: "crear" },
-  { navLink: "/dashboard/studentdashboard", name: "estudiar" },
-  { navLink: "/dashboard/admindashboard", name: "administrar" },
+  { navLink: "/dashboard/create", name: "crear" },
+  { navLink: "/dashboard/study", name: "estudiar" },
+  { navLink: "/dashboard/admin/users", name: "administrar" },
 ];
 
 const Sidebar = () => {

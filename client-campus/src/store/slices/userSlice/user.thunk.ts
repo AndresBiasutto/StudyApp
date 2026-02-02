@@ -6,6 +6,8 @@ import type { User } from "../../../BR/domain/entities/user.interface";
 import { CreateUserUseCase } from "../../../BR/application/useCases/User/createUser.useCase";
 import { UpdateUserUseCase } from "../../../BR/application/useCases/User/updateUser.useCase";
 import { DeleteUserUseCase } from "../../../BR/application/useCases/User/deleteUser.useCase";
+import { GetListedUsersUseCase } from "../../../BR/application/useCases/User/getListedUsers.useCase";
+import { GetUserData } from "../../../BR/application/useCases/User/getUserData.useCase";
 
 const repository = new UserApiRepository();
 
@@ -17,12 +19,26 @@ export const fetchUsers = createAsyncThunk(
     return await useCase.execute();
   }
 );
+export const fetchListedUsers = createAsyncThunk(
+  "users/fetchListed",
+  async () => {
+    const useCase = new GetListedUsersUseCase(repository);
+    return await useCase.execute();
+  }
+);
 
 /* GET BY ID */
 export const fetchUserById = createAsyncThunk(
   "users/fetchById",
-  async (id: number) => {
+  async (id: string) => {
     const useCase = new GetUserByIdUseCase(repository);
+    return await useCase.execute(id);
+  }
+);
+export const fetchSelectedUser = createAsyncThunk(
+  "users/fetchSelected",
+  async (id: string) => {
+    const useCase = new GetUserData(repository);
     return await useCase.execute(id);
   }
 );
@@ -39,7 +55,7 @@ export const createUser = createAsyncThunk(
 /* UPDATE */
 export const updateUser = createAsyncThunk(
   "users/update",
-  async ({ id, data }: { id: number; data: Partial<User> }) => {
+  async ({ id, data }: { id: string; data: Partial<User> }) => {
     const useCase = new UpdateUserUseCase(repository);
     return await useCase.execute(id, data);
   }
@@ -48,7 +64,7 @@ export const updateUser = createAsyncThunk(
 /* DELETE */
 export const deleteUser = createAsyncThunk(
   "users/delete",
-  async (id: number) => {
+  async (id: string) => {
     const useCase = new DeleteUserUseCase(repository);
     await useCase.execute(id);
     return id;

@@ -65,8 +65,16 @@ class UserService {
     if (!user) throw new Error("User not found");
     return user;
   }
+  async getSelectedUser(id_user: string) {
+    const user = await userRepository.getSelectedUser(id_user);
+    if (!user) throw new Error("User not found");
+    return user;
+  }
   async getAllUsers() {
     return userRepository.getAllUsers();
+  }
+  async getAllLiDataUsers() {
+    return userRepository.getAllLiDataUsers();
   }
   async getUserByName(name: string) {
     return userRepository.getUserByName(name);
