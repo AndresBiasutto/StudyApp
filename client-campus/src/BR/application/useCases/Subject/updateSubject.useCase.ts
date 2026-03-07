@@ -11,7 +11,7 @@ export class UpdateSubjectUseCase {
     this.repository = repository;
   }
 
-  execute(id: number, subject: Partial<Subject>): Promise<Subject> {
+  execute(id: string, subject: Partial<Subject>): Promise<Subject> {
     return this.repository.update(id, subject);
   }
 }

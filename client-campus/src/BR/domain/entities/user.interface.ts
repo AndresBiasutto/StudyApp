@@ -12,4 +12,6 @@ export interface User{
     Role: Role
     subjects: Subject[] | [];
     enroledSubjects: Subject[] | [];
+    token: string;
+    id_role: string;
 }

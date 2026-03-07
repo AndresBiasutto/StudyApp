@@ -1,4 +1,4 @@
-import { LiItemConfig } from "./liItemConfig";
+import type { LiItemConfig } from "./liItemConfig";
 
 export interface liItemProps {
   index: number;

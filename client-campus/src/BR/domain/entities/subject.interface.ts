@@ -1,12 +1,15 @@
-import { UUID } from "crypto";
 import type { Unit } from "./unit.interface";
+import type { Grade } from "./grade.interface";
+import type { Role } from "./role.interface";
+import type { User } from "./user.interface";
 
 export interface Subject {
-  id_subject: UUID;
+  id_subject: string;
   name: string;
-  description: string;
-  imageUrl: string;
-
-  units: Unit[];
-  subjectState?: "pending" | "published";
+  description?: string;
+  imageUrl?: string;
+  Grade: Grade;
+  Role: Role;
+  units?: Unit[] | [];
+  creator?: User;
 }

@@ -8,6 +8,7 @@ import { UpdateUserUseCase } from "../../../BR/application/useCases/User/updateU
 import { DeleteUserUseCase } from "../../../BR/application/useCases/User/deleteUser.useCase";
 import { GetListedUsersUseCase } from "../../../BR/application/useCases/User/getListedUsers.useCase";
 import { GetUserData } from "../../../BR/application/useCases/User/getUserData.useCase";
+import { UpdateRoleUseCase } from "../../../BR/application/useCases/User/updateRole.useCase";
 
 const repository = new UserApiRepository();
 
@@ -26,7 +27,13 @@ export const fetchListedUsers = createAsyncThunk(
     return await useCase.execute();
   }
 );
-
+export const updateRole = createAsyncThunk(
+  "users/updateRole",
+  async ({ id_user, id_role }: { id_user: string; id_role: string }) => {
+    const useCase = new UpdateRoleUseCase(repository);
+    return await useCase.execute(id_user, id_role);
+  }
+);
 /* GET BY ID */
 export const fetchUserById = createAsyncThunk(
   "users/fetchById",

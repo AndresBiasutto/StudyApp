@@ -10,10 +10,19 @@ import { BiLogOut } from "react-icons/bi";
 import CloseBackground from "../../molecules/closeBackground.molecule";
 import Navigation from "../../molecules/navigation.molecule";
 import Button from "../../atoms/button.atom";
+import { logout } from "../../../../store/slices/authSlice/auth.slice";
+import { useNavigate } from "react-router-dom";
 const navItems = [{ navLink: "/settings", name: "settings" }];
 const SettingsMenu = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { settingsMenuOpen } = useSelector((state: RootState) => state.ui);
+
+  const handleExit = () => {
+    dispatch(toggleSettingsMenu())
+    dispatch(logout());
+    navigate("/");
+  };
   return (
     <>
       <CloseBackground
@@ -38,7 +47,7 @@ const SettingsMenu = () => {
         />
         <Button
           btnName="salir"
-          action={() => alert("salir")}
+          action={() => handleExit()}
           icon={<BiLogOut />}
           bgLight="bg-lightWarning"
           bgDark="dark:bg-darkWarning"

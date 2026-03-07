@@ -8,7 +8,7 @@ export class CreateSubjectUseCase {
     this.repository = repository;
   }
 
-  execute(subject: Omit<Subject, "id">): Promise<Subject> {
+  execute(subject: Partial<Subject> ): Promise<Subject> {
     return this.repository.create(subject);
   }
 }

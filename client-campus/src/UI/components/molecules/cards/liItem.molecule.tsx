@@ -1,5 +1,4 @@
-import { RiProfileLine } from "react-icons/ri";
-import ButtonSquare from "../../atoms/buttonSquare.atom";
+
 import Ptxt from "../../atoms/P.atom";
 import Span from "../../atoms/span.atom";
 import type { liItemProps } from "../../../interfaces/liItemProps";
@@ -27,16 +26,11 @@ const LiItem: React.FC<liItemProps> = ({ index, item }) => {
         </div>
 
         <div className="col-span-3">
-          <Span text={item.description ?? "-"} />
+          <Span text={item.Role ? item.Role: item.Grade } />
         </div>
 
         <div className="col-span-1 flex justify-end">
-          <ButtonSquare
-            btnName="perfil"
-            icon={<RiProfileLine />}
-            bgLight="bg-lightSecondary"
-            bgDark="dark:bg-darkSecondary"
-          />
+
         </div>
       </NavLink>
     </li>

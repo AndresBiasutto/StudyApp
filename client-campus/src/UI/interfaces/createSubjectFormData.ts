@@ -1,7 +1,5 @@
 export interface createSubjectFormData {
-  id: string;
   name: string;
-  description: string;
-  subjectState: string | string;
+  id_grade: string;
   [key: string]: string;
 }

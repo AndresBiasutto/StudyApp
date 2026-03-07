@@ -30,7 +30,7 @@ export const fetchSubjectById = createAsyncThunk(
 /* CREATE */
 export const createSubject = createAsyncThunk(
   "subjects/create",
-  async (subject: Omit<Subject, "id">) => {
+  async (subject: Partial<Subject> ) => {
     const useCase = new CreateSubjectUseCase(repository);
     return await useCase.execute(subject);
   }
@@ -39,7 +39,7 @@ export const createSubject = createAsyncThunk(
 /* UPDATE */
 export const updateSubject = createAsyncThunk(
   "subjects/update",
-  async ({ id, data }: { id: number; data: Partial<Subject> }) => {
+  async ({ id, data }: { id: string; data: Partial<Subject> }) => {
     const useCase = new UpdateSubjectUseCase(repository);
     return await useCase.execute(id, data);
   }
@@ -48,7 +48,7 @@ export const updateSubject = createAsyncThunk(
 /* DELETE */
 export const deleteSubject = createAsyncThunk(
   "subjects/delete",
-  async (id: number) => {
+  async (id: string) => {
     const useCase = new DeleteSubjectUseCase(repository);
     await useCase.execute(id);
     return id;

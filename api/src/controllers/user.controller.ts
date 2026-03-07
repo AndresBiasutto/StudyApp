@@ -1,3 +1,4 @@
+import { error } from "console";
 import userService from "../services/user.service";
 import comparePassword from "../utils/comparePassword";
 
@@ -15,7 +16,6 @@ class UserController {
     }
     return userService.registerUser(newUser);
   }
-
   async loginUser(data: any) {
     const userFound: any = await userService.getUserByEmail(data.e_mail);
     if (!userFound) {
@@ -34,9 +34,14 @@ class UserController {
     }
     return userService.loginUser(data);
   }
-
   createUser(newUser: object) {
     return userService.createUser(newUser);
+  }
+  authUser(token: string) {
+    return userService.authUser(token);
+  }
+  getMe(id_user: string) {
+    return userService.getMe(id_user);
   }
   async verify(token: any) {
     const user = await userService.findByToken(token);
@@ -45,7 +50,6 @@ class UserController {
     }
     return userService.verify(token);
   }
-
   getUser(id_user: string) {
     return userService.getUser(id_user);
   }
@@ -63,6 +67,15 @@ class UserController {
   }
   updateUser(id_user: string, data: object) {
     return userService.updateUser(id_user, data);
+  }
+  updateUserRole(id_user: string, id_role: string) {
+    if (!id_role) {
+      throw new Error("id_role es necesario");
+    }
+    if (!id_user) {
+      throw new Error("id_user es necesario");
+    }
+    return userService.updateUserRole(id_user, id_role);
   }
   deleteUser(id_user: string) {
     userService.deleteUser(id_user);

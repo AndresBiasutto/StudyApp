@@ -9,7 +9,7 @@ export class DeleteSubjectUseCase {
     this.repository = repository;
   }
 
-  execute(id: number): Promise<void> {
+  execute(id: string): Promise<void> {
     return this.repository.delete(id);
   }
 }

@@ -1,11 +1,32 @@
 import sequelize from "../config/database";
-
+import { UserEntity } from "./entities/userEntity.entity";
+import { mapUserModelToEntity } from "./mappers/user.mapper";
 const { User, Role, Subject } = sequelize.models;
 
 class UserRepository {
   async createUser(data: any) {
     return User.create(data);
   }
+  async findOrCreateGoogleUser(data: any): Promise<UserEntity> {
+    const { e_mail } = data;
+
+    const existingUser = await User.findOne({
+      where: { e_mail },
+      include: [{ model: Role }],
+    });
+
+    if (existingUser) return mapUserModelToEntity(existingUser) as UserEntity;
+    const defaultRole: any = await Role.findOne({ where: { name: "user" } });
+
+    const newUser = await User.create({
+      ...data,
+      id_role: defaultRole.id_role,
+      provider: "google",
+    });
+
+    return mapUserModelToEntity(newUser);
+  }
+
   async registerUser(data: any) {
     return User.create(data);
   }
@@ -19,7 +40,7 @@ class UserRepository {
         {
           model: Subject,
           as: "createdSubjects",
-          attributes: ["id_subject","name", "description"],
+          attributes: ["id_subject", "name", "description"],
         },
       ],
     });
@@ -36,6 +57,7 @@ class UserRepository {
       image: data.image,
       Role: data.Role,
       subjects: data.createdSubjects,
+      id_role: data.id_role
     };
     return formatedData;
   }
@@ -75,14 +97,13 @@ class UserRepository {
       return {
         id_user: user.id_user,
         name: user.name,
-        last_name: user.last_name, 
+        last_name: user.last_name,
         image: user.image,
-        Role: user.Role
+        Role: user.Role,
       };
     });
     return listedUsers;
   }
-
   async getUserByName(name: string) {
     return User.findOne({ where: { name } });
   }
@@ -111,6 +132,23 @@ class UserRepository {
     const user = await User.findByPk(id_user);
     if (!user) return null;
     return user.update(data);
+  }
+  async updateUserRole(id_user: string, roleUpdated: object) {
+    const user = await User.findByPk(id_user, {
+      include: [
+        {
+          model: Role,
+          attributes: ["name"],
+        },
+        {
+          model: Subject,
+          as: "createdSubjects",
+          attributes: ["id_subject", "name", "description"],
+        },
+      ],
+    });
+    if (!user) return null;
+    return user.update(roleUpdated);
   }
   async deleteUser(id_user: string) {
     return User.destroy({ where: { id_user } });

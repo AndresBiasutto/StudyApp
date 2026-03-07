@@ -1,5 +1,5 @@
 import React from "react";
-import { navInfo } from "./navInfo";
+import type { navInfo } from "./navInfo";
 
 export interface adminSidebar {
   sidebarOpen: boolean;

@@ -1,0 +1,28 @@
+import { useEffect } from "react";
+import { fetchSubjects } from "../../../../store/slices/subjectSlice/subject.thunk";
+
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../hooks/UseStore.hook";
+
+import SubjectLi from "../../molecules/cards/subjectLi.molecule";
+
+const AdminSubjectList = () => {
+  const { items, loading, error } = useAppSelector((state) => state.subjects);
+  const appDispatch = useAppDispatch();
+  useEffect(() => {
+    appDispatch(fetchSubjects());
+  }, [appDispatch]);
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>{error}</p>;
+  return (
+      <ul className="w-full max-h-96 overflow-y-scroll flex flex-col items-start gap-2 justify-start border border-lightBorder dark:border-darkBorder rounded">
+        {items.map((item, index) => (
+          <SubjectLi key={index} item={item} />
+        ))}
+      </ul>
+  );
+};
+
+export default AdminSubjectList;

@@ -1,4 +1,4 @@
-import { User } from "../../../BR/domain/entities/user.interface";
+import type { User } from "../../../BR/domain/entities/user.interface";
 
 export interface UserState {
   items: User[];

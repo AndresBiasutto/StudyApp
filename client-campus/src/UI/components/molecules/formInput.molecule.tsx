@@ -40,5 +40,4 @@ const FormInput: React.FC<FormInputProps> = ({
     </div>
   );
 };
-
 export default FormInput;

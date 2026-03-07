@@ -10,7 +10,6 @@ export class GetListedUsersUseCase {
   }
 
   execute(): Promise<User[]> {
-    console.log(this.repository.getListed());
     return this.repository.getListed();
   }
 }

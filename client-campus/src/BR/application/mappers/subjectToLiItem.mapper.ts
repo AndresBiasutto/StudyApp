@@ -5,5 +5,5 @@ export const subjectToLiItem = (subject: Subject): LiItemViewModel => ({
   id: subject.id_subject,
   image: subject.imageUrl,
   name: subject.name,
-  description: subject.subjectState ?? "pending",
+  description: subject.description ?? "-",
 });

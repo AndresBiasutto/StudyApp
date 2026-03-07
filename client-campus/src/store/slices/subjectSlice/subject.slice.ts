@@ -52,7 +52,7 @@ const subjectSlice = createSlice({
       /* UPDATE */
       .addCase(updateSubject.fulfilled, (state, action) => {
         const index = state.items.findIndex(
-          (s) => s.id === action.payload.id
+          (s) => s.id_subject === action.payload.id_subject
         );
         if (index !== -1) {
           state.items[index] = action.payload;
@@ -62,7 +62,7 @@ const subjectSlice = createSlice({
       /* DELETE */
       .addCase(deleteSubject.fulfilled, (state, action) => {
         state.items = state.items.filter(
-          (s) => s.id !== action.payload
+          (s) => s.id_subject !== action.payload
         );
       });
   },

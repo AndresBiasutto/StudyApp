@@ -7,7 +7,8 @@ import {
   updateUser,
   deleteUser,
   fetchListedUsers,
-  fetchSelectedUser
+  fetchSelectedUser,
+  updateRole,
 } from "./user.thunk";
 
 const initialState: UserState = {
@@ -60,18 +61,30 @@ const userSlice = createSlice({
       /* UPDATE */
       .addCase(updateUser.fulfilled, (state, action) => {
         const index = state.items.findIndex(
-          (s) => s.id_user === action.payload.id_user
+          (s) => s.id_user === action.payload.id_user,
         );
         if (index !== -1) {
           state.items[index] = action.payload;
         }
       })
+      .addCase(updateRole.fulfilled, (state, action) => {
+        const index = state.items.findIndex(
+          (s) => s.id_user === action.payload.id_user,
+        );
+
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+
+        // 🔥 ESTA LÍNEA ES LA QUE TE FALTA
+        if (state.selected?.id_user === action.payload.id_user) {
+          state.selected = action.payload;
+        }
+      })
 
       /* DELETE */
       .addCase(deleteUser.fulfilled, (state, action) => {
-        state.items = state.items.filter(
-          (s) => s.id_user !== action.payload
-        );
+        state.items = state.items.filter((s) => s.id_user !== action.payload);
       });
   },
 });

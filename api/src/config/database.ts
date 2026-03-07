@@ -33,14 +33,17 @@ fs.readdirSync(modelsDir)
     modelDefiners.push(defineModel);
   });
 modelDefiners.forEach((defineModel) => defineModel(sequelize));
-const { User, Subject, Role, Unit, Chapter, Video, Image } = sequelize.models;
+const { User, Subject, Role, Grade, Unit, Chapter, Video, Image } = sequelize.models;
 
-
-if (User && Subject && Role) {
+if (User && Subject && Role && Grade && Unit && Chapter && Video && Image) {
   User.belongsTo(Role, { foreignKey: "id_role" });
+  Subject.belongsTo(Grade, { foreignKey: "id_grade" });
 
   User.hasMany(Subject, { as: "createdSubjects", foreignKey: "id_user" });
   Subject.belongsTo(User, { as: "creator", foreignKey: "id_user" });
+
+  User.hasMany(Subject, { as: "enrolledSubjects", foreignKey: "id_user" });
+  Subject.belongsTo(User, { as: "student", foreignKey: "id_user" });
 
   Subject.hasMany(Unit, { as: "createdUnits", foreignKey: "id_subject" });
   Unit.belongsTo(Subject, { as: "subjectUnits", foreignKey: "id_subject" });
@@ -54,7 +57,7 @@ if (User && Subject && Role) {
   Chapter.hasMany(Image, { as: "createdImages", foreignKey: "id_chapter" });
   Image.belongsTo(Chapter, { as: "ChapterImages", foreignKey: "id_chapter" });
 } else {
-  console.error("❌ ERROR: User o Subject no están definidos.");
+  console.error("❌ ERROR: algún modelo no está definido.");
 }
 
 export default sequelize;

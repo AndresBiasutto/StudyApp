@@ -1,4 +1,4 @@
-import { Subject } from "../../domain/entities/subject.interface";
+import type { Subject } from "../../domain/entities/subject.interface";
 
 export interface UserDetail {
   id: string;

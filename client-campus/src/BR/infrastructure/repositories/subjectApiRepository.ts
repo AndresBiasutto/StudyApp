@@ -9,22 +9,22 @@ export class SubjectApiRepository implements SubjectRepository {
     return data;
   }
 
-  async getById(id: number): Promise<Subject> {
+  async getById(id: string): Promise<Subject> {
     const { data } = await httpClient.get<Subject>(`/subjects/${id}`);
     return data;
   }
 
-  async create(subject: Omit<Subject, "id">): Promise<Subject> {
+  async create(subject: Partial<Subject> ): Promise<Subject> {
     const { data } = await httpClient.post<Subject>("/subjects", subject);
     return data;
   }
 
-  async update(id: number, subject: Partial<Subject>): Promise<Subject> {
+  async update(id: string, subject: Partial<Subject>): Promise<Subject> {
     const { data } = await httpClient.put<Subject>(`/subjects/${id}`, subject);
     return data;
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await httpClient.delete(`/subjects/${id}`);
   }
 }

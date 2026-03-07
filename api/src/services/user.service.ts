@@ -3,10 +3,46 @@ import sendVerificationEmail from "../utils/sendVerificationEmail";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import userRepository from "../repositories/user.repository";
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 class UserService {
+  async authUser(googleToken: string) {
+    const ticket = await client.verifyIdToken({
+      idToken: googleToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload?.email) {
+      throw new Error("Token de Google inválido");
+    }
+
+    const user = await userRepository.findOrCreateGoogleUser({
+      e_mail: payload.email,
+      name: payload.given_name,
+      last_name: payload.family_name,
+      image: payload.picture,
+    });
+
+    const SECRET = process.env.SECRET as string;
+    const jwtToken = jwt.sign({ id_user: user.id_user }, SECRET, {
+      expiresIn: "1d",
+    });
+    const response = {
+      ...user,
+      token: jwtToken,
+    };
+    console.log("Usuario autenticado con Google:", response);
+    return response;
+  }
+
+  async getMe(id_user: string) {
+    return userRepository.getUser(id_user);
+  }
+
   async createUser(data: any) {
-    console.log(data);
     return userRepository.createUser(data);
   }
   async registerUser(data: any) {
@@ -43,7 +79,7 @@ class UserService {
       contactNumber: user.contactNumber,
       description: user.description,
       role: user.Role,
-      createdSubjects: user.createdSubjects
+      createdSubjects: user.createdSubjects,
     };
     return response;
   }
@@ -86,6 +122,20 @@ class UserService {
     const user = await userRepository.updateUser(id_user, data);
     if (!user) throw new Error("User not found");
     return user;
+  }
+  async updateUserRole(id_user: string, id_role: string) {
+    const usertoUpdateRole = this.getUser(id_user);
+    const roleUpdated = {
+      ...usertoUpdateRole,
+      id_role,
+    };
+    const userRoleUpdated = await userRepository.updateUserRole(
+      id_user,
+      roleUpdated,
+    );
+    console.log(userRoleUpdated)
+    if (!usertoUpdateRole) throw new Error("User not found");
+    return userRoleUpdated;
   }
   async deleteUser(id_user: string) {
     const deleted = await userRepository.deleteUser(id_user);

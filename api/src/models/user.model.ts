@@ -11,9 +11,6 @@ export default (sequelize: Sequelize) => {
     last_name: DataTypes.STRING,
     description: DataTypes.STRING,
     e_mail: { type: DataTypes.STRING, allowNull: false, unique: true },
-    e_mail_verified: { type: DataTypes.BOOLEAN, defaultValue: false },
-    verification_token: DataTypes.STRING,
-    password: DataTypes.STRING,
     contact_number: DataTypes.STRING,
     image: DataTypes.STRING,
   });

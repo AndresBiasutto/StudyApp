@@ -1,14 +1,20 @@
 import sequelize from "../config/database";
-const { User, Subject, Unit } = sequelize.models;
+const { User, Subject, Unit, Grade } = sequelize.models;
 
 class SubjectRepository {
-
   async createSubject(data: any) {
     return await Subject.create(data);
   }
 
   async getSubject(id: string) {
-    return await Subject.findByPk(id);
+    return await Subject.findByPk(id, {
+      include: [
+        {
+          model: Grade,
+          attributes: ["id_grade", "name"],
+        },
+      ],
+    });
   }
 
   async getAllSubjects() {
@@ -23,7 +29,11 @@ class SubjectRepository {
         {
           model: Unit,
           as: "createdUnits",
-          attributes: ["order","name"],
+          attributes: ["order", "name"],
+        },
+        {
+          model: Grade,
+          attributes: ["id_grade", "name"],
         },
       ],
     });
