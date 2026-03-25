@@ -6,6 +6,11 @@ const initialState: UiState = {
   modalOpen: false,
   settingsMenuOpen: false,
   isDark: false,
+  modalContent:{
+    type: "",
+    data: null,
+    title: ""
+  }
 };
 
 const uiSlice = createSlice({
@@ -33,6 +38,9 @@ const uiSlice = createSlice({
     toggleSettingsMenu: (state) => {
       state.settingsMenuOpen = !state.settingsMenuOpen;
     },
+    setModalContent: (state, action) =>{
+      state.modalContent = action.payload;
+    },
     openSettingsMenu: (state) => {
       state.settingsMenuOpen = true;
     },
@@ -58,6 +66,7 @@ export const {
   toggleModal,
   openModal,
   closeModal,
+  setModalContent,
   toggleTheme,
   setDark,
   setLight,

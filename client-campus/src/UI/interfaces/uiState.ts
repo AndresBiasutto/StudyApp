@@ -3,4 +3,9 @@ export interface UiState {
   modalOpen: boolean;
   isDark: boolean;
   settingsMenuOpen: boolean;
+  modalContent:{
+    type:string;
+    data: null ;
+    title:string;
+  }
 }

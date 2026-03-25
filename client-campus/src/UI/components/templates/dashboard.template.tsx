@@ -5,6 +5,7 @@ import SettingsMenu from "../organisms/dashboard/settingsMenu.organism";
 import DashboardFooter from "../organisms/dashboard/dashboardFooter.organism";
 import { useAppSelector } from "../../../hooks/UseStore.hook";
 import type { RootState } from "../../../store/store";
+import FormInModal from "../organisms/forms/formInModal.organism";
 const Dashboard = () => {
     const { sidebarOpen } = useAppSelector((state: RootState) => state.ui);
   
@@ -13,6 +14,7 @@ const Dashboard = () => {
       <SidebarMenu />
       <div className=" bg-lightPrimary dark:bg-darkPrimary flex flex-col justify-start items-center w-full min-h-screen overflow-y-auto">
         <DashboardHeader />
+        <FormInModal />
         <div className={`min-h-screen w-full md:w-2/3 transition-all mt-12 ${sidebarOpen ? "md:ml-64" : "md:ml-0"}`}>
           <SettingsMenu />
           <Outlet />
