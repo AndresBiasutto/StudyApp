@@ -18,7 +18,7 @@ const AdminSubjectList = () => {
   if (error) return <p>{error}</p>;
   return (
       <ul className="w-full max-h-96 overflow-y-scroll flex flex-col items-start gap-2 justify-start border border-lightBorder dark:border-darkBorder rounded">
-        {items.map((item, index) => (
+        {items.map((item , index) => (
           <SubjectUl key={index} item={item} />
         ))}
       </ul>

@@ -5,7 +5,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../hooks/UseStore.hook";
-import { fetchUsers } from "../../../../../store/slices/authSlice/auth.thunk";
+import { fetchUsers } from "../../../../../store/slices/userSlice/user.thunk";
 import { useForm } from "../../../../../hooks/UseForm.hook";
 import Spinner from "../../../molecules/spinner.molecule";
 import { toggleModal } from "../../../../../store/slices/uiSlice";
@@ -18,8 +18,7 @@ import type { User } from "../../../../../BR/domain/entities/user.interface";
 import { updateSubject } from "../../../../../store/slices/subjectSlice/subject.thunk";
 
 interface UpdateUserFormValues {
-  id_teacher: string;
-  id_subject: string;
+  id_user: string;
   [key: string]: string;
 }
 
@@ -28,14 +27,13 @@ interface UpdateSubjectFormProps {
 }
 
 const initialState: UpdateUserFormValues = {
-  id_teacher: "",
-  id_subject: "",
+  id_user: "",
 };
 
 const validate = (data: UpdateUserFormValues) => {
   const errors: Partial<Record<keyof UpdateUserFormValues, string>> = {};
-  if (!data.id_teacher) {
-    errors.id_teacher = "Debe seleccionar un profesor";
+  if (!data.id_user) {
+    errors.id_user = "Debe seleccionar un profesor";
   }
   return errors;
 };
@@ -50,9 +48,11 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
     error,
   } = useAppSelector((state) => state.users);
 
-  const users = userState.map((user: User) => ({
+  const users = userState
+    .filter((user: User) => user.Role?.name === "teacher")
+    .map((user: User) => ({
     id: user.id_user,
-    name: user.name,
+    name: `${user.name} ${user.last_name}`,
   }));
 
   const { values, errors, handleChange, handleSubmit } =
@@ -66,18 +66,20 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
   if (error) return <p>{error}</p>;
 
   const onSubmit = async (data: UpdateUserFormValues) => {
-    dispatch(
+    const result = await dispatch(
       updateSubject({
         id: item?.id_subject || "",
         data,
-      }),
+      })
     );
-    console.log("datos enviados" ,data);
+
+    if (updateSubject.fulfilled.match(result)) {
       setUpdateSuccess(true);
       setTimeout(() => {
         dispatch(toggleModal());
         setUpdateSuccess(false);
       }, 1500);
+    }
   };
 
   //   const inputBaseStyles =
@@ -93,11 +95,11 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
     >
       <FormSelect
         label="Asignar profesor"
-        name="id_teacher"
-        value={values.id_teacher}
+        name="id_user"
+        value={values.id_user}
         handleChange={handleChange}
         items={users}
-        error={errors.id_teacher}
+        error={errors.id_user}
       />
 
       <Button
@@ -112,7 +114,7 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
         <div className="mt-4 flex justify-center">
           <Ptxt
             aditionalStyle="bg-lightLink dark:bg-darkLink rounded p-1"
-            text="Materia editada exitosamente"
+            text="Profesor asignado exitosamente"
           />
         </div>
       )}

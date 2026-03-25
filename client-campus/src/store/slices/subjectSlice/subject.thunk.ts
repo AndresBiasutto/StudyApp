@@ -39,9 +39,18 @@ export const createSubject = createAsyncThunk(
 /* UPDATE */
 export const updateSubject = createAsyncThunk(
   "subjects/update",
-  async ({ id, data }: { id: string; data: Partial<Subject> }) => {
+  async (
+    { id, data }: { id: string; data: Partial<Subject> },
+    { dispatch }
+  ) => {
     const useCase = new UpdateSubjectUseCase(repository);
-    return await useCase.execute(id, data);
+    const updatedSubject = await useCase.execute(id, data);
+    const refreshedSubjects = await dispatch(fetchSubjects()).unwrap();
+
+    return (
+      refreshedSubjects.find((subject) => subject.id_subject === id) ??
+      updatedSubject
+    );
   }
 );
 
