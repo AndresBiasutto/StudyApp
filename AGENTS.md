@@ -1,187 +1,289 @@
 # AGENTS.md: Guidelines for Agent Contributions
 
 ## Introduction
-This file is a guide for agents (or automated intelligence) working in this repository. It contains essential commands, code style guidelines, and best practices for maintaining the `/api` backend of the Campus Virtual Project.
+This file is a guide for agents (or automated intelligence) working in this repository. It contains essential commands, code style guidelines, and best practices for maintaining both projects of the Campus Virtual:
+- `/api` - Backend (Node.js/Express)
+- `/client-campus` - Frontend (React/Vite)
 
 ---
 
-## 1. Build, Lint, and Test Commands
+## 1. Project Structure
 
-### Setup
-Before starting: Ensure all dependencies are installed via npm:
+### Backend (`/api`)
+```
+api/
+├── src/
+│   ├── routes/
+│   ├── controllers/
+│   ├── services/
+│   ├── repositories/
+│   ├── middlewares/
+│   └── index.ts
+├── package.json
+└── .env
+```
+
+### Frontend (`/client-campus`)
+```
+client-campus/
+├── src/
+│   ├── BR/                    # Clean Architecture
+│   │   ├── application/       # Use Cases, Mappers, ViewModels
+│   │   ├── domain/            # Entities, Repository Interfaces
+│   │   └── infrastructure/   # API Repositories, httpClient
+│   ├── UI/                    # Presentation Layer
+│   │   ├── components/       # Atomic Design (atoms, molecules, organisms)
+│   │   ├── views/             # Pages
+│   │   └── interfaces/        # Props interfaces
+│   ├── store/                 # Redux Toolkit
+│   │   └── slices/
+│   ├── routes/                # Routing
+│   └── hooks/                 # Custom hooks
+├── package.json
+├── vite.config.ts
+└── tsconfig.json
+```
+
+---
+
+## 2. Commands
+
+### 2.1 Backend Commands
+
+#### Setup
 ```bash
+cd api
 npm install
 ```
 
-### Build the Project
-Compile the TypeScript code into JavaScript (output to `dist/`):
+#### Build
 ```bash
 npm run build
 ```
 
-### Run the Development Server
-Start the development server with hot reload:
+#### Run Development Server
 ```bash
 npm run dev
 ```
 
-### Testing
-Run all Jest tests:
+#### Testing
 ```bash
 npm test
-```
-
-Run tests in watch mode:
-```bash
 npm run test:watch
-```
-
-Run a single test file (replace `example.test.ts` with the file name):
-```bash
 npx jest path/to/example.test.ts
-```
-
-Check test coverage:
-```bash
 npm run test:coverage
 ```
 
-### Code Lint
-Lint the TypeScript code:
+#### Lint
 ```bash
 ts-node ./node_modules/.bin/eslint .
 ```
 
-### Type Checking
-Run the TypeScript compiler to ensure type safety without building:
+#### Type Check
 ```bash
 npx tsc --noEmit
 ```
 
 ---
 
-## 2. Code Style Guidelines
+### 2.2 Frontend Commands
 
-### 2.1 Imports
-- Group imports in the following order:
-  1. Node.js core modules (e.g., `fs`, `path`).
-  2. External dependencies (e.g., `express`, `dotenv`).
-  3. Internal modules (e.g., `./routes`, `../services`).
-- Use absolute paths for imports where possible, utilizing `tsconfig.json` `paths` mapping.
+#### Setup
+```bash
+cd client-campus
+npm install
+```
 
-### 2.2 Formatting
-- Indentation: Use **2 spaces** per level.
-- Line length: **120 characters** max.
-- Always use **single quotes** for strings (`'single'`).
-- End files with a single newline.
-- Use trailing commas for multiline objects/arrays.
+#### Build
+```bash
+npm run build
+```
 
-### 2.3 TypeScript Conventions
-- Always use strict typing: Avoid using `any`.
-- Prefer `interface` over `type` unless unions or advanced typing are required.
-- Use `unknown` for untrusted inputs; validate and narrow types before use.
-- Define function return types explicitly.
-- Example of strict typing:
-  ```typescript
-  interface User {
-      id: number;
-      name: string;
-  }
-  const greet = (user: User): string => `Hello, ${user.name}`;
-  ```
+#### Run Development Server
+```bash
+npm run dev
+```
 
-### 2.4 Naming Conventions
-- **Files**: Use kebab-case for files (e.g., `user-repository.ts`).
-- **Variables**: Use camelCase for variables (e.g., `userProfile`).
-- **Classes**: Use PascalCase for classes (e.g., `UserService`).
-- **Constants**: Use UPPER_SNAKE_CASE for constants (e.g., `API_SECRET`).
-- **Interfaces**: Prefix with `I` (e.g., `IUser`, `IService`).
+#### Lint
+```bash
+npm run lint
+```
 
-### 2.5 Error Handling
-- Use `try...catch` for all asynchronous operations.
-- Throw custom errors for predictable issues (e.g., validation).
-  ```typescript
-  throw new ValidationError('Email is invalid');
-  ```
-- Define an error-handling middleware for global error logging and client response.
+#### Preview Production Build
+```bash
+npm run preview
+```
 
----
-
-## 3. Testing Practices
-- Place tests alongside implementation in `src/tests/`.
-- Use descriptive test names (e.g., `should_create_user_with_valid_data`).
-- Use mocks for external services (e.g., database queries, email services).
-- Avoid testing implementation details; focus on behavior and outcomes.
-
-Example test structure:
-```typescript
-describe('User Service', () => {
-    it('should create user with valid data', async () => {
-        // Arrange
-        const data = { name: 'John' };
-
-        // Act
-        const result = await UserService.create(data);
-
-        // Assert
-        expect(result).toHaveProperty('id');
-    });
-});
+#### Type Check
+```bash
+npx tsc --noEmit
 ```
 
 ---
 
-## 4. Development Best Practices
+## 3. Code Style Guidelines
 
-### Environment Variables
-- Store sensitive data (like credentials) in `.env`.
-- Example:
-  ```plaintext
-  DB_NAME=campus
-  DB_USER=postgres
-  DB_PASS=1234
-  PORT=3000
-  GOOGLE_CLIENT_ID=your-client-id
-  ```
+### 3.1 Backend Conventions
+
+#### Imports
+Group imports in this order:
+1. Node.js core modules (e.g., `fs`, `path`)
+2. External dependencies (e.g., `express`, `dotenv`)
+3. Internal modules (e.g., `./routes`, `../services`)
+
+#### Formatting
+- Indentation: **2 spaces**
+- Line length: **120 characters** max
+- Single quotes for strings
+- Trailing commas for multiline objects/arrays
+
+#### TypeScript
+- Avoid `any`, use `unknown` for untrusted inputs
+- Prefer `interface` over `type`
+- Define function return types explicitly
+
+#### Naming
+- Files: kebab-case (`user-repository.ts`)
+- Variables: camelCase (`userProfile`)
+- Classes: PascalCase (`UserService`)
+- Constants: UPPER_SNAKE_CASE (`API_SECRET`)
+- Interfaces: Prefix with `I` (`IUser`, `IService`)
+
+#### Error Handling
+- Use `try...catch` for async operations
+- Throw custom errors for predictable issues
+
+---
+
+### 3.2 Frontend Conventions
+
+#### Technology Stack
+- React 19
+- Vite 7
+- TypeScript
+- Tailwind CSS 4
+- Redux Toolkit
+- React Router DOM 7
+
+#### Atomic Design Structure
+```
+UI/components/
+├── atoms/         # Button, Input, Icon, Label, etc.
+├── molecules/     # Sidebar, Cards, Forms, Navigation
+├── organisms/     # Complex components (Admin, Teacher, Forms)
+└── templates/    # Layout templates (Dashboard)
+```
+
+#### Clean Architecture (BR/)
+```
+BR/
+├── application/
+│   ├── useCases/     # GetUsersUseCase, CreateUserUseCase, etc.
+│   ├── mappers/      # Data transformers
+│   └── viewModels/  # View-specific models
+├── domain/
+│   ├── entities/    # User, Subject, Role, Grade (interfaces)
+│   └── services/    # Repository contracts (interfaces)
+└── infrastructure/
+    ├── repositories/ # API implementations (UserApiRepository, etc.)
+    ├── services/    # httpClient (Axios with interceptors)
+    └── errors/      # Error types
+```
+
+#### Naming Conventions
+- Files: kebab-case (`button.atom.tsx`, `user-api-repository.ts`)
+- Components: PascalCase (`Button`, `UserApiRepository`)
+- Props Interfaces: Prefix with `I` (`IButtonProps`)
+- Hooks: camelCase with `use` prefix (`useForm`, `useStore`)
+
+#### Redux Patterns
+- Slices in `src/store/slices/`
+- Thunks alongside slices
+- Use `createAsyncThunk` for async operations
+- Typed `RootState` and `AppDispatch`
+
+#### HttpClient
+- Located in `src/BR/infrastructure/services/httpClient.ts`
+- Uses Axios with interceptors for:
+  - Auto token injection from Redux store
+  - 401 error handling (auto logout)
+- Base URL from environment variable `VITE_API_URL`
+
+---
+
+## 4. Environment Variables
+
+### Backend
+```plaintext
+DB_NAME=campus
+DB_USER=postgres
+DB_PASS=1234
+PORT=3000
+GOOGLE_CLIENT_ID=your-client-id
+```
+
+### Frontend
+```plaintext
+VITE_API_URL=http://localhost:3000/api/
+```
+
+---
+
+## 5. Development Guidelines
 
 ### Backend Changes
-1. Add routes in `src/routes/`.
-2. Implement logic in `src/controllers/` or `src/services/`.
-3. Add database queries in `src/repositories/`.
-4. Write tests in `src/tests/`.
+1. Add routes in `src/routes/`
+2. Implement logic in `src/controllers/` or `src/services/`
+3. Add database queries in `src/repositories/`
+4. Write tests in `src/tests/`
+
+### Frontend Changes
+1. **Domain Layer**: Add entities/interfaces in `src/BR/domain/entities/`
+2. **Repository Interface**: Define contract in `src/BR/domain/services/`
+3. **Repository Implementation**: Implement in `src/BR/infrastructure/repositories/`
+4. **Use Case**: Add business logic in `src/BR/application/useCases/`
+5. **Thunk**: Add async action in `src/store/slices/*/`
+6. **Slice**: Add state management in `src/store/slices/*/`
+7. **Component**: Add UI in `src/UI/components/` (follow Atomic Design)
+8. **View**: Add page in `src/UI/views/`
+9. **Route**: Add route in `src/UI/App.tsx`
 
 ### Additional Notes
-- Adhere to the modular structure of the project.
-- Maintain high test coverage.
-- Document new configuration or features.
+- Adhere to the modular structure of both projects
+- Maintain high test coverage
+- Document new configuration or features
+- Always use strict typing
 
 ---
 
-## 5. Commit Message Guidelines
-- Follow this format for commit messages:
-  ```
-  [Type] Summary of changes (Max 50 characters)
+## 6. Commit Message Guidelines
 
-  Detailed explanation (if needed, wrap at 72 characters).
-  
-  ISSUE: #123 (if applicable)
-  ```
-- Common types: `feat`, `fix`, `test`, `refactor`, `docs`.
-- Example:
-  ```
-  [fix] Correct error handling in UserService
+Follow this format:
+```
+[Type] Summary of changes (Max 50 characters)
 
-  Fixed a bug where invalid emails were not properly caught.
-  ISSUE: #45
-  ```
+Detailed explanation (if needed, wrap at 72 characters).
 
----
+ISSUE: #123 (if applicable)
+```
 
-## 6. General Reminders
-- Always keep dependencies up-to-date.
-- Use `npm run test` before submitting changes.
-- Keep the project clean and maintainable for agents and humans alike.
+Common types: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`
+
+Example:
+```
+[fix] Correct error handling in UserService
+
+Fixed a bug where invalid emails were not properly caught.
+ISSUE: #45
+```
 
 ---
 
-With this guide, agents should be able to contribute effectively and maintain high-quality standards for the `/api` backend of the Campus Virtual project.
+## 7. General Reminders
+- Always keep dependencies up-to-date
+- Run type checking before submitting changes
+- Keep the project clean and maintainable for agents and humans alike
+
+---
+
+With this guide, agents should be able to contribute effectively and maintain high-quality standards for both the `/api` backend and `/client-campus` frontend of the Campus Virtual project.

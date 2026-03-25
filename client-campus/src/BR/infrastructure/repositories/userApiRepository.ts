@@ -17,12 +17,9 @@ export class UserApiRepository implements UserRepository {
     >("users/authUser", { token });
     return data;
   }
-  async authMe(token: string): Promise<User> {
-    const { data } = await httpClient.get<User>("users/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  async authMe(_token: string): Promise<User> {
+    const { data } = await httpClient.get<User>("users/me");
+    console.log(_token)
     return data;
   }
   async getAll(): Promise<User[]> {
