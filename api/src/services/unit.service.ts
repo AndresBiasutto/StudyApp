@@ -5,8 +5,8 @@ class UnitService {
     return unitRepository.create(data,);
   }
 
-  async getUnit(id_chapter: string) {
-    const unit = await unitRepository.getOne(id_chapter);
+  async getUnit(id_unit: string) {
+    const unit = await unitRepository.getOne(id_unit);
     if (!unit) throw new Error("Unit not found");
     return unit;
   }
@@ -19,14 +19,14 @@ class UnitService {
     return unitRepository.getByName(name);
   }
 
-  async updateUnit(id_chapter: string, data: any) {
-    const Unit = await unitRepository.update(id_chapter, data);
-    if (!Unit) throw new Error("Unit not found");
-    return Unit;
+  async updateUnit(id_unit: string, data: any) {
+    const unit = await unitRepository.update(id_unit, data);
+    if (!unit) throw new Error("Unit not found");
+    return unit;
   }
 
-  async deleteUnit(id_chapter: string) {
-    const deleted = await unitRepository.delete(id_chapter);
+  async deleteUnit(id_unit: string) {
+    const deleted = await unitRepository.delete(id_unit);
     if (!deleted) throw new Error("Unit not found");
     return true;
   }

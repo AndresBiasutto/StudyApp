@@ -1,7 +1,7 @@
 import type React from "react";
 
 export interface chapterCard {
-  id: number;
+  id: string | undefined;
   title: string;
   text: string;
   chapterOrder: number;

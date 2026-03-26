@@ -5,7 +5,7 @@ import SettingsMenu from "../organisms/dashboard/settingsMenu.organism";
 import DashboardFooter from "../organisms/dashboard/dashboardFooter.organism";
 import { useAppSelector } from "../../../hooks/UseStore.hook";
 import type { RootState } from "../../../store/store";
-import FormInModal from "../organisms/forms/formInModal.organism";
+import FormInModal from "../organisms/common/formInModal.organism";
 const Dashboard = () => {
     const { sidebarOpen } = useAppSelector((state: RootState) => state.ui);
   

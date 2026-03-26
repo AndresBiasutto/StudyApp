@@ -1,12 +1,12 @@
 export interface Chapter {
-  id: number;
+  id_chapter?: string;
   name: string;
   chapterOrder: number;
-  id_chapter?: string;
   order?: number;
   description?: string;
   text?: string;
   videoUrl?: string;
+  id_unit?: string;
 }
 
 

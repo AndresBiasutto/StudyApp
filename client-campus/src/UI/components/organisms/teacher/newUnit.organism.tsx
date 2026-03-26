@@ -13,19 +13,58 @@ import {
 } from "react-icons/fa";
 import { useState } from "react";
 import ButtonSquare from "../../atoms/buttonSquare.atom";
+import { useDispatch } from "react-redux";
+import { setModalContent, toggleModal } from "../../../../store/slices/uiSlice";
 
 const NewUnit: React.FC<creatorCard> = ({
+  id,
   title,
   text,
   unitOrder,
-  createChapter,
   chapters,
 }) => {
   const [show, setShow] = useState(false);
+  const dispatch = useDispatch();
+  const handleCreateChapter = () => {
+    dispatch(toggleModal());
+    dispatch(
+      setModalContent({
+        type: "CREATE_CHAPTER",
+        data: { id_unit: id },
+        title: `Nuevo capitulo`,
+      }),
+    );
+  };
+  const handleEditUnit = () => {
+    dispatch(toggleModal());
+    dispatch(
+      setModalContent({
+        type: "EDIT_UNIT",
+        data: {
+          id_unit: id,
+          name: title,
+          description: text,
+          unitOrder: unitOrder,
+        },
+        title: `Editar ${title}`,
+      }),
+    );
+  };
+  const handleDeleteUnit = () => {
+    dispatch(toggleModal());
+    dispatch(
+      setModalContent({
+        type: "DELETE_UNIT",
+        data: { id_unit: id },
+        title: `Eliminar ${title}`,
+      }),
+    );
+  };
   return (
     <div className="w-full flex flex-col justify-start items-end gap-2 p-2 bg-lightSecondary dark:bg-darkSecondary rounded">
       <div className="w-full flex items-start justify-between">
         <UnitCardHeader
+          id=""
           title={title}
           text={text}
           order={unitOrder}
@@ -34,14 +73,14 @@ const NewUnit: React.FC<creatorCard> = ({
         <div className="flex gap-2">
           <ButtonSquare
             btnName="editar unidad"
-            action={() => alert("editar")}
+            action={handleEditUnit}
             icon={<FaRegEdit />}
             bgLight="bg-lightLink"
             bgDark="dark:bg-darkLink"
           />
           <ButtonSquare
             btnName="eliminar unidad"
-            action={() => alert("borrar")}
+            action={handleDeleteUnit}
             icon={<FaRegTrashAlt />}
             bgLight="bg-lightWarning"
             bgDark="dark:bg-darkWarning"
@@ -51,7 +90,7 @@ const NewUnit: React.FC<creatorCard> = ({
 
       <div className="w-full flex justify-center items-center">
         <ButtonRounded
-          btnName="nuevo capítulo"
+          btnName={show ? "ver menos" : "ver más"}
           action={() => setShow(!show)}
           icon={show ? <FaChevronUp /> : <FaChevronDown />}
           bgLight="bg-lightAccent"
@@ -63,17 +102,17 @@ const NewUnit: React.FC<creatorCard> = ({
           {chapters
             ? chapters.map((chap) => (
                 <NewChapter
-                  key={chap.id}
-                  id={chap.id}
+                  key={chap.id_chapter}
+                  id={chap.id_chapter}
                   title={chap.name}
-                  text={""}
-                  chapterOrder={chap.chapterOrder}
+                  text={chap.description ?? ""}
+                  chapterOrder={chap.order ?? chap.chapterOrder}
                 />
               ))
             : []}
           <Button
             btnName="nuevo capítulo"
-            action={createChapter}
+            action={handleCreateChapter}
             icon={<BsFillPostcardFill />}
             bgLight="bg-lightAccent"
             bgDark="dark:bg-darkAccent"

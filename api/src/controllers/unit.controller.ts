@@ -17,7 +17,7 @@ class UnitController {
     return unitService.updateUnit(id_unit, data);
   }
   delete(id_unit: string) {
-    unitService.deleteUnit(id_unit);
+    return unitService.deleteUnit(id_unit);
   }
 }
 

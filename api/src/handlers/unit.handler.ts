@@ -51,7 +51,7 @@ class UnitHandler {
 
   async delete(req: Request, res: Response) {
     try {
-      unitController.delete(req.params.id);
+      await unitController.delete(req.params.id);
       res.json({ message: "Unit deleted" });
     } catch (err: any) {
       res.status(404).json({ error: err.message });

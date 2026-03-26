@@ -7,8 +7,8 @@ class UnitRepository {
     return Unit.create(data);
   }
 
-  async getOne(id_chapter: string) {
-    return Unit.findByPk(id_chapter);
+  async getOne(id_unit: string) {
+    return Unit.findByPk(id_unit);
   }
 
   async getAll() {
@@ -31,14 +31,14 @@ class UnitRepository {
     return Unit.findOne({ where: { name } });
   }
 
-  async update(id_chapter: string, data: any) {
-    const chapter = await Unit.findByPk(id_chapter);
-    if (!chapter) return null;
-    return chapter.update(data);
+  async update(id_unit: string, data: any) {
+    const unit = await Unit.findByPk(id_unit);
+    if (!unit) return null;
+    return unit.update(data);
   }
 
-  async delete(id_chapter: string) {
-    return Unit.destroy({ where: { id_chapter } });
+  async delete(id_unit: string) {
+    return Unit.destroy({ where: { id_unit } });
   }
 }
 

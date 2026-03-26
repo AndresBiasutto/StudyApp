@@ -15,7 +15,7 @@ const TeacherDetailSubject = () => {
   const appDispatch = useAppDispatch();
   const { selected, error } = useAppSelector((state) => state.subjects);
   const dispatch = useDispatch();
-  const handleCreateSubject = () => {
+  const handleCreateUnit = () => {
     dispatch(toggleModal());
     dispatch(
       setModalContent({
@@ -45,6 +45,7 @@ const TeacherDetailSubject = () => {
         {selected?.createdUnits
           ? selected?.createdUnits.map((unit) => (
               <NewUnit
+                id={unit.id_unit}
                 title={unit.name}
                 text={unit.description}
                 unitOrder={unit.order}
@@ -54,7 +55,7 @@ const TeacherDetailSubject = () => {
           : ""}
         <Button
           btnName="nueva unidad"
-          action={handleCreateSubject}
+          action={handleCreateUnit}
           icon={<SiBookstack />}
           bgLight="bg-lightAccent"
           bgDark="dark:bg-darkAccent"

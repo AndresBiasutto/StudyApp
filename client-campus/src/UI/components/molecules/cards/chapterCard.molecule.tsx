@@ -1,9 +1,40 @@
 import H3 from "../../atoms/h3.atom";
+import type { Chapter } from "../../../../BR/domain/entities/chapter.interface";
 import type { creatorCardHeader } from "../../../interfaces/creatorCardHeader";
 import { FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
 import ButtonSquare from "../../atoms/buttonSquare.atom";
+import { setModalContent, toggleModal } from "../../../../store/slices/uiSlice";
+import { useDispatch } from "react-redux";
 
-const chapterCard: React.FC<creatorCardHeader> = ({ title, order, icon }) => {
+const ChapterCard: React.FC<creatorCardHeader> = ({ id, title, text, order, icon }) => {
+  const dispatch = useDispatch();
+  const chapterData: Partial<Chapter> = {
+    id_chapter: id,
+    name: title,
+    order: order,
+    description: text,
+  };
+
+  const handleEditChapter = () => {
+    dispatch(toggleModal());
+    dispatch(
+      setModalContent({
+        type: "EDIT_CHAPTER",
+        data: chapterData,
+        title: `Editar ${title}`,
+      }),
+    );
+  };
+  const handleDeleteChapter = () => {
+    dispatch(toggleModal());
+    dispatch(
+      setModalContent({
+        type: "DELETE_CHAPTER",
+        data: chapterData,
+        title: `Eliminar ${title}`,
+      }),
+    );
+  };
   return (
     <div className="w-full flex flex-row justify-start items-center gap-2">
       <div className="w-8 h-8 flex items-center justify-center border rounded border-darkBorder dark:border-lightBorder">
@@ -17,14 +48,14 @@ const chapterCard: React.FC<creatorCardHeader> = ({ title, order, icon }) => {
           <div className="flex gap-2">
             <ButtonSquare
               btnName="editar capitulo"
-              action={() => alert("editar")}
+              action={handleEditChapter}
               icon={<FaRegEdit />}
               bgLight="bg-lightLink"
               bgDark="dark:bg-darkLink"
             />
             <ButtonSquare
               btnName="eliminar capitulo"
-              action={() => alert("borrar")}
+              action={handleDeleteChapter}
               icon={<FaRegTrashAlt />}
               bgLight="bg-lightWarning"
               bgDark="dark:bg-darkWarning"
@@ -36,4 +67,4 @@ const chapterCard: React.FC<creatorCardHeader> = ({ title, order, icon }) => {
   );
 };
 
-export default chapterCard;
+export default ChapterCard;
