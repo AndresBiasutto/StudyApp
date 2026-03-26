@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useAppSelector } from "../../hooks/UseStore.hook";
-import H2 from "../components/atoms/h2.atom";
-import Content from "../components/molecules/content.molecule";
-import AdminTools from "../components/organisms/admin/adminTools.organism";
+import { useAppSelector } from "../../../hooks/UseStore.hook";
+import H2 from "../../components/atoms/h2.atom";
+import Content from "../../components/molecules/content.molecule";
+import AdminTools from "../../components/organisms/admin/adminTools.organism";
 
 const AdminHome = () => {
   const { selected, loading, error } = useAppSelector((state) => state.auth);

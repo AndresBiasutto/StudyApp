@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/UseStore.hook";
+import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
 import { useParams } from "react-router-dom";
-import { fetchSelectedUser } from "../../store/slices/userSlice/user.thunk";
-import AdminUserDetailAside from "../components/organisms/admin/adminUserDetailAside.organism";
-import type { User } from "../../BR/domain/entities/user.interface";
-import AdminUserDetailPage from "../components/organisms/admin/adminUserDetailPage.organism";
-import Spinner from "../components/molecules/spinner.molecule";
-import { fetchRoles } from "../../store/slices/roleSlice/role.thunk";
+import { fetchSelectedUser } from "../../../store/slices/userSlice/user.thunk";
+import AdminUserDetailAside from "../../components/organisms/admin/adminUserDetailAside.organism";
+import type { User } from "../../../BR/domain/entities/user.interface";
+import AdminUserDetailPage from "../../components/organisms/admin/adminUserDetailPage.organism";
+import Spinner from "../../components/molecules/spinner.molecule";
+import { fetchRoles } from "../../../store/slices/roleSlice/role.thunk";
 
 const AdminUserDetail = () => {
   const { id_user } = useParams();

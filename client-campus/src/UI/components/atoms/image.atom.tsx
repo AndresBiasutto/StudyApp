@@ -12,7 +12,7 @@ const Image: React.FC<ImageProps> = ({ src, alt, className = "" }) => {
       <img
         src={src}
         alt={alt}
-        className={`w-full h-auto object-contain ${className}`}
+        className={`${className} w-full h-auto object-contain `}
       />
     </div>
   );

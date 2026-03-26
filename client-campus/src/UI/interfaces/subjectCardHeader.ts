@@ -1,5 +1,5 @@
 export interface subjectCardHeader {
-  title: string;
+  title?: string | undefined;
   text?: string;
   image?: string;
 

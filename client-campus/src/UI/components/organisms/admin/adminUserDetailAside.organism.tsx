@@ -11,7 +11,6 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../hooks/UseStore.hook";
-import UpdateUserRoleForm from "../forms/updateUserRoleForm.organism";
 import { useEffect, useState } from "react";
 import {
   deleteUser,
@@ -20,6 +19,7 @@ import {
 import Button from "../../atoms/button.atom";
 import { FaUserXmark } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import UpdateUserRoleForm from "../forms/adminForms/updateUserRoleForm.organism";
 
 const AdminUserDetailAside = () => {
   const navigate = useNavigate();

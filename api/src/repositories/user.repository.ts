@@ -1,7 +1,7 @@
 import sequelize from "../config/database";
 import { UserEntity } from "./entities/userEntity.entity";
 import { mapUserModelToEntity } from "./mappers/user.mapper";
-const { User, Role, Subject } = sequelize.models;
+const { User, Role, Subject, Grade } = sequelize.models;
 
 class UserRepository {
   async createUser(data: any) {
@@ -41,6 +41,12 @@ class UserRepository {
           model: Subject,
           as: "createdSubjects",
           attributes: ["id_subject", "name", "description"],
+          include: [
+            {
+              model: Grade,
+              attributes: ["name"],
+            },
+          ],
         },
       ],
     });
@@ -56,7 +62,16 @@ class UserRepository {
       contact_number: data.contact_number,
       image: data.image,
       Role: data.Role,
-      subjects: data.createdSubjects,
+      subjects: data.createdSubjects?.map((subject: any) => ({
+        id_subject: subject.id_subject,
+        name: subject.name,
+        description: subject.description,
+        Grade: subject.Grade
+          ? {
+              name: subject.Grade.name,
+            }
+          : null,
+      })),
       id_role: data.id_role
     };
     return formatedData;

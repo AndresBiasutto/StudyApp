@@ -2,8 +2,8 @@ import { SiBookstack } from "react-icons/si";
 import Button from "../../atoms/button.atom";
 import { BsFillPostcardFill } from "react-icons/bs";
 import type { creatorCard } from "../../../interfaces/creatorCard";
-import UnitCardHeader from "../../molecules/cards/UnitCardHeader";
-import NewChapter from "./NewChapter.organism";
+import UnitCardHeader from "../../molecules/cards/unitCardHeader";
+import NewChapter from "../teacher/NewChapter.organism";
 import ButtonRounded from "../../atoms/buttonRounded.atom";
 import {
   FaChevronDown,
@@ -66,7 +66,7 @@ const NewUnit: React.FC<creatorCard> = ({
                   key={chap.id}
                   id={chap.id}
                   title={chap.name}
-                  text={chap.description}
+                  text={""}
                   chapterOrder={chap.chapterOrder}
                 />
               ))

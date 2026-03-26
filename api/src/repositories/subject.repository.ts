@@ -1,5 +1,5 @@
 import sequelize from "../config/database";
-const { User, Subject, Unit, Grade } = sequelize.models;
+const { User, Subject, Unit, Grade, Chapter } = sequelize.models;
 
 class SubjectRepository {
   async createSubject(data: any) {
@@ -12,6 +12,18 @@ class SubjectRepository {
         {
           model: Grade,
           attributes: ["id_grade", "name"],
+        },
+        {
+          model: Unit,
+          as: "createdUnits",
+          attributes: ["id_unit", "order", "name", "description"],
+          include: [
+            {
+              model: Chapter,
+              as: "createdChapters",
+              attributes: ["id_chapter", "order", "name", "description"],
+            },
+          ],
         },
       ],
     });

@@ -14,6 +14,9 @@ const user = [
   { navLink: "/dashboard/study", name: "estudiar" },
   { navLink: "/dashboard/admin/users", name: "administrar" },
 ];
+const teacher = [
+  { name: "home", navLink: "/dashboard/teacher/home" },
+];
 const admin = [
   { name: "home", navLink: "/dashboard/admin/home" },
   { name: "administrar usuarios", navLink: "/dashboard/admin/users" },
@@ -24,7 +27,7 @@ const Sidebar = () => {
   const { sidebarOpen } = useSelector((state: RootState) => state.ui);
   const { selected, loading, error } = useAppSelector((state) => state.auth);
   useEffect(() => {}, [selected]);
-  
+
   const navUser = () => {
     switch (selected?.Role?.name) {
       case "user":
@@ -32,7 +35,7 @@ const Sidebar = () => {
       case "admin":
         return admin;
       case "teacher":
-        return user;
+        return teacher;
       default:
         return user;
     }

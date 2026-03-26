@@ -21,7 +21,7 @@ export const fetchSubjects = createAsyncThunk(
 /* GET BY ID */
 export const fetchSubjectById = createAsyncThunk(
   "subjects/fetchById",
-  async (id: number) => {
+  async (id: string) => {
     const useCase = new GetSubjectByIdUseCase(repository);
     return await useCase.execute(id);
   }

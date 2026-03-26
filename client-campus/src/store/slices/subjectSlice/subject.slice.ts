@@ -40,8 +40,16 @@ const subjectSlice = createSlice({
       })
 
       /* FETCH BY ID */
+      .addCase(fetchSubjectById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchSubjectById.fulfilled, (state, action) => {
         state.selected = action.payload;
+      })
+      .addCase(fetchSubjectById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Error al obtener la materia";
       })
 
       /* CREATE */
@@ -52,7 +60,7 @@ const subjectSlice = createSlice({
       /* UPDATE */
       .addCase(updateSubject.fulfilled, (state, action) => {
         const index = state.items.findIndex(
-          (s) => s.id_subject === action.payload.id_subject
+          (s) => s.id_subject === action.payload.id_subject,
         );
         if (index !== -1) {
           state.items[index] = action.payload;
@@ -62,7 +70,7 @@ const subjectSlice = createSlice({
       /* DELETE */
       .addCase(deleteSubject.fulfilled, (state, action) => {
         state.items = state.items.filter(
-          (s) => s.id_subject !== action.payload
+          (s) => s.id_subject !== action.payload,
         );
       });
   },

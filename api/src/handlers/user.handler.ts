@@ -29,7 +29,6 @@ async authUser(req: Request, res: Response) {
 async getMe(req: AuthRequest, res: Response) {
   try {
     const id_user = req.user?.id_user;
-    console.log("ID del usuario autenticado:", id_user);
     if (!id_user) {
       return res.status(401).json({ error: "No autorizado" });
     }

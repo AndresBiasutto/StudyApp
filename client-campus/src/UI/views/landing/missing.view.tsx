@@ -1,4 +1,4 @@
-import H1 from "../components/atoms/h1.atom";
+import H1 from "../../components/atoms/h1.atom";
 
 const Missing = () => {
   return (

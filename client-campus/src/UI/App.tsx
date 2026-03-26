@@ -1,21 +1,22 @@
 import { Route, Routes } from "react-router-dom";
-import Landing from "./views/landing.view";
+import Landing from "./views/landing/landing.view";
 import type { RootState } from "../store/store";
 import { useSelector } from "react-redux";
 import Dashboard from "./components/templates/dashboard.template";
-import StudentDashboard from "./views/studentDashboard.view";
-import Missing from "./views/missing.view";
-import AdminUserDetail from "./views/adminUserDetail.view";
-import AdminUsersTab from "./views/adminUsers.view";
+import Missing from "./views/landing/missing.view";
+import AdminUserDetail from "./views/admin/adminUserDetail.view";
+import AdminUsersTab from "./views/admin/adminUsers.view";
 import { useAppDispatch, useAppSelector } from "../hooks/UseStore.hook";
 import { useEffect } from "react";
-import AdminHome from "./views/adminHome.view";
+import AdminHome from "./views/admin/adminHome.view";
 import { authenticateMe } from "../store/slices/authSlice/auth.thunk";
 import ProtectedRoutes from "../routes/protectedRoutes";
 import RedirectOnAuth from "../routes/redirectOnAuth";
 import Spinner from "./components/molecules/spinner.molecule";
-import TeacherHome from "./views/teacherHome.view";
-import AdminSubjects from "./views/AdminSubjects.view";
+import TeacherHome from "./views/teacher/teacherHome.view";
+import AdminSubjects from "./views/admin/adminSubjects.view";
+import StudentDashboard from "./views/student/studentDashboard.view";
+import TeacherDetailSubject from "./views/teacher/teacherDetailSubject.view";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -43,6 +44,14 @@ function App() {
             element={
               <ProtectedRoutes role={"teacher"}>
                 <TeacherHome />
+              </ProtectedRoutes>
+            }
+          ></Route>
+          <Route
+            path="dashboard/teacher/subject/:id_subject"
+            element={
+              <ProtectedRoutes role={"teacher"}>
+                <TeacherDetailSubject />
               </ProtectedRoutes>
             }
           ></Route>

@@ -1,15 +1,15 @@
-import Button from "../components/atoms/button.atom";
-import SearchBar from "../components/molecules/searchBar.molecule";
+import Button from "../../components/atoms/button.atom";
+import SearchBar from "../../components/molecules/searchBar.molecule";
 import { FaUserPlus } from "react-icons/fa6";
-import LiHeader from "../components/molecules/cards/liHeader.molecule";
-import LiItem from "../components/molecules/cards/liItem.molecule";
+import LiHeader from "../../components/molecules/cards/liHeader.molecule";
+import LiItem from "../../components/molecules/cards/liItem.molecule";
 import {
   useAppDispatch,
   useAppSelector,
-} from "../../hooks/UseStore.hook";
+} from "../../../hooks/UseStore.hook";
 import { useEffect } from "react";
-import { fetchListedUsers } from "../../store/slices/userSlice/user.thunk";
-import { userToLiItem } from "../../BR/application/mappers/userToLiItem.mapper";
+import { fetchListedUsers } from "../../../store/slices/userSlice/user.thunk";
+import { userToLiItem } from "../../../BR/application/mappers/userToLiItem.mapper";
 
 const AdminUsersTab = () => {
   

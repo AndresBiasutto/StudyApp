@@ -10,6 +10,6 @@ export interface Subject {
   imageUrl?: string;
   Grade: Grade;
   Role: Role;
-  units?: Unit[] | [];
+  createdUnits?: Unit[] | [];
   creator?: User;
 }

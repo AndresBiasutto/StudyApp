@@ -1,6 +1,6 @@
 import { BsFillPostcardFill } from "react-icons/bs";
-import type { chapterCard } from "../../../types/chapters";
 import ChapterCard from "../../molecules/cards/chapterCard.molecule";
+import type { chapterCard } from "../../../interfaces/chapterCard";
 
 const NewChapter:React.FC<chapterCard> = ({ title, text, chapterOrder }) => {
   return (
