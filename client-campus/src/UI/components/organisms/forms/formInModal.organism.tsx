@@ -7,21 +7,28 @@ import DeleteUserForm from "./adminForms/deleteUserForm.organism";
 import SetTeacherForm from "./adminForms/setTeacherForm.organism";
 import UpdateSubjectForm from "./adminForms/updateSubjectForm.organism";
 import UpdateUserRoleForm from "./adminForms/updateUserRoleForm.organism";
+import CreateUnitForm from "./teacherForms/createUnitForm.organism";
 
 const FormInModal = () => {
   const { modalContent } = useAppSelector((state: RootState) => state.ui);
   const form = (() => {
     switch (modalContent.type) {
-      case "DELETE_SUBJECT":
-        return <DeleteSubjectForm item={modalContent?.data} />;
       case "CREATE_SUBJECT":
         return <CreateSubjectForm />;
+      case "CREATE_UNIT":
+        return <CreateUnitForm />;
       case "EDIT_SUBJECT":
+        return <UpdateSubjectForm item={modalContent?.data} />;
+      case "EDIT_CHAPTER":
         return <UpdateSubjectForm item={modalContent?.data} />;
       case "UPDATE_USER_ROLE":
         return <UpdateUserRoleForm />;
       case "DELETE_USER":
         return <DeleteUserForm item={modalContent?.data} />;
+      case "DELETE_SUBJECT":
+        return <DeleteSubjectForm item={modalContent?.data} />;
+      case "DELETE_CHAPTER":
+        return <DeleteSubjectForm item={modalContent?.data} />;
       case "ASSIGN_TEACHER":
         return <SetTeacherForm item={modalContent?.data} />;
       default:

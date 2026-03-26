@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import SubjectCardHeader from "../../components/molecules/cards/subjectCardHeader.molecule";
 import { SiBookstack } from "react-icons/si";
 import { setModalContent, toggleModal } from "../../../store/slices/uiSlice";
-import imagen from "../../../../public/vite.svg"
+import imagen from "../../../../public/vite.svg";
 import NewUnit from "../../components/organisms/teacher/newUnit.organism";
 import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
@@ -11,10 +11,10 @@ import { useEffect } from "react";
 import { fetchSubjectById } from "../../../store/slices/subjectSlice/subject.thunk";
 
 const TeacherDetailSubject = () => {
-    const { id_subject } = useParams();
+  const { id_subject } = useParams();
   const appDispatch = useAppDispatch();
   const { selected, error } = useAppSelector((state) => state.subjects);
-      const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const handleCreateSubject = () => {
     dispatch(toggleModal());
     dispatch(
@@ -42,17 +42,16 @@ const TeacherDetailSubject = () => {
         image={imagen}
       />
       <div className="w-full flex flex-col justify-start items-end gap-4">
-        {selected?.createdUnits ? selected?.createdUnits.map((unit) => (
-          <NewUnit
-            title={unit.name}
-            text={unit.description}
-            unitOrder={unit.order}
-            chapters={unit.createdChapters }
-          />
-        ))
-      :
-      ""
-      }
+        {selected?.createdUnits
+          ? selected?.createdUnits.map((unit) => (
+              <NewUnit
+                title={unit.name}
+                text={unit.description}
+                unitOrder={unit.order}
+                chapters={unit.createdChapters}
+              />
+            ))
+          : ""}
         <Button
           btnName="nueva unidad"
           action={handleCreateSubject}

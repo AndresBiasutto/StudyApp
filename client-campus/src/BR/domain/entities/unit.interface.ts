@@ -6,4 +6,8 @@ export interface Unit {
   description: string;
   order: number;
   createdChapters: Chapter[];
+  id_unit?: string;
+  unitOrder?: number;
+  chapters: Chapter[];
+  id_subject?: string;
 }

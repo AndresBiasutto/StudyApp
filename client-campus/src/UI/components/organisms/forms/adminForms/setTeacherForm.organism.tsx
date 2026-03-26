@@ -69,7 +69,7 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
     const result = await dispatch(
       updateSubject({
         id: item?.id_subject || "",
-        data,
+        data: data as Partial<Subject>,
       })
     );
 

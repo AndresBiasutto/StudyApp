@@ -17,6 +17,8 @@ import userReducer from "./slices/userSlice/user.slice";
 import authReducer from "./slices/authSlice/auth.slice";
 import rolesReducer from "./slices/roleSlice/role.slice";
 import gradesReducer from "./slices/gradeSlice/grade.slice";
+import unitsReducer from "./slices/unitSlice/unit.slice";
+import chaptersReducer from "./slices/chapterSlice/chapter.slice";
 
 // 🔹 Persist config SOLO para auth
 const authPersistConfig = {
@@ -30,6 +32,8 @@ const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   users: userReducer,
   subjects: subjectReducer,
+  units: unitsReducer,
+  chapters: chaptersReducer,
   roles: rolesReducer,
   grades: gradesReducer,
 });

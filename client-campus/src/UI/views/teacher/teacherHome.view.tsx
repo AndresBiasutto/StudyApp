@@ -4,7 +4,7 @@ import TeacherTools from "../../components/organisms/teacher/teacherTools.organi
 
 const TeacherHome = () => {
   return (
-    <Content title="Teacher Home HOUSE!">
+    <Content title="">
       <TeacherTools />
       <TeacherAssignedSubjects />
     </Content>

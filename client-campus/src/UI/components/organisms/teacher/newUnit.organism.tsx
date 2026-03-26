@@ -40,7 +40,7 @@ const NewUnit: React.FC<creatorCard> = ({
             bgDark="dark:bg-darkLink"
           />
           <ButtonSquare
-            btnName="eliminar materia"
+            btnName="eliminar unidad"
             action={() => alert("borrar")}
             icon={<FaRegTrashAlt />}
             bgLight="bg-lightWarning"
