@@ -29,6 +29,11 @@ httpClient.interceptors.response.use(
     if (error.response?.status === 401) {
       store.dispatch(logout());
     }
+
+    if (error.response?.data?.error) {
+      return Promise.reject(new Error(error.response.data.error));
+    }
+
     return Promise.reject(error);
   }
 );

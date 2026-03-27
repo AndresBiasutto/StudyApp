@@ -72,7 +72,7 @@ class UserService {
     const response = {
       id_user: user.id_user,
       name: user.name,
-      last_name: user.name,
+      last_name: user.last_name,
       e_mail: user.e_mail,
       token: token,
       image: user.image,
@@ -118,13 +118,16 @@ class UserService {
   async getUserByEmail(e_mail: string) {
     return userRepository.getUserByEmail(e_mail);
   }
+  async getUserRoleName(id_user: string) {
+    return userRepository.getUserRoleName(id_user);
+  }
   async updateUser(id_user: string, data: any) {
     const user = await userRepository.updateUser(id_user, data);
     if (!user) throw new Error("User not found");
     return user;
   }
   async updateUserRole(id_user: string, id_role: string) {
-    const usertoUpdateRole = this.getUser(id_user);
+    const usertoUpdateRole =await this.getUser(id_user);
     const roleUpdated = {
       ...usertoUpdateRole,
       id_role,

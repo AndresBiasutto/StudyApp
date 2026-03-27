@@ -24,7 +24,7 @@ function App() {
   const { loading, error, token } = useAppSelector((state) => state.auth);
   useEffect(() => {
     if (token) {
-      dispatch(authenticateMe(token));
+      dispatch(authenticateMe());
     }
   }, [dispatch, token]);
 

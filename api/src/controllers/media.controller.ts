@@ -1,30 +1,42 @@
+import { Request, Response } from "express";
 import mediaService from "../services/media.service";
 
 class MediaController {
-  createVideo(newVideo: object) {
-    return mediaService.createVideo(newVideo);
+  async createVideo(req: Request, res: Response) {
+    try {
+      const video = await mediaService.createVideo(req.body);
+      res.status(201).json(video);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
   }
-  createImage(newImage: object) {
-    return mediaService.createImage(newImage);
+
+  async createImage(req: Request, res: Response) {
+    try {
+      const image = await mediaService.createImage(req.body);
+      res.status(201).json(image);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
   }
-//   getOne(id_role: string) {
-//     return mediaService.getRole(id_role);
-//   }
- getAllVideos() {
-   return mediaService.getAllVideos();
- }
- getAllImages() {
-   return mediaService.getAllImages();
- }
-//   getByName(name: string) {
-//     return mediaService.getRoleByName(name);
-//   }
-//   update(id_role: string, data: object) {
-//     return mediaService.updateRole(id_role, data);
-//   }
-//   delete(id_role: string) {
-//     mediaService.deleteRole(id_role);
-//   }
+
+  async getAllVideos(req: Request, res: Response) {
+    try {
+      const medias = await mediaService.getAllVideos();
+      res.json(medias);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  async getAllImages(req: Request, res: Response) {
+    try {
+      const medias = await mediaService.getAllImages();
+      res.json(medias);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 export default new MediaController();

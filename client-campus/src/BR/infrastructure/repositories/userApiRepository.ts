@@ -6,7 +6,9 @@ import type { AuthUserDTO } from "../../../UI/interfaces/authUserDTO";
 
 export class UserApiRepository implements UserRepository {
   async updateRole(id_user: string, id_role: string): Promise<User> {
-    const { data } = await httpClient.put<User>(`/users/updateRole/${id_user}`, {id_role});
+    const { data } = await httpClient.put<User>(`/users/updateRole/${id_user}`, {
+      id_role,
+    });
     return data;
   }
   async authUser(token: string): Promise<User> {
@@ -18,7 +20,7 @@ export class UserApiRepository implements UserRepository {
     return data;
   }
   async authMe(): Promise<User> {
-    const { data } = await httpClient.get<User>("users/me");
+    const { data } = await httpClient.get<User>("/users/me");
     return data;
   }
   async getAll(): Promise<User[]> {
@@ -34,16 +36,19 @@ export class UserApiRepository implements UserRepository {
     return data;
   }
   async getById(id_user: string): Promise<User> {
-    const { data } = await httpClient.get<User>(`/users/${id_user}`);
+    const { data } = await httpClient.get<User>(`/users/liData/${id_user}`);
     return data;
   }
   async create(user: Omit<User, "id">): Promise<User> {
     const { data } = await httpClient.post<User>("/users", user);
     return data;
   }
-  async update(id_user: string, user: Partial<User>): Promise<User> {
-    const { data } = await httpClient.put<User>(`/users/${id_user}`, user);
-    return data;
+  async update(_id_user: string, _user: Partial<User>): Promise<User> {
+    void _id_user;
+    void _user;
+    throw new Error(
+      "La API actual no expone una ruta general para actualizar usuarios.",
+    );
   }
   async delete(id_user: string): Promise<void> {
 

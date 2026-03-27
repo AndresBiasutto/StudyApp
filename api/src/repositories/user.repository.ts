@@ -143,6 +143,18 @@ class UserRepository {
       ],
     });
   }
+  async getUserRoleName(id_user: string) {
+    const user: any = await User.findByPk(id_user, {
+      include: [
+        {
+          model: Role,
+          attributes: ["name"],
+        },
+      ],
+    });
+
+    return user?.Role?.name ?? null;
+  }
   async updateUser(id_user: string, data: any) {
     const user = await User.findByPk(id_user);
     if (!user) return null;

@@ -22,6 +22,10 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(authenticateUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(authenticateUser.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
@@ -32,8 +36,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.error.message ?? "Error al autenticar usuario";
       })
-
-      .addCase(authenticateUser.pending, (state) => {
+      .addCase(authenticateMe.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -42,6 +45,12 @@ const authSlice = createSlice({
         state.selected = action.payload;
         state.isAuthenticated = true;
       })
+      .addCase(authenticateMe.rejected, (state, action) => {
+        state.loading = false;
+        state.selected = null;
+        state.isAuthenticated = false;
+        state.error = action.error.message ?? "No se pudo restaurar la sesión";
+      });
   },
 });
 

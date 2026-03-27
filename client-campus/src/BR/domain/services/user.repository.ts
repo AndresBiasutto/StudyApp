@@ -2,7 +2,7 @@ import type { User } from "../entities/user.interface";
 
 export interface UserRepository {
   authUser(token: string): Promise<User>;
-  authMe(token: string): Promise<User>;
+  authMe(): Promise<User>;
   getAll(): Promise<User[]>;
   getListed(): Promise<User[]>;
   getById(id: string): Promise<User>;

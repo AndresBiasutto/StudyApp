@@ -1,12 +1,14 @@
 import { Router } from "express";
-import chapterHandler from "../handlers/chapter.handler";
+import chapterController from "../controllers/chapter.controller";
+import { authenticateJWT } from "../middlewares/auth.middleware";
+import { authorizeRoles } from "../middlewares/role.middleware";
 
 const router = Router();
 
-router.post("/", chapterHandler.create);
-router.get("/", chapterHandler.getAll);
-router.get("/:id", chapterHandler.getOne);
-router.put("/:id", chapterHandler.update);
-router.delete("/:id", chapterHandler.delete);
+router.post("/", authenticateJWT, authorizeRoles("teacher"), chapterController.create);
+router.get("/", chapterController.getAll);
+router.get("/:id", chapterController.getOne);
+router.put("/:id", authenticateJWT, authorizeRoles("teacher"), chapterController.update);
+router.delete("/:id", authenticateJWT, authorizeRoles("teacher"), chapterController.delete);
 
 export default router;

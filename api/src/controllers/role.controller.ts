@@ -1,23 +1,63 @@
+import { Request, Response } from "express";
 import roleService from "../services/role.service";
 
 class RoleController {
-  create(newRole: object) {
-    return roleService.createRole(newRole);
+  async create(req: Request, res: Response) {
+    try {
+      const role = await roleService.createRole(req.body);
+      res.status(201).json(role);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
   }
-  getOne(id_role: string) {
-    return roleService.getRole(id_role);
+
+  async getOne(req: Request, res: Response) {
+    try {
+      const role = await roleService.getRole(req.params.id);
+      res.json(role);
+    } catch (err: any) {
+      res.status(404).json({ error: err.message });
+    }
   }
-  getAll() {
-    return roleService.getAllRoles();
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const roles = await roleService.getAllRoles();
+      res.json(roles);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   }
-  getByName(name: string) {
-    return roleService.getRoleByName(name);
+
+  async getByName(req: Request, res: Response) {
+    try {
+      const role = await roleService.getRoleByName(req.params.name);
+      if (!role) {
+        return res.status(404).json({ error: "Role not found" });
+      }
+
+      res.json(role);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   }
-  update(id_role: string, data: object) {
-    return roleService.updateRole(id_role, data);
+
+  async update(req: Request, res: Response) {
+    try {
+      const updated = await roleService.updateRole(req.params.id, req.body);
+      res.json(updated);
+    } catch (err: any) {
+      res.status(404).json({ error: err.message });
+    }
   }
-  delete(id_role: string) {
-    roleService.deleteRole(id_role);
+
+  async delete(req: Request, res: Response) {
+    try {
+      await roleService.deleteRole(req.params.id);
+      res.json({ message: "Role deleted" });
+    } catch (err: any) {
+      res.status(404).json({ error: err.message });
+    }
   }
 }
 

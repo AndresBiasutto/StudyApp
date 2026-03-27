@@ -70,7 +70,7 @@ const CreateChapterForm: React.FC<CreateChapterFormProps> = ({ item }) => {
         createChapter({
           name: data.name,
           description: data.description,
-          chapterOrder: Number(data.order),
+          order: Number(data.order),
           id_unit: unitId,
         })
       );

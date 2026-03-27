@@ -9,7 +9,7 @@ export class AuthMe {
     this.repository = repository;
   }
 
-  execute(token: string): Promise<User> {
-    return this.repository.authMe(token);
+  execute(): Promise<User> {
+    return this.repository.authMe();
   }
 }

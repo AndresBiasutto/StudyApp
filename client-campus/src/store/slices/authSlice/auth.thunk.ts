@@ -23,9 +23,9 @@ export const authenticateUser = createAsyncThunk(
 );
 export const authenticateMe = createAsyncThunk(
   "auth/authenticateMe",
-  async (token: string ) => {
+  async () => {
     const useCase = new AuthMe(repository);
-    return await useCase.execute(token);
+    return await useCase.execute();
   },
 );
 export const loginSuccess = createAsyncThunk(

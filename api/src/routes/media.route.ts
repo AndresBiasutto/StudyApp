@@ -1,12 +1,14 @@
 import { Router } from "express";
-import mediaHandler from "../handlers/media.handler";
+import mediaController from "../controllers/media.controller";
+import { authenticateJWT } from "../middlewares/auth.middleware";
+import { authorizeRoles } from "../middlewares/role.middleware";
 
 const router = Router();
 
-router.post("/videos", mediaHandler.createVideo);
-router.post("/images", mediaHandler.createImage);
-router.get("/videos", mediaHandler.getAllVideos);
-router.get("/images", mediaHandler.getAllImages);
+router.post("/videos", authenticateJWT, authorizeRoles("teacher"), mediaController.createVideo);
+router.post("/images", authenticateJWT, authorizeRoles("teacher"), mediaController.createImage);
+router.get("/videos", mediaController.getAllVideos);
+router.get("/images", mediaController.getAllImages);
 // router.get("/", mediaHandler.getAllVideos);
 // router.get("/", mediaHandler.getAllImages);
 // router.get("/:id", mediaHandler.getOneVideo);
