@@ -1,20 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { SubjectApiRepository } from "../../../BR/infrastructure/repositories/subjectApiRepository";
-import { GetSubjectsUseCase } from "../../../BR/application/useCases/Subject/getSubject.useCase";
-import { GetSubjectByIdUseCase } from "../../../BR/application/useCases/Subject/getSubjectById.useCase";
-import { CreateSubjectUseCase } from "../../../BR/application/useCases/Subject/createSubject.useCase";
-import { UpdateSubjectUseCase } from "../../../BR/application/useCases/Subject/updateSubject.useCase";
-import { DeleteSubjectUseCase } from "../../../BR/application/useCases/Subject/deleteSubject.useCase";
 import type { Subject } from "../../../BR/domain/entities/subject.interface";
-
-const repository = new SubjectApiRepository();
+import { getSubjectUseCases } from "../../../BR/application/useCases/Subject";
 
 /* GET ALL */
 export const fetchSubjects = createAsyncThunk(
   "subjects/fetchAll",
   async () => {
-    const useCase = new GetSubjectsUseCase(repository);
-    return await useCase.execute();
+    return await getSubjectUseCases().getSubjects.execute();
   }
 );
 
@@ -22,8 +14,7 @@ export const fetchSubjects = createAsyncThunk(
 export const fetchSubjectById = createAsyncThunk(
   "subjects/fetchById",
   async (id: string) => {
-    const useCase = new GetSubjectByIdUseCase(repository);
-    return await useCase.execute(id);
+    return await getSubjectUseCases().getSubjectById.execute(id);
   }
 );
 
@@ -31,8 +22,7 @@ export const fetchSubjectById = createAsyncThunk(
 export const createSubject = createAsyncThunk(
   "subjects/create",
   async (subject: Partial<Subject> ) => {
-    const useCase = new CreateSubjectUseCase(repository);
-    return await useCase.execute(subject);
+    return await getSubjectUseCases().createSubject.execute(subject);
   }
 );
 
@@ -43,8 +33,10 @@ export const updateSubject = createAsyncThunk(
     { id, data }: { id: string; data: Partial<Subject> },
     { dispatch }
   ) => {
-    const useCase = new UpdateSubjectUseCase(repository);
-    const updatedSubject = await useCase.execute(id, data);
+    const updatedSubject = await getSubjectUseCases().updateSubject.execute(
+      id,
+      data,
+    );
     const refreshedSubjects = await dispatch(fetchSubjects()).unwrap();
 
     return (
@@ -58,8 +50,7 @@ export const updateSubject = createAsyncThunk(
 export const deleteSubject = createAsyncThunk(
   "subjects/delete",
   async (id: string) => {
-    const useCase = new DeleteSubjectUseCase(repository);
-    await useCase.execute(id);
+    await getSubjectUseCases().deleteSubject.execute(id);
     return id;
   }
 );
