@@ -2,230 +2,354 @@
 
 ## 1. Overview
 
-The Backend is built with **Node.js** and **Express**, providing a REST API for the Campus Virtual application. It uses **Sequelize** as ORM for database operations and **JWT** for authentication.
+The backend is a REST API built with Node.js, Express, TypeScript, Sequelize, and PostgreSQL.
+Its main responsibility is to manage:
 
-### Technology Stack
-- Node.js + Express
-- TypeScript
-- Sequelize (ORM)
-- PostgreSQL
-- JWT (Authentication)
-- bcrypt (Password hashing)
-- Nodemailer (Emails)
+- authentication and session restoration
+- users and roles
+- subjects and student enrollment
+- academic content hierarchy: subject -> unit -> chapter -> media
+
+The current backend follows a layered architecture:
+
+```text
+Route -> Controller -> Service -> Repository -> Sequelize Model -> PostgreSQL
+```
+
+Cross-cutting concerns such as authentication and authorization are handled through Express middlewares.
 
 ---
 
-## 2. Project Structure
+## 2. Technology Stack
 
-```
+- Node.js
+- Express 5
+- TypeScript
+- Sequelize
+- PostgreSQL
+- JSON Web Token (`jsonwebtoken`)
+- Google Sign-In verification (`google-auth-library`)
+- bcrypt
+- Nodemailer
+
+---
+
+## 3. Project Structure
+
+```text
 api/
 ├── src/
-│   ├── config/           # Database, app configuration
-│   ├── controllers/      # Request handlers (thin layer)
-│   ├── handlers/        # Business logic (validation, transformation)
-│   ├── middlewares/     # Express middlewares (auth)
-│   ├── models/         # Sequelize models
-│   ├── repositories/   # Data access layer
-│   │   ├── entities/   # TypeORM entities (if used)
-│   │   └── mappers/    # Data mappers
-│   ├── routes/         # Express routes
-│   ├── services/       # Business services
-│   ├── tests/         # Integration tests
-│   ├── utils/         # Utilities (JWT, password, email)
-│   ├── app.ts        # Express app
-│   └── server.ts     # Entry point
+│   ├── app.ts                  # Express app and global middleware
+│   ├── server.ts               # Startup script
+│   ├── config/
+│   │   ├── database.ts         # Sequelize connection and model associations
+│   │   ├── initDb.ts           # DB connection and sync
+│   │   └── health.controller.ts
+│   ├── routes/                 # API routes
+│   ├── controllers/            # HTTP layer
+│   ├── services/               # Business orchestration
+│   ├── repositories/           # Data access with Sequelize
+│   │   ├── entities/
+│   │   └── mappers/
+│   ├── middlewares/            # Auth and role authorization
+│   ├── models/                 # Sequelize model definitions
+│   ├── utils/                  # JWT, hashing, email, helpers
+│   └── tests/                  # Integration setup
 ├── package.json
-└── .env
+└── tsconfig.json
 ```
+
+Notes:
+
+- There is no `handlers/` layer in the current implementation.
+- Business logic is concentrated in `services/`.
+- Repositories shape many of the response DTOs returned to the frontend.
 
 ---
 
-## 3. Architecture Pattern
+## 4. Runtime Flow
 
-### Flow of Request
-```
-Route → Controller → Handler → Service → Repository → Database
-         ↓
-      Middleware (auth)
+### Request flow
+
+```text
+Client
+  -> Express route
+  -> auth middleware (optional)
+  -> role middleware (optional)
+  -> controller
+  -> service
+  -> repository
+  -> Sequelize
+  -> PostgreSQL
 ```
 
-### Layers
-| Layer | Responsibility |
-|-------|---------------|
-| **Routes** | Define endpoints and HTTP methods |
-| **Controllers** | Thin layer, extract params, call handlers |
-| **Handlers** | Validate input, transform data, call services |
-| **Services** | Business logic, orchestrate repositories |
-| **Repositories** | Data access, database queries |
-| **Models** | Database schema definitions |
+### Startup flow
+
+1. `server.ts` loads environment variables.
+2. `initDb()` authenticates Sequelize and runs `sequelize.sync({ alter: true })`.
+3. `app.ts` mounts middleware and exposes all routes under `/api`.
+
+Relevant files:
+
+- [app.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/app.ts)
+- [server.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/server.ts)
+- [database.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/config/database.ts)
+- [initDb.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/config/initDb.ts)
 
 ---
 
-## 4. Commands
+## 5. Domain Model
+
+The backend models an academic campus with these main relationships:
+
+- `User belongsTo Role`
+- `User hasMany Subject` as `createdSubjects`
+- `User belongsToMany Subject` as `enrolledSubjects`
+- `Subject belongsTo User` as `creator`
+- `Subject belongsToMany User` as `students`
+- `Subject belongsTo Grade`
+- `Subject hasMany Unit` as `createdUnits`
+- `Unit belongsTo Subject`
+- `Unit hasMany Chapter` as `createdChapters`
+- `Chapter belongsTo Unit`
+- `Chapter hasMany Video`
+- `Chapter hasMany Image`
+
+This relationship graph is defined centrally in [database.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/config/database.ts).
+
+---
+
+## 6. Data Flows
+
+### Authentication flow
+
+#### Email/password
+
+1. Client sends credentials to `POST /api/users/login`.
+2. `user.controller.ts` looks up the user by email.
+3. Password is compared with bcrypt.
+4. `user.service.ts` signs a JWT containing `id_user`.
+5. The response includes user profile data plus `token`.
+
+#### Google Sign-In
+
+1. Client sends Google ID token to `POST /api/users/authUser`.
+2. `user.service.ts` verifies the token with Google.
+3. The repository finds or creates a local user.
+4. The backend signs its own JWT for API access.
+
+#### Session restoration
+
+1. Client sends `Authorization: Bearer <token>` to `GET /api/users/me`.
+2. `authenticateJWT` validates the token and extracts `id_user`.
+3. The repository returns the full user profile, role, created subjects, and enrolled subjects.
+
+### Authorization flow
+
+1. `authenticateJWT` validates the token.
+2. `authorizeRoles(...)` loads the role name from the database.
+3. Access is granted only if the user's role matches the route requirements.
+
+### Academic content flow
+
+The main academic read path is:
+
+```text
+Subject
+  -> createdUnits
+     -> createdChapters
+```
+
+`GET /api/subjects/:id` returns a subject enriched with:
+
+- grade
+- units
+- chapters
+- students
+
+This endpoint is the main source for the teacher and student subject detail screens.
+
+---
+
+## 7. API Surface
+
+All routes are mounted under `/api`.
+
+### Users
+
+| Method | Endpoint | Auth | Roles | Description |
+|--------|----------|------|-------|-------------|
+| POST | `/users` | Yes | `admin` | Create user |
+| POST | `/users/authUser` | No | - | Authenticate with Google |
+| POST | `/users/register` | No | - | Register a local user |
+| POST | `/users/login` | No | - | Login with email/password |
+| GET | `/users/me` | Yes | any authenticated user | Restore current user |
+| GET | `/users/verify?token=...` | No | - | Verify email token |
+| GET | `/users/allteachers` | Yes | `admin` | List teachers |
+| GET | `/users/allStudents` | Yes | `admin` | List students |
+| GET | `/users/liData` | Yes | `admin` | Lightweight list of users |
+| GET | `/users/liData/:id_user` | Yes | `admin` | Detailed user view |
+| GET | `/users` | Yes | `admin` | List all users |
+| PUT | `/users/updateRole/:id_user` | Yes | `admin` | Update role |
+| DELETE | `/users/:id_user` | Yes | `admin` | Delete user |
+
+### Subjects
+
+| Method | Endpoint | Auth | Roles | Description |
+|--------|----------|------|-------|-------------|
+| POST | `/subjects` | Yes | `admin` | Create subject |
+| GET | `/subjects` | No | - | List subjects |
+| GET | `/subjects/:id` | No | - | Get subject with units/chapters |
+| PUT | `/subjects/:id` | Yes | `admin` | Update subject and student assignments |
+| DELETE | `/subjects/:id` | Yes | `admin` | Delete subject |
+
+### Units
+
+| Method | Endpoint | Auth | Roles | Description |
+|--------|----------|------|-------|-------------|
+| POST | `/units` | Yes | `teacher` | Create unit |
+| GET | `/units` | No | - | List units |
+| GET | `/units/:id` | No | - | Get unit |
+| PUT | `/units/:id` | Yes | `teacher` | Update unit |
+| DELETE | `/units/:id` | Yes | `teacher` | Delete unit |
+
+### Chapters
+
+| Method | Endpoint | Auth | Roles | Description |
+|--------|----------|------|-------|-------------|
+| POST | `/chapters` | Yes | `teacher` | Create chapter |
+| GET | `/chapters` | No | - | List chapters |
+| GET | `/chapters/:id` | No | - | Get chapter |
+| PUT | `/chapters/:id` | Yes | `teacher` | Update chapter |
+| DELETE | `/chapters/:id` | Yes | `teacher` | Delete chapter |
+
+### Roles
+
+| Method | Endpoint | Auth | Roles | Description |
+|--------|----------|------|-------|-------------|
+| GET | `/roles` | No | - | List available roles |
+
+### Grades
+
+| Method | Endpoint | Auth | Roles | Description |
+|--------|----------|------|-------|-------------|
+| GET | `/grades` | No | - | List available grades |
+
+### Media
+
+The project includes media routes and repositories, intended for chapter-related image/video resources.
+
+---
+
+## 8. Important Files by Responsibility
+
+### HTTP and middleware
+
+- [app.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/app.ts)
+- [auth.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/auth.middleware.ts)
+- [role.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/role.middleware.ts)
+
+### User flow
+
+- [user.route.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/routes/user.route.ts)
+- [user.controller.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/controllers/user.controller.ts)
+- [user.service.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/services/user.service.ts)
+- [user.repository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/user.repository.ts)
+
+### Academic content flow
+
+- [subject.route.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/routes/subject.route.ts)
+- [subject.controller.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/controllers/subject.controller.ts)
+- [subject.service.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/services/subject.service.ts)
+- [subject.repository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/subject.repository.ts)
+- [unit.repository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/unit.repository.ts)
+- [chapter.repository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/chapter.repository.ts)
+
+---
+
+## 9. Commands
 
 ### Setup
+
 ```bash
 cd api
 npm install
 ```
 
 ### Development
+
 ```bash
-npm run dev    # Start with nodemon (auto-reload)
+npm run dev
 ```
 
 ### Build
+
 ```bash
-npm run build  # Compile TypeScript to dist/
+npm run build
 ```
 
 ### Production
+
 ```bash
-npm start      # Run compiled JS from dist/
+npm start
 ```
 
-### Testing
+### Type check
+
 ```bash
-npm test       # Run Jest tests
+npx tsc --noEmit
 ```
 
 ---
 
-## 5. Environment Variables
+## 10. Environment Variables
 
-Create a `.env` file in the `api/` root:
+Create a `.env` file inside `api/`.
 
-```plaintext
+```env
 DB_NAME=campus
 DB_USER=postgres
-DB_PASS=your_password
+DB_PASS=1234
 DB_HOST=localhost
-DB_PORT=5432
 PORT=3000
-JWT_SECRET=your_jwt_secret
+SECRET=your_jwt_secret
 GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_email_password
 ```
 
----
+Notes:
 
-## 6. API Endpoints
-
-### Users
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/users` | Create user |
-| GET | `/api/users` | Get all users |
-| GET | `/api/users/:id` | Get user by ID |
-| PUT | `/api/users/:id` | Update user |
-| DELETE | `/api/users/:id` | Delete user |
-| PUT | `/api/users/updateRole/:id` | Update user role |
-| POST | `/api/users/authUser` | Authenticate with Google |
-| GET | `/api/users/me` | Get current user |
-
-### Subjects
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/subjects` | Create subject |
-| GET | `/api/subjects` | Get all subjects |
-| GET | `/api/subjects/:id` | Get subject by ID |
-| PUT | `/api/subjects/:id` | Update subject |
-| DELETE | `/api/subjects/:id` | Delete subject |
-
-### Grades
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/grades` | Get all grades |
-
-### Roles
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/roles` | Get all roles |
-
-### Chapters
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/chapters/:id` | Get chapter by ID |
-| POST | `/api/chapters` | Create chapter |
-| PUT | `/api/chapters/:id` | Update chapter |
-| DELETE | `/api/chapters/:id` | Delete chapter |
-
-### Units
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/units/:id` | Get unit by ID |
-| POST | `/api/units` | Create unit |
-| PUT | `/api/units/:id` | Update unit |
-| DELETE | `/api/units/:id` | Delete unit |
+- The runtime code currently expects `SECRET`, not `JWT_SECRET`.
+- `database.ts` contains a custom `dotenv.config({ path: "/custom/path/.env" })` call, but the server startup also calls `dotenv.config()`. The effective environment loading should be reviewed if deployment issues appear.
 
 ---
 
-## 7. Authentication
+## 11. Implementation Notes
 
-### JWT Token
-- Tokens are generated using `jsonwebtoken`
-- Token is included in request headers: `Authorization: Bearer <token>`
-- Middleware `auth.middleware.ts` validates token on protected routes
-
-### Google OAuth
-- Uses `google-auth-library` for Google Sign-In
-- Endpoint: `POST /api/users/authUser`
+- Sequelize models are loaded dynamically from `src/models`.
+- The database is synchronized with `sequelize.sync({ alter: true })` at startup.
+- Repositories often return already-shaped payloads for frontend consumption instead of returning raw models.
+- Some endpoints are public for reads (`subjects`, `units`, `chapters`, `roles`, `grades`), while mutations are role-protected.
 
 ---
 
-## 8. Code Conventions
+## 12. Testing
 
-### Naming
-- Files: kebab-case (`user.repository.ts`)
-- Classes: PascalCase (`UserRepository`)
-- Variables: camelCase (`userData`)
-- Interfaces: Prefix with `I` (`IUser`)
+The repository contains unit and integration-oriented test files, especially around:
 
-### Imports Order
-1. Node.js core modules
-2. External dependencies
-3. Internal modules
+- auth middleware
+- role middleware
+- user controller
+- user service
+- crypto helpers
 
-### Error Handling
-- Use `try...catch` in handlers/services
-- Return proper HTTP status codes
-- Throw custom errors for validation
+Examples:
 
----
+- [auth.middleware.test.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/auth.middleware.test.ts)
+- [role.middleware.test.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/role.middleware.test.ts)
+- [user.controller.test.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/controllers/user.controller.test.ts)
+- [user.service.test.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/services/user.service.test.ts)
+- [user.test.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/tests/integration/user.test.ts)
 
-## 9. Database
-
-### Models
-- User
-- Subject
-- Grade
-- Role
-- Chapter
-- Unit
-
-### Relationships
-- User has many Subjects (enrolled)
-- Subject belongs to Grade
-- Subject belongs to Role (teacher)
-- Subject has many Units
-- Unit has many Chapters
-
----
-
-## 10. Testing
-
-### Unit Tests
-Located in same directory as implementation with `.test.ts` suffix:
-- `user.controller.test.ts`
-- `user.service.test.ts`
-- `auth.middleware.test.ts`
-
-### Integration Tests
-Located in `src/tests/integration/`
-
-### Run Tests
-```bash
-npm test
-```
+Run tests according to the scripts available in the project setup.

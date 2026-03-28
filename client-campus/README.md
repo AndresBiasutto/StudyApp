@@ -2,340 +2,387 @@
 
 ## 1. Overview
 
-The Frontend is a **React 19** application built with **Vite**, following **Clean Architecture** and **Atomic Design** principles. It uses **Redux Toolkit** for state management and **Tailwind CSS 4** for styling.
+The frontend is a React 19 application built with Vite and TypeScript.
+It implements the Campus Virtual user experience for three main roles:
 
-### Technology Stack
+- admin
+- teacher
+- student
+
+The codebase combines three ideas:
+
+- presentation with Atomic Design under `src/UI`
+- application/domain/infrastructure separation under `src/BR`
+- global state orchestration with Redux Toolkit
+
+The effective runtime flow is:
+
+```text
+View/Component -> Redux thunk -> Use case -> Repository -> httpClient -> Backend API
+```
+
+This means the app uses Redux as the orchestration layer, while `BR/` provides the abstraction boundary around API access and business actions.
+
+---
+
+## 2. Technology Stack
+
 - React 19
 - Vite 7
 - TypeScript
 - Tailwind CSS 4
-- Redux Toolkit + Redux Persist
+- Redux Toolkit
+- Redux Persist
 - React Router DOM 7
-- Axios (HTTP Client)
-- Framer Motion (Animations)
+- Axios
+- Framer Motion
+- Google OAuth
 
 ---
 
-## 2. Project Structure
+## 3. Project Structure
 
-```
+```text
 client-campus/
 ├── src/
-│   ├── BR/                    # Clean Architecture
-│   │   ├── application/       # Use Cases, Mappers, ViewModels
-│   │   │   ├── useCases/    # Business logic (User/, Subject/, etc.)
-│   │   │   ├── mappers/     # Data transformers
-│   │   │   └── viewModels/  # View-specific models
-│   │   ├── domain/           # Entities & Repository Interfaces
-│   │   │   ├── entities/    # User, Subject, Role, Grade, etc.
-│   │   │   └── services/    # Repository contracts
-│   │   └── infrastructure/  # Implementations
-│   │       ├── repositories/ # API implementations
-│   │       ├── services/    # httpClient (Axios)
-│   │       └── errors/      # Error types
-│   │
-│   ├── UI/                    # Presentation Layer
-│   │   ├── components/      # Atomic Design
-│   │   │   ├── atoms/       # Button, Input, Icon, Label, etc.
-│   │   │   ├── molecules/   # Sidebar, Cards, Forms, Navigation
-│   │   │   ├── organisms/  # Complex components
-│   │   │   └── templates/  # Layout templates
-│   │   ├── views/           # Pages (Admin, Teacher, Student)
-│   │   └── interfaces/     # Props interfaces
-│   │
-│   ├── store/                # Redux Toolkit
-│   │   ├── slices/          # Auth, User, Subject, Role, Grade, UI
-│   │   └── store.ts        # Store configuration
-│   │
-│   ├── routes/              # Routing (protected routes)
-│   ├── hooks/               # Custom hooks (useStore, useForm)
-│   └── assets/              # Images, SVGs
-│
+│   ├── UI/
+│   │   ├── main.tsx                # App bootstrap
+│   │   ├── App.tsx                 # Main routes
+│   │   ├── index.css               # Global styles
+│   │   ├── views/                  # Pages by role
+│   │   ├── components/             # Atomic Design components
+│   │   │   ├── atoms/
+│   │   │   ├── molecules/
+│   │   │   ├── organisms/
+│   │   │   └── templates/
+│   │   └── interfaces/
+│   ├── BR/
+│   │   ├── domain/
+│   │   │   ├── entities/           # Domain interfaces
+│   │   │   └── services/           # Repository contracts and validators
+│   │   ├── application/
+│   │   │   ├── useCases/           # Use cases grouped by entity
+│   │   │   ├── mappers/
+│   │   │   └── viewModels/
+│   │   └── infrastructure/
+│   │       ├── repositories/       # API repository implementations
+│   │       ├── services/           # Axios httpClient
+│   │       ├── factories/          # Repository factory singleton
+│   │       └── errors/
+│   ├── store/
+│   │   ├── slices/                 # Redux feature slices
+│   │   └── store.ts
+│   ├── routes/                     # Protected routing and auth redirect
+│   ├── hooks/                      # Typed redux hooks and form hook
+│   └── assets/
 ├── package.json
-├── vite.config.ts
-└── tsconfig.json
+└── vite.config.ts
 ```
 
 ---
 
-## 3. Clean Architecture (BR/)
-
-### Flow of Data
-```
-UI Component → Use Case → Repository (Interface) → API Repository → HTTP Client → Backend API
-       ↓
-   Redux Store
-```
+## 4. Architecture
 
 ### Layers
 
-| Layer | Purpose |
-|-------|---------|
-| **Domain** | Entities (interfaces) and repository contracts |
-| **Application** | Use cases with business logic, mappers, view models |
-| **Infrastructure** | Repository implementations, HTTP client |
+| Layer | Responsibility |
+|-------|----------------|
+| `UI/` | Screens, layout, components, user interaction |
+| `store/` | Async orchestration, cache, UI state, auth state |
+| `BR/domain` | Contracts and domain interfaces |
+| `BR/application` | Use cases and mapping logic |
+| `BR/infrastructure` | API repositories and HTTP client |
+
+### Real execution flow
+
+Most user actions follow this pattern:
+
+```text
+Component
+  -> dispatch(thunk)
+  -> use case
+  -> repository interface
+  -> API repository
+  -> Axios httpClient
+  -> backend endpoint
+  -> Redux slice updates state
+  -> component re-renders
+```
+
+This is important because the app is not using components to call repositories directly. Redux is the main coordination point.
 
 ---
 
-## 4. Commands
+## 5. Bootstrap and Routing
+
+### App bootstrap
+
+[main.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/main.tsx) initializes:
+
+- `GoogleOAuthProvider`
+- Redux `Provider`
+- `PersistGate`
+- `BrowserRouter`
+
+### Main routes
+
+[App.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/App.tsx) defines:
+
+- landing routes
+- protected dashboard routes
+- admin, teacher, and student role-based views
+
+### Route protection
+
+- [protectedRoutes.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/routes/protectedRoutes.tsx)
+- [redirectOnAuth.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/routes/redirectOnAuth.tsx)
+
+The route logic depends on:
+
+- `auth.isAuthenticated`
+- `auth.selected.Role.name`
+
+---
+
+## 6. State Management
+
+The Redux store is configured in [store.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/store/store.ts).
+
+### Active slices
+
+- `ui`
+- `auth`
+- `users`
+- `subjects`
+- `units`
+- `chapters`
+- `roles`
+- `grades`
+
+### Persistence
+
+Only `auth.token` is persisted with Redux Persist.
+
+That creates this session restoration flow:
+
+1. Token survives page reload.
+2. `App.tsx` detects token presence.
+3. `authenticateMe()` is dispatched.
+4. Backend returns the full current user.
+5. Protected routes and role redirects become active.
+
+---
+
+## 7. HTTP Client
+
+The HTTP client lives in [httpClient.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/infrastructure/services/httpClient.ts).
+
+### Responsibilities
+
+- set `baseURL` from `VITE_API_URL`
+- inject `Authorization: Bearer <token>`
+- convert backend `{ error: string }` responses into thrown `Error`
+- log out automatically on HTTP `401`
+
+This file is the single entry point for authenticated API communication.
+
+---
+
+## 8. Repository and Use Case Layer
+
+### Repository factory
+
+[repositoryFactory.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/infrastructure/factories/repositoryFactory.ts) exposes singleton repositories for:
+
+- users
+- subjects
+- roles
+- grades
+- units
+- chapters
+
+### Use cases
+
+Use cases are grouped by feature, for example:
+
+- [useCases/User/index.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/application/useCases/User/index.ts)
+- [useCases/Subject/index.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/application/useCases/Subject/index.ts)
+- [useCases/Unit/index.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/application/useCases/Unit/index.ts)
+- [useCases/Chapter/index.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/application/useCases/Chapter/index.ts)
+
+This layer gives the UI a stable API even if repository details evolve.
+
+---
+
+## 9. Main Data Flows
+
+### Authentication flow
+
+#### Google login
+
+1. The client obtains a Google token.
+2. A thunk dispatches `authenticateUser`.
+3. The user use case calls `UserApiRepository.authUser`.
+4. The backend returns a Campus user plus JWT.
+5. The auth slice stores `token`, `selected`, and `isAuthenticated`.
+
+Relevant files:
+
+- [auth.thunk.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/store/slices/authSlice/auth.thunk.ts)
+- [auth.slice.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/store/slices/authSlice/auth.slice.ts)
+- [userApiRepository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/infrastructure/repositories/userApiRepository.ts)
+
+#### Session restoration
+
+1. Persisted token is loaded from storage.
+2. `App.tsx` dispatches `authenticateMe`.
+3. `/users/me` returns the full user with role and assigned subjects.
+4. The UI redirects to the correct dashboard.
+
+### Admin flow
+
+Admins manage users and subjects.
+
+Example:
+
+1. [adminUsers.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/admin/adminUsers.view.tsx) dispatches `fetchListedUsers`.
+2. The thunk calls the user use case.
+3. The repository calls `/users/liData`.
+4. The `users` slice stores the lightweight user list.
+5. UI maps each item to a presentational card model.
+
+### Teacher flow
+
+Teachers mainly operate on subjects they created.
+
+1. The authenticated user profile already includes `subjects`.
+2. [teacherAssignedSubjects.organism.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/organisms/teacher/teacherAssignedSubjects.organism.tsx) renders those subjects from `auth.selected`.
+3. Entering a subject detail page dispatches `fetchSubjectById`.
+4. The selected subject includes nested units and chapters.
+5. The teacher can create or modify units and chapters through modal-driven forms.
+
+### Student flow
+
+Students consume subjects assigned to them.
+
+1. The authenticated user profile includes `enrolledSubjects`.
+2. [studentSubjects.organism.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/organisms/student/studentSubjects.organism.tsx) renders that list.
+3. [studentDetailSubject.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/student/studentDetailSubject.view.tsx) loads a subject by ID.
+4. The screen traverses `subject -> createdUnits -> createdChapters`.
+
+---
+
+## 10. Role-Based UI
+
+The frontend is organized by user role:
+
+- `admin/*`
+- `teacher/*`
+- `student/*`
+- `landing/*`
+
+Examples:
+
+- [adminHome.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/admin/adminHome.view.tsx)
+- [teacherHome.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/teacher/teacherHome.view.tsx)
+- [studentHome.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/student/studentHome.view.tsx)
+
+This keeps navigation and screens aligned with authorization rules coming from the backend.
+
+---
+
+## 11. Atomic Design
+
+The component tree is structured as:
+
+- `atoms`: basic UI primitives
+- `molecules`: small compositions
+- `organisms`: feature-level components
+- `templates`: page layout containers
+
+The dashboard shell is defined in:
+
+- [dashboard.template.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/templates/dashboard.template.tsx)
+
+This template wraps most role-specific pages.
+
+---
+
+## 12. Domain Interfaces
+
+The domain contracts used across the app are defined under `src/BR/domain/entities`.
+
+Important interfaces:
+
+- [user.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/user.interface.ts)
+- [subject.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/subject.interface.ts)
+- [unit.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/unit.interface.ts)
+- [chapter.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/chapter.interface.ts)
+- [role.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/role.interface.ts)
+- [grade.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/grade.interface.ts)
+
+These interfaces mirror the backend response shape closely.
+
+---
+
+## 13. Commands
 
 ### Setup
+
 ```bash
 cd client-campus
 npm install
 ```
 
 ### Development
+
 ```bash
-npm run dev    # Start Vite dev server
+npm run dev
 ```
 
 ### Build
-```bash
-npm run build  # Production build
-```
 
-### Preview
 ```bash
-npm run preview  # Preview production build
+npm run build
 ```
 
 ### Lint
+
 ```bash
-npm run lint    # Run ESLint
+npm run lint
 ```
 
-### Type Check
+### Preview
+
+```bash
+npm run preview
+```
+
+### Type check
+
 ```bash
 npx tsc --noEmit
 ```
 
 ---
 
-## 5. Environment Variables
+## 14. Environment Variables
 
-Create a `.env` file in `client-campus/` root:
+Create a `.env` file inside `client-campus/`.
 
-```plaintext
+```env
 VITE_API_URL=http://localhost:3000/api/
+VITE_GOOGLE_OAUTH_CLIENT_ID=your_google_client_id
 ```
+
+`VITE_GOOGLE_OAUTH_CLIENT_ID` is required because [main.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/main.tsx) initializes `GoogleOAuthProvider` with that value.
 
 ---
 
-## 6. State Management (Redux)
+## 15. Implementation Notes
 
-### Store Structure
-```
-store/
-├── slices/
-│   ├── authSlice/      # Authentication (token, user)
-│   ├── userSlice/      # Users CRUD
-│   ├── subjectSlice/   # Subjects CRUD
-│   ├── roleSlice/      # Roles
-│   ├── gradeSlice/     # Grades
-│   └── uiSlice/       # UI state (modals, theme)
-└── store.ts           # Configure store + persist
-```
-
-### Auth Persistence
-- Uses `redux-persist` with `localStorage`
-- Only persists `auth.token`
-- Auto-logout on 401 response
-
----
-
-## 7. HTTP Client
-
-### Location
-`src/BR/infrastructure/services/httpClient.ts`
-
-### Features
-- **Automatic token injection**: Adds `Authorization: Bearer <token>` to requests
-- **401 handling**: Dispatches logout on unauthorized responses
-- **Base URL**: From `VITE_API_URL` environment variable
-
-### Usage
-```typescript
-import { httpClient } from '../infrastructure/services/httpClient';
-
-// GET request
-const users = await httpClient.get('/users');
-
-// POST request
-const newUser = await httpClient.post('/users', userData);
-```
-
----
-
-## 8. Atomic Design
-
-### Atoms
-Basic building blocks (no dependencies):
-- `Button`, `Input`, `Label`, `Icon`, `Image`
-- `H1`, `H2`, `H3`, `P`, `Span`
-- `Link`, `NavItem`
-
-### Molecules
-Simple groups of atoms:
-- `SearchBar`, `Sidebar`, `Navigation`
-- `FormInput`, `FormSelect`
-- `Card`, `Spinner`, `Modal`
-
-### Organisms
-Complex UI components:
-- `AdminTools`, `TeacherTools`
-- `CreateSubjectForm`, `RegisterForm`
-- `DashboardHeader`, `DashboardFooter`
-
-### Templates
-Layout structures:
-- `Dashboard` template
-
----
-
-## 9. Components Usage
-
-### Atoms
-```tsx
-import Button from '../components/atoms/button.atom';
-import Input from '../components/atoms/input.atom';
-
-<Button btnName="Submit" onClick={handleSubmit} />
-<Input type="text" name="email" value={email} onChange={handleChange} />
-```
-
-### Molecules
-```tsx
-import SearchBar from '../components/molecules/searchBar.molecule';
-import Spinner from '../components/molecules/spinner.molecule';
-
-<SearchBar onSearch={handleSearch} />
-{loading && <Spinner />}
-```
-
-### Organisms
-```tsx
-import CreateSubjectForm from '../components/organisms/forms/createSubjectForm.organism';
-import DashboardHeader from '../components/organisms/dashboard/dashboardHeader.organism';
-
-<CreateSubjectForm onSubmit={handleCreate} />
-<DashboardHeader user={user} />
-```
-
----
-
-## 10. Views (Pages)
-
-| View | Description |
-|------|-------------|
-| `landing.view.tsx` | Landing page |
-| `register.view.tsx` | Registration page |
-| `adminHome.view.tsx` | Admin dashboard |
-| `adminUsers.view.tsx` | Admin user management |
-| `adminSubjects.view.tsx` | Admin subject management |
-| `adminUserDetail.view.tsx` | Admin user details |
-| `teacherHome.view.tsx` | Teacher dashboard |
-| `studentDashboard.view.tsx` | Student dashboard |
-| `missing.view.tsx` | 404 page |
-
----
-
-## 11. Routing
-
-### Protected Routes
-Location: `src/routes/protectedRoutes.tsx`
-
-### Usage
-```tsx
-import ProtectedRoutes from '../routes/protectedRoutes';
-
-<Route 
-  path="/admin" 
-  element={
-    <ProtectedRoutes role="admin">
-      <AdminHome />
-    </ProtectedRoutes>
-  } 
-/>
-```
-
----
-
-## 12. Custom Hooks
-
-### useStore
-Access Redux store with types:
-```tsx
-import { useAppDispatch, useAppSelector } from '../hooks/UseStore.hook';
-
-const dispatch = useAppDispatch();
-const { users, loading } = useAppSelector(state => state.users);
-```
-
-### useForm
-Form handling with validation:
-```tsx
-import { useForm } from '../hooks/UseForm.hook';
-
-const { values, errors, handleChange, handleSubmit } = useForm(initialState, validate);
-```
-
----
-
-## 13. Code Conventions
-
-### Naming
-- Files: kebab-case (`button.atom.tsx`, `user-api-repository.ts`)
-- Components: PascalCase (`Button`, `UserApiRepository`)
-- Props Interfaces: Prefix with `I` (`IButtonProps`)
-- Hooks: `use` prefix (`useForm`, `useStore`)
-
-### Imports
-```typescript
-// External
-import { useState } from 'react';
-import axios from 'axios';
-
-// Internal (absolute paths)
-import { httpClient } from '@/BR/infrastructure/services/httpClient';
-import type { User } from '@/BR/domain/entities/user.interface';
-```
-
----
-
-## 14. Styling
-
-### Tailwind CSS 4
-- Uses `@import "tailwindcss"` syntax
-- Custom theme variables in `src/UI/index.css`
-- Dark mode support with `.dark` class
-
-### Component Styles
-```tsx
-<button className="px-4 py-2 bg-lightPrimary dark:bg-darkPrimary text-lightText dark:text-darkText rounded">
-  Click Me
-</button>
-```
-
----
-
-## 15. Forms
-
-### Creating a Form
-1. Define form data interface in `src/UI/interfaces/`
-2. Create validator in `src/BR/domain/services/validators/`
-3. Use `useForm` hook with validation
-4. Dispatch thunk action on submit
-
-### Example
-```tsx
-const { values, errors, handleChange, handleSubmit } = useForm(formData, validate);
-
-const onSubmit = (data) => {
-  dispatch(createSubject(data));
-};
-
-<form onSubmit={handleSubmit(onSubmit)}>
-  <FormInput label="Name" name="name" value={values.name} onChange={handleChange} error={errors.name} />
-</form>
-```
+- Redux is the main execution coordinator.
+- The app uses typed hooks from [UseStore.hook.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/hooks/UseStore.hook.ts).
+- API repositories are thin wrappers over Axios and mostly map endpoint calls 1:1.
+- Several screens rely on backend-enriched payloads instead of assembling nested relationships on the client.
+- The architecture is cleaner in the frontend than in the backend, but both are coupled by shared response shapes.
