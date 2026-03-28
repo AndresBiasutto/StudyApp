@@ -112,6 +112,12 @@ class UserService {
   async getAllLiDataUsers() {
     return userRepository.getAllLiDataUsers();
   }
+  async getAllTeachers() {
+    return userRepository.getAllUsersByRole("teacher");
+  }
+  async getAllStudents() {
+    return userRepository.getAllUsersByRole("student");
+  }
   async getUserByName(name: string) {
     return userRepository.getUserByName(name);
   }

@@ -9,6 +9,18 @@ export const fetchUsers = createAsyncThunk(
     return await getUserUseCases().getUsers.execute();
   }
 );
+export const fetchTeachers = createAsyncThunk(
+  "users/fetchTeachers",
+  async () => {
+    return await getUserUseCases().getAllTeachers.execute();
+  }
+);
+export const fetchStudents = createAsyncThunk(
+  "users/fetchStudents",
+  async () => {
+    return await getUserUseCases().getAllStudents.execute();
+  }
+);
 export const fetchListedUsers = createAsyncThunk(
   "users/fetchListed",
   async () => {

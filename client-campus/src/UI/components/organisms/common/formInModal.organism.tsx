@@ -4,6 +4,7 @@ import Modal from "../dashboard/modal.organism";
 import CreateSubjectForm from "../forms/adminForms/createSubjectForm.organism";
 import DeleteSubjectForm from "../forms/adminForms/deleteSubjectForm.organism";
 import DeleteUserForm from "../forms/adminForms/deleteUserForm.organism";
+import SetStudentsForm from "../forms/adminForms/setStudentsForm.organism";
 import SetTeacherForm from "../forms/adminForms/setTeacherForm.organism";
 import UpdateSubjectForm from "../forms/adminForms/updateSubjectForm.organism";
 import UpdateUserRoleForm from "../forms/adminForms/updateUserRoleForm.organism";
@@ -43,6 +44,10 @@ const FormInModal = () => {
         return <DeleteChapterForm item={modalContent?.data} />;
       case "ASSIGN_TEACHER":
         return <SetTeacherForm item={modalContent?.data} />;
+      case "ASSIGN_STUDENTS":
+        return <SetStudentsForm
+         // item={modalContent?.data}
+          />;
       default:
         return null;
     }

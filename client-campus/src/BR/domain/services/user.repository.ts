@@ -4,6 +4,8 @@ export interface UserRepository {
   authUser(token: string): Promise<User>;
   authMe(): Promise<User>;
   getAll(): Promise<User[]>;
+  getAllTeachers(): Promise<User[]>;
+  getAllStudents(): Promise<User[]>;
   getListed(): Promise<User[]>;
   getById(id: string): Promise<User>;
   getUserData(id: string): Promise<User>;

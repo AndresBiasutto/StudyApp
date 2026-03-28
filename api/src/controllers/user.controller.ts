@@ -142,6 +142,24 @@ class UserController {
     }
   }
 
+  async getAllTeachers(req: Request, res: Response) {
+    try {
+      const teachers = await userService.getAllTeachers();
+      res.json(teachers);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  async getAllStudents(req: Request, res: Response) {
+    try {
+      const students = await userService.getAllStudents();
+      res.json(students);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
   async getUserByName(req: Request, res: Response) {
     try {
       const user = await userService.getUserByName(req.params.name);

@@ -27,6 +27,14 @@ export class UserApiRepository implements UserRepository {
     const { data } = await httpClient.get<User[]>("/users");
     return data;
   }
+  async getAllTeachers(): Promise<User[]> {
+    const { data } = await httpClient.get<User[]>("/users/allteachers");
+    return data;
+  }
+  async getAllStudents(): Promise<User[]> {
+    const { data } = await httpClient.get<User[]>("/users/allStudents");
+    return data;
+  }
   async getListed(): Promise<User[]> {
     const { data } = await httpClient.get<User[]>("/users/liData");
     return data;

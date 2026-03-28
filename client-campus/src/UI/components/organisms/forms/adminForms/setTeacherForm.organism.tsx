@@ -5,7 +5,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../hooks/UseStore.hook";
-import { fetchUsers } from "../../../../../store/slices/userSlice/user.thunk";
+import { fetchTeachers } from "../../../../../store/slices/userSlice/user.thunk";
 import { useForm } from "../../../../../hooks/UseForm.hook";
 import Spinner from "../../../molecules/spinner.molecule";
 import { toggleModal } from "../../../../../store/slices/uiSlice";
@@ -14,7 +14,6 @@ import Button from "../../../atoms/button.atom";
 import { CiEdit } from "react-icons/ci";
 import Ptxt from "../../../atoms/P.atom";
 import type { Subject } from "../../../../../BR/domain/entities/subject.interface";
-import type { User } from "../../../../../BR/domain/entities/user.interface";
 import { updateSubject } from "../../../../../store/slices/subjectSlice/subject.thunk";
 
 interface UpdateUserFormValues {
@@ -43,14 +42,12 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
   const dispatch = useAppDispatch();
 
   const {
-    items: userState,
+    teachers,
     loading,
     error,
   } = useAppSelector((state) => state.users);
 
-  const users = userState
-    .filter((user: User) => user.Role?.name === "teacher")
-    .map((user: User) => ({
+  const users = teachers.map((user) => ({
     id: user.id_user,
     name: `${user.name} ${user.last_name}`,
   }));
@@ -59,8 +56,10 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
     useForm<UpdateUserFormValues>(initialState, validate);
 
   useEffect(() => {
-    if (userState.length === 0) dispatch(fetchUsers());
-  }, [dispatch, userState.length]);
+    if (teachers.length === 0) {
+      dispatch(fetchTeachers());
+    }
+  }, [dispatch, teachers.length]);
 
   if (loading) return <Spinner />;
   if (error) return <p>{error}</p>;

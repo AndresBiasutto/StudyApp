@@ -72,7 +72,7 @@ class UserRepository {
             }
           : null,
       })),
-      id_role: data.id_role
+      id_role: data.id_role,
     };
     return formatedData;
   }
@@ -118,6 +118,26 @@ class UserRepository {
       };
     });
     return listedUsers;
+  }
+  async getAllUsersByRole(roleName: string) {
+    const users = await User.findAll({
+      include: [
+        {
+          model: Role,
+          attributes: ["name"],
+          where: { name: roleName },
+        },
+      ],
+      order: [["name", "ASC"], ["last_name", "ASC"]],
+    });
+    console.log(users);
+    return users.map((user: any) => ({
+      id_user: user.id_user,
+      name: user.name,
+      last_name: user.last_name,
+      image: user.image,
+      Role: user.Role,
+    }));
   }
   async getUserByName(name: string) {
     return User.findOne({ where: { name } });
