@@ -1,24 +1,37 @@
-import  subjectRepository  from "../repositories/subject.repository";
+import subjectRepository from "../repositories/subject.repository";
+import { mapSubjectResponse } from "../contracts/mappers/response.mapper";
 
 class SubjectService {
-  createSubject(data: any) {
-    return subjectRepository.createSubject(data);
+  async createSubject(data: any) {
+    const subject = await subjectRepository.createSubject(data);
+    return mapSubjectResponse(subject);
   }
 
-  getSubject(id: string) {
-    return subjectRepository.getSubject(id);
+  async getSubject(id: string) {
+    const subject = await subjectRepository.getSubject(id);
+    if (!subject) {
+      return null;
+    }
+
+    return mapSubjectResponse(subject);
   }
 
-  getAllSubjects() {
-    return subjectRepository.getAllSubjects();
+  async getAllSubjects() {
+    const subjects = await subjectRepository.getAllSubjects();
+    return subjects.map(mapSubjectResponse);
   }
 
   getSubjectByName(name: string) {
     return subjectRepository.getSubjectByName(name);
   }
 
-  updateSubject(id: string, data: any) {
-    return subjectRepository.updateSubject(id, data);
+  async updateSubject(id: string, data: any) {
+    const subject = await subjectRepository.updateSubject(id, data);
+    if (!subject) {
+      return null;
+    }
+
+    return mapSubjectResponse(subject);
   }
 
   deleteSubject(id: string) {

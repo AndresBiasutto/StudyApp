@@ -47,7 +47,7 @@ export class UserApiRepository implements UserRepository {
     const { data } = await httpClient.get<User>(`/users/liData/${id_user}`);
     return data;
   }
-  async create(user: Omit<User, "id">): Promise<User> {
+  async create(user: Omit<User, "id_user">): Promise<User> {
     const { data } = await httpClient.post<User>("/users", user);
     return data;
   }

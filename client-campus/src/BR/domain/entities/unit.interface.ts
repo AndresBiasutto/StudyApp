@@ -1,13 +1,11 @@
 import type { Chapter } from "./chapter.interface";
 
 export interface Unit {
-  id: number;
+  id_unit: string;
   name: string;
-  description: string;
-  order: number;
+  description?: string | null;
+  order?: number | null;
+  imageUrl?: string | null;
   createdChapters: Chapter[];
-  id_unit?: string;
-  unitOrder?: number;
-  chapters: Chapter[];
   id_subject?: string;
 }

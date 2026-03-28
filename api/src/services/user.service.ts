@@ -4,6 +4,11 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import userRepository from "../repositories/user.repository";
 import { OAuth2Client } from "google-auth-library";
+import {
+  mapAuthResponse,
+  mapUserListResponse,
+  mapUserResponse,
+} from "../contracts/mappers/response.mapper";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -30,20 +35,28 @@ class UserService {
     const jwtToken = jwt.sign({ id_user: user.id_user }, SECRET, {
       expiresIn: "1d",
     });
-    const response = {
-      ...user,
-      token: jwtToken,
-    };
-    console.log("Usuario autenticado con Google:", response);
-    return response;
+    const fullUser = await userRepository.getUser(user.id_user);
+
+    if (!fullUser) {
+      throw new Error("Usuario no encontrado");
+    }
+
+    return mapAuthResponse(fullUser, jwtToken);
   }
 
   async getMe(id_user: string) {
-    return userRepository.getUser(id_user);
+    const user = await userRepository.getUser(id_user);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return mapUserResponse(user);
   }
 
   async createUser(data: any) {
-    return userRepository.createUser(data);
+    const user = await userRepository.createUser(data);
+    return mapUserListResponse(user);
   }
   async registerUser(data: any) {
     const encriptedPassword = await hashPassword(data.password);
@@ -69,19 +82,13 @@ class UserService {
     const token: any = jwt.sign({ id_user: user.id_user }, SECRET, {
       expiresIn: 84600,
     });
-    const response = {
-      id_user: user.id_user,
-      name: user.name,
-      last_name: user.last_name,
-      e_mail: user.e_mail,
-      token: token,
-      image: user.image,
-      contactNumber: user.contactNumber,
-      description: user.description,
-      role: user.Role,
-      createdSubjects: user.createdSubjects,
-    };
-    return response;
+    const fullUser = await userRepository.getUser(user.id_user);
+
+    if (!fullUser) {
+      throw new Error("User not found");
+    }
+
+    return mapAuthResponse(fullUser, token);
   }
   async findByToken(token: any) {
     return userRepository.findByToken(token);
@@ -99,24 +106,28 @@ class UserService {
   async getUser(id_user: string) {
     const user = await userRepository.getUser(id_user);
     if (!user) throw new Error("User not found");
-    return user;
+    return mapUserResponse(user);
   }
   async getSelectedUser(id_user: string) {
     const user = await userRepository.getSelectedUser(id_user);
     if (!user) throw new Error("User not found");
-    return user;
+    return mapUserResponse(user);
   }
   async getAllUsers() {
-    return userRepository.getAllUsers();
+    const users = await userRepository.getAllUsers();
+    return users.map(mapUserResponse);
   }
   async getAllLiDataUsers() {
-    return userRepository.getAllLiDataUsers();
+    const users = await userRepository.getAllLiDataUsers();
+    return users.map(mapUserListResponse);
   }
   async getAllTeachers() {
-    return userRepository.getAllUsersByRole("teacher");
+    const users = await userRepository.getAllUsersByRole("teacher");
+    return users.map(mapUserListResponse);
   }
   async getAllStudents() {
-    return userRepository.getAllUsersByRole("student");
+    const users = await userRepository.getAllUsersByRole("student");
+    return users.map(mapUserListResponse);
   }
   async getUserByName(name: string) {
     return userRepository.getUserByName(name);
@@ -130,21 +141,24 @@ class UserService {
   async updateUser(id_user: string, data: any) {
     const user = await userRepository.updateUser(id_user, data);
     if (!user) throw new Error("User not found");
-    return user;
+    return mapUserListResponse(user);
   }
   async updateUserRole(id_user: string, id_role: string) {
-    const usertoUpdateRole =await this.getUser(id_user);
-    const roleUpdated = {
-      ...usertoUpdateRole,
-      id_role,
-    };
-    const userRoleUpdated = await userRepository.updateUserRole(
-      id_user,
-      roleUpdated,
-    );
-    console.log(userRoleUpdated)
-    if (!usertoUpdateRole) throw new Error("User not found");
-    return userRoleUpdated;
+    const userToUpdateRole = await userRepository.getUser(id_user);
+
+    if (!userToUpdateRole) {
+      throw new Error("User not found");
+    }
+
+    await userRepository.updateUserRole(id_user, { id_role });
+
+    const updatedUser = await userRepository.getUser(id_user);
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    return mapUserResponse(updatedUser);
   }
   async deleteUser(id_user: string) {
     const deleted = await userRepository.deleteUser(id_user);

@@ -50,7 +50,7 @@ export const fetchSelectedUser = createAsyncThunk(
 /* CREATE */
 export const createUser = createAsyncThunk(
   "users/create",
-  async (user: Omit<User, "id">) => {
+  async (user: Omit<User, "id_user">) => {
     return await getUserUseCases().createUser.execute(user);
   },
 );

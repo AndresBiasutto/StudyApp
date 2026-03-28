@@ -14,9 +14,20 @@ class SubjectRepository {
           attributes: ["id_grade", "name"],
         },
         {
+          model: User,
+          as: "creator",
+          attributes: ["id_user", "name", "last_name", "e_mail", "image"],
+          include: [
+            {
+              model: sequelize.models.Role,
+              attributes: ["id_role", "name"],
+            },
+          ],
+        },
+        {
           model: Unit,
           as: "createdUnits",
-          attributes: ["id_unit", "order", "name", "description"],
+          attributes: ["id_unit", "order", "name", "description", "imageUrl"],
           include: [
             {
               model: Chapter,
@@ -28,8 +39,14 @@ class SubjectRepository {
         {
           model: User,
           as: "students",
-          attributes: ["id_user", "name", "last_name", "image"],
+          attributes: ["id_user", "name", "last_name", "e_mail", "image"],
           through: { attributes: [] },
+          include: [
+            {
+              model: sequelize.models.Role,
+              attributes: ["id_role", "name"],
+            },
+          ],
         },
       ],
     });
@@ -41,13 +58,26 @@ class SubjectRepository {
         {
           model: User,
           as: "creator",
-          attributes: ["id_user", "name"],
+          attributes: ["id_user", "name", "last_name", "e_mail", "image"],
+          include: [
+            {
+              model: sequelize.models.Role,
+              attributes: ["id_role", "name"],
+            },
+          ],
         },
 
         {
           model: Unit,
           as: "createdUnits",
-          attributes: ["order", "name"],
+          attributes: ["id_unit", "order", "name", "description", "imageUrl"],
+          include: [
+            {
+              model: Chapter,
+              as: "createdChapters",
+              attributes: ["id_chapter", "order", "name", "description"],
+            },
+          ],
         },
         {
           model: Grade,
@@ -56,8 +86,14 @@ class SubjectRepository {
         {
           model: User,
           as: "students",
-          attributes: ["id_user", "name", "last_name", "image"],
+          attributes: ["id_user", "name", "last_name", "e_mail", "image"],
           through: { attributes: [] },
+          include: [
+            {
+              model: sequelize.models.Role,
+              attributes: ["id_role", "name"],
+            },
+          ],
         },
       ],
     });

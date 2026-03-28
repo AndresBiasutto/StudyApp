@@ -1,11 +1,8 @@
 export interface Chapter {
-  id_chapter?: string;
+  id_chapter: string;
   name: string;
-  chapterOrder: number;
-  order?: number;
-  description?: string;
-  text?: string;
-  videoUrl?: string;
+  order?: number | null;
+  description?: string | null;
   id_unit?: string;
 }
 

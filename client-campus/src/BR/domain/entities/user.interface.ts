@@ -5,13 +5,13 @@ export interface User{
     id_user:string;
     name: string;
     last_name: string;
-    e_mail: string;
-    contact_number: string;
-    description: string;
-    image: string;
-    Role: Role
-    subjects: Subject[] | [];
-    enrolledSubjects: Subject[] | [];
-    token: string;
-    id_role: string;
+    e_mail?: string | null;
+    contact_number?: string | null;
+    description?: string | null;
+    image?: string | null;
+    Role?: Role | null;
+    subjects: Subject[];
+    enrolledSubjects: Subject[];
+    token?: string;
+    id_role?: string | null;
 }

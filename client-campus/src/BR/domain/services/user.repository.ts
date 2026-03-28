@@ -9,8 +9,8 @@ export interface UserRepository {
   getListed(): Promise<User[]>;
   getById(id: string): Promise<User>;
   getUserData(id: string): Promise<User>;
-  create(User: Omit<User, "id">): Promise<User>;
-  update(id: string, User: Partial<User>): Promise<User>;
+  create(user: Omit<User, "id_user">): Promise<User>;
+  update(id: string, user: Partial<User>): Promise<User>;
   updateRole(id_user: string, id_role: string): Promise<User>;
   delete(id: string): Promise<void>;
 }
