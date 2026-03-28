@@ -15,8 +15,9 @@ import RedirectOnAuth from "../routes/redirectOnAuth";
 import Spinner from "./components/molecules/spinner.molecule";
 import TeacherHome from "./views/teacher/teacherHome.view";
 import AdminSubjects from "./views/admin/adminSubjects.view";
-import StudentDashboard from "./views/student/studentDashboard.view";
 import TeacherDetailSubject from "./views/teacher/teacherDetailSubject.view";
+import StudentHome from "./views/student/studentHome.view";
+import StudentDetailSubject from "./views/student/studentDetailSubject.view";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -32,13 +33,28 @@ function App() {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className={`${isDark ? "dark" : ""} min-h-screen`}>
+    <div className={`${isDark ? "dark" : ""} min-h-screen transition-all`}>
       <RedirectOnAuth />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="*" element={<Missing />} />
         <Route element={<Dashboard />}>
-          <Route path="dashboard/study" element={<StudentDashboard />} />
+          <Route
+            path="dashboard/student/home"
+            element={
+              <ProtectedRoutes role={"student"}>
+                <StudentHome />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="dashboard/student/subject/:id_subject"
+            element={
+              <ProtectedRoutes role={"student"}>
+                <StudentDetailSubject />
+              </ProtectedRoutes>
+            }
+          />
           <Route
             path="dashboard/teacher/home"
             element={
@@ -46,7 +62,7 @@ function App() {
                 <TeacherHome />
               </ProtectedRoutes>
             }
-          ></Route>
+          />
           <Route
             path="dashboard/teacher/subject/:id_subject"
             element={
@@ -54,7 +70,7 @@ function App() {
                 <TeacherDetailSubject />
               </ProtectedRoutes>
             }
-          ></Route>
+          />
           <Route
             path="dashboard/admin/home"
             element={

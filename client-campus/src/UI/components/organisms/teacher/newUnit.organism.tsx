@@ -3,7 +3,7 @@ import Button from "../../atoms/button.atom";
 import { BsFillPostcardFill } from "react-icons/bs";
 import type { creatorCard } from "../../../interfaces/creatorCard";
 import UnitCardHeader from "../../molecules/cards/unitCardHeader";
-import NewChapter from "../teacher/NewChapter.organism";
+import NewChapter from "./NewChapter.organism";
 import ButtonRounded from "../../atoms/buttonRounded.atom";
 import {
   FaChevronDown,

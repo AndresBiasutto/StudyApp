@@ -48,6 +48,17 @@ class UserRepository {
             },
           ],
         },
+        {
+          model: Subject,
+          as: "enrolledSubjects",
+          attributes: ["id_subject", "name", "description"],
+          include: [
+            {
+              model: Grade,
+              attributes: ["name"],
+            },
+          ],
+        },
       ],
     });
     const formatedData = {
@@ -62,6 +73,16 @@ class UserRepository {
       contact_number: data.contact_number,
       image: data.image,
       Role: data.Role,
+      enrolledSubjects: data.enrolledSubjects?.map((subject: any) => ({
+        id_subject: subject.id_subject,
+        name: subject.name,
+        description: subject.description,
+        Grade: subject.Grade
+          ? {
+              name: subject.Grade.name,
+            }
+          : null,
+      })),
       subjects: data.createdSubjects?.map((subject: any) => ({
         id_subject: subject.id_subject,
         name: subject.name,
@@ -128,7 +149,10 @@ class UserRepository {
           where: { name: roleName },
         },
       ],
-      order: [["name", "ASC"], ["last_name", "ASC"]],
+      order: [
+        ["name", "ASC"],
+        ["last_name", "ASC"],
+      ],
     });
     console.log(users);
     return users.map((user: any) => ({

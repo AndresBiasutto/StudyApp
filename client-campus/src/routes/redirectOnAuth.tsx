@@ -19,7 +19,7 @@ const RedirectOnAuth = () => {
         navigate("/dashboard/teacher/home", { replace: true });
         break;
       case "student":
-        navigate("/dashboard/study", { replace: true });
+        navigate("/dashboard/student/home", { replace: true });
         break;
       case "user":
         navigate("/dashboard/study", { replace: true });

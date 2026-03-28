@@ -17,6 +17,9 @@ const user = [
 const teacher = [
   { name: "home", navLink: "/dashboard/teacher/home" },
 ];
+const student = [
+  { name: "mi aula", navLink: "/dashboard/student/home" },
+];
 const admin = [
   { name: "home", navLink: "/dashboard/admin/home" },
   { name: "administrar usuarios", navLink: "/dashboard/admin/users" },
@@ -36,6 +39,8 @@ const Sidebar = () => {
         return admin;
       case "teacher":
         return teacher;
+      case "student":
+        return student;
       default:
         return user;
     }

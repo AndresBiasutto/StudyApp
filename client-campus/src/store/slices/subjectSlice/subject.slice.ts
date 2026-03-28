@@ -45,6 +45,7 @@ const subjectSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchSubjectById.fulfilled, (state, action) => {
+        state.loading = false;
         state.selected = action.payload;
       })
       .addCase(fetchSubjectById.rejected, (state, action) => {

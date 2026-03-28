@@ -11,7 +11,7 @@ export interface User{
     image: string;
     Role: Role
     subjects: Subject[] | [];
-    enroledSubjects: Subject[] | [];
+    enrolledSubjects: Subject[] | [];
     token: string;
     id_role: string;
 }
