@@ -45,9 +45,7 @@ const FormInModal = () => {
       case "ASSIGN_TEACHER":
         return <SetTeacherForm item={modalContent?.data} />;
       case "ASSIGN_STUDENTS":
-        return <SetStudentsForm
-         // item={modalContent?.data}
-          />;
+        return <SetStudentsForm item={modalContent?.data} />;
       default:
         return null;
     }

@@ -9,11 +9,12 @@ import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
 import { useEffect } from "react";
 import { fetchSubjectById } from "../../../store/slices/subjectSlice/subject.thunk";
+import Spinner from "../../components/molecules/spinner.molecule";
 
 const TeacherDetailSubject = () => {
   const { id_subject } = useParams();
   const appDispatch = useAppDispatch();
-  const { selected, error } = useAppSelector((state) => state.subjects);
+  const { selected,loading, error } = useAppSelector((state) => state.subjects);
   const dispatch = useDispatch();
   const handleCreateUnit = () => {
     dispatch(toggleModal());
@@ -33,6 +34,8 @@ const TeacherDetailSubject = () => {
       };
     }
   }, [id_subject, appDispatch]);
+    if (loading) return <Spinner />;
+
   if (error) return <p>{error}</p>;
   return (
     <div className="w-full flex flex-col justify-start items-end rounded border border-lightBorder dark:border-darkBorder p-4 gap-4">

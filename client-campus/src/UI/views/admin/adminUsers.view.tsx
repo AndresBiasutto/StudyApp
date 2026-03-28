@@ -10,6 +10,8 @@ import {
 import { useEffect } from "react";
 import { fetchListedUsers } from "../../../store/slices/userSlice/user.thunk";
 import { userToLiItem } from "../../../BR/application/mappers/userToLiItem.mapper";
+import Spinner from "../../components/molecules/spinner.molecule";
+import Content from "../../components/molecules/content.molecule";
 
 const AdminUsersTab = () => {
   
@@ -19,10 +21,10 @@ const AdminUsersTab = () => {
   useEffect(() => {
     appDispatch(fetchListedUsers());
   }, [appDispatch]);
-  if (loading) return <p>Cargando...</p>;
+  if (loading ) return <Spinner />;
   if (error) return <p>{error}</p>;
   return (
-    <div className="w-full p-2 flex flex-col justify-start items-center gap-4">
+    <Content title="administrar usuarios">
       <div className="w-full grid grid-cols-3 gap-4 items-center mt-4 md:mt-0">
         <div className=" col-span-3 md:col-span-2 ">
           <SearchBar />
@@ -45,7 +47,8 @@ const AdminUsersTab = () => {
           ))}
         </ul>
       </div>
-    </div>
+    </Content>
+
   );
 };
 

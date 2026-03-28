@@ -25,6 +25,12 @@ class SubjectRepository {
             },
           ],
         },
+        {
+          model: User,
+          as: "students",
+          attributes: ["id_user", "name", "last_name", "image"],
+          through: { attributes: [] },
+        },
       ],
     });
   }
@@ -47,6 +53,12 @@ class SubjectRepository {
           model: Grade,
           attributes: ["id_grade", "name"],
         },
+        {
+          model: User,
+          as: "students",
+          attributes: ["id_user", "name", "last_name", "image"],
+          through: { attributes: [] },
+        },
       ],
     });
   }
@@ -58,7 +70,22 @@ class SubjectRepository {
   async updateSubject(id: string, data: any) {
     const subject = await Subject.findByPk(id);
     if (!subject) return null;
-    return await subject.update(data);
+
+    const { student_ids, ...subjectData } = data;
+
+    if (Object.keys(subjectData).length > 0) {
+      await subject.update(subjectData);
+    }
+
+    if (Array.isArray(student_ids)) {
+      const students = await User.findAll({
+        where: { id_user: student_ids },
+      });
+
+      await (subject as any).setStudents(students);
+    }
+
+    return await this.getSubject(id);
   }
 
   async deleteSubject(id: string) {

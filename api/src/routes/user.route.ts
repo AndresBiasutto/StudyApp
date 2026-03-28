@@ -11,12 +11,8 @@ router.post("/register", userController.registerUser);
 router.post("/login", userController.loginUser);
 router.get("/me", authenticateJWT, userController.getMe);
 router.get("/verify", userController.verifyToken);
-router.get("/allteachers",
-    //  authenticateJWT, authorizeRoles("admin"),
-     userController.getAllTeachers);
-router.get("/allStudents", 
-    // authenticateJWT, authorizeRoles("admin"), 
-userController.getAllStudents);
+router.get("/allteachers", authenticateJWT, authorizeRoles("admin"), userController.getAllTeachers);
+router.get("/allStudents", authenticateJWT, authorizeRoles("admin"), userController.getAllStudents);
 router.get("/liData", authenticateJWT, authorizeRoles("admin"), userController.getAllLiDataUsers);
 router.get("/liData/:id_user", authenticateJWT, authorizeRoles("admin"), userController.getSelectedUser);
 router.get("/", authenticateJWT, authorizeRoles("admin"), userController.getAllUsers);

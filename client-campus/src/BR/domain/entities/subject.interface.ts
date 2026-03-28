@@ -12,4 +12,6 @@ export interface Subject {
   Role: Role;
   createdUnits?: Unit[] | [];
   creator?: User;
+  students?: User[] | [];
+  student_ids?: string[];
 }
