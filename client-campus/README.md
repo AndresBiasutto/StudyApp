@@ -3,17 +3,17 @@
 ## 1. Overview
 
 The frontend is a React 19 application built with Vite and TypeScript.
-It implements the Campus Virtual user experience for three main roles:
+It implements the Campus Virtual experience for three main roles:
 
 - admin
 - teacher
 - student
 
-The codebase combines three ideas:
+The codebase combines:
 
 - presentation with Atomic Design under `src/UI`
 - application/domain/infrastructure separation under `src/BR`
-- global state orchestration with Redux Toolkit
+- global orchestration with Redux Toolkit
 
 The effective runtime flow is:
 
@@ -21,7 +21,11 @@ The effective runtime flow is:
 View/Component -> Redux thunk -> Use case -> Repository -> httpClient -> Backend API
 ```
 
-This means the app uses Redux as the orchestration layer, while `BR/` provides the abstraction boundary around API access and business actions.
+Recent stabilization work focused on:
+
+- aligning frontend entities with backend DTOs
+- reducing contract drift between API and UI
+- fixing request loops in the admin user detail flow
 
 ---
 
@@ -46,11 +50,11 @@ This means the app uses Redux as the orchestration layer, while `BR/` provides t
 client-campus/
 ├── src/
 │   ├── UI/
-│   │   ├── main.tsx                # App bootstrap
-│   │   ├── App.tsx                 # Main routes
-│   │   ├── index.css               # Global styles
-│   │   ├── views/                  # Pages by role
-│   │   ├── components/             # Atomic Design components
+│   │   ├── main.tsx
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   ├── views/
+│   │   ├── components/
 │   │   │   ├── atoms/
 │   │   │   ├── molecules/
 │   │   │   ├── organisms/
@@ -58,22 +62,22 @@ client-campus/
 │   │   └── interfaces/
 │   ├── BR/
 │   │   ├── domain/
-│   │   │   ├── entities/           # Domain interfaces
-│   │   │   └── services/           # Repository contracts and validators
+│   │   │   ├── entities/
+│   │   │   └── services/
 │   │   ├── application/
-│   │   │   ├── useCases/           # Use cases grouped by entity
+│   │   │   ├── useCases/
 │   │   │   ├── mappers/
 │   │   │   └── viewModels/
 │   │   └── infrastructure/
-│   │       ├── repositories/       # API repository implementations
-│   │       ├── services/           # Axios httpClient
-│   │       ├── factories/          # Repository factory singleton
+│   │       ├── repositories/
+│   │       ├── services/
+│   │       ├── factories/
 │   │       └── errors/
 │   ├── store/
-│   │   ├── slices/                 # Redux feature slices
+│   │   ├── slices/
 │   │   └── store.ts
-│   ├── routes/                     # Protected routing and auth redirect
-│   ├── hooks/                      # Typed redux hooks and form hook
+│   ├── routes/
+│   ├── hooks/
 │   └── assets/
 ├── package.json
 └── vite.config.ts
@@ -88,7 +92,7 @@ client-campus/
 | Layer | Responsibility |
 |-------|----------------|
 | `UI/` | Screens, layout, components, user interaction |
-| `store/` | Async orchestration, cache, UI state, auth state |
+| `store/` | Async orchestration, cache, auth state, UI state |
 | `BR/domain` | Contracts and domain interfaces |
 | `BR/application` | Use cases and mapping logic |
 | `BR/infrastructure` | API repositories and HTTP client |
@@ -109,7 +113,7 @@ Component
   -> component re-renders
 ```
 
-This is important because the app is not using components to call repositories directly. Redux is the main coordination point.
+Redux is the main coordination point.
 
 ---
 
@@ -130,7 +134,7 @@ This is important because the app is not using components to call repositories d
 
 - landing routes
 - protected dashboard routes
-- admin, teacher, and student role-based views
+- admin, teacher, and student views
 
 ### Route protection
 
@@ -171,6 +175,11 @@ That creates this session restoration flow:
 4. Backend returns the full current user.
 5. Protected routes and role redirects become active.
 
+Important note:
+
+- `users.loading` is currently shared across list/detail/mutation operations.
+- This is functional now, but it is still a structural limitation and should eventually be split into more granular loading states.
+
 ---
 
 ## 7. HTTP Client
@@ -210,7 +219,7 @@ Use cases are grouped by feature, for example:
 - [useCases/Unit/index.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/application/useCases/Unit/index.ts)
 - [useCases/Chapter/index.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/application/useCases/Chapter/index.ts)
 
-This layer gives the UI a stable API even if repository details evolve.
+This layer gives the UI a stable API if repository details evolve.
 
 ---
 
@@ -243,13 +252,26 @@ Relevant files:
 
 Admins manage users and subjects.
 
-Example:
+Example list flow:
 
 1. [adminUsers.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/admin/adminUsers.view.tsx) dispatches `fetchListedUsers`.
 2. The thunk calls the user use case.
 3. The repository calls `/users/liData`.
 4. The `users` slice stores the lightweight user list.
 5. UI maps each item to a presentational card model.
+
+Example detail flow:
+
+1. [adminUserDetail.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/admin/adminUserDetail.view.tsx) dispatches `fetchSelectedUser(id_user)`.
+2. The thunk calls the user use case.
+3. The repository calls `/users/liData/:id_user`.
+4. The selected user is stored in `users.selected`.
+5. The detail page renders the aside and the subject list for that user.
+
+The request loop previously present in this screen was removed by stabilizing these files:
+
+- [adminUserDetail.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/admin/adminUserDetail.view.tsx)
+- [adminUserDetailAside.organism.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/organisms/admin/adminUserDetailAside.organism.tsx)
 
 ### Teacher flow
 
@@ -287,8 +309,6 @@ Examples:
 - [teacherHome.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/teacher/teacherHome.view.tsx)
 - [studentHome.view.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/student/studentHome.view.tsx)
 
-This keeps navigation and screens aligned with authorization rules coming from the backend.
-
 ---
 
 ## 11. Atomic Design
@@ -303,8 +323,6 @@ The component tree is structured as:
 The dashboard shell is defined in:
 
 - [dashboard.template.tsx](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/templates/dashboard.template.tsx)
-
-This template wraps most role-specific pages.
 
 ---
 
@@ -321,7 +339,7 @@ Important interfaces:
 - [role.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/role.interface.ts)
 - [grade.interface.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/BR/domain/entities/grade.interface.ts)
 
-These interfaces mirror the backend response shape closely.
+These interfaces are now closer to the backend DTOs than before.
 
 ---
 
@@ -361,7 +379,7 @@ npm run preview
 ### Type check
 
 ```bash
-npx tsc --noEmit
+cmd /c npx tsc --noEmit
 ```
 
 ---
@@ -385,4 +403,5 @@ VITE_GOOGLE_OAUTH_CLIENT_ID=your_google_client_id
 - The app uses typed hooks from [UseStore.hook.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/hooks/UseStore.hook.ts).
 - API repositories are thin wrappers over Axios and mostly map endpoint calls 1:1.
 - Several screens rely on backend-enriched payloads instead of assembling nested relationships on the client.
-- The architecture is cleaner in the frontend than in the backend, but both are coupled by shared response shapes.
+- The frontend contracts are now more aligned with backend DTOs than before.
+- The admin user detail request loop was fixed, but the `users` slice still uses a shared loading flag across operations and should be split later.

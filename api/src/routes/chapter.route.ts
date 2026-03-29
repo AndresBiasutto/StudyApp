@@ -2,13 +2,49 @@ import { Router } from "express";
 import chapterController from "../controllers/chapter.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 import { authorizeRoles } from "../middlewares/role.middleware";
+import { asyncHandler } from "../middlewares/async-handler.middleware";
+import { validate } from "../middlewares/validation.middleware";
+import {
+  ensureTeacherOwnsChapterByParam,
+  ensureTeacherOwnsUnitFromBody,
+} from "../middlewares/ownership.middleware";
+import {
+  chapterIdParamSchema,
+  createChapterSchema,
+  updateChapterSchema,
+} from "../validators/chapter.validator";
 
 const router = Router();
 
-router.post("/", authenticateJWT, authorizeRoles("teacher"), chapterController.create);
-router.get("/", chapterController.getAll);
-router.get("/:id", chapterController.getOne);
-router.put("/:id", authenticateJWT, authorizeRoles("teacher"), chapterController.update);
-router.delete("/:id", authenticateJWT, authorizeRoles("teacher"), chapterController.delete);
+router.post(
+  "/",
+  authenticateJWT,
+  authorizeRoles("teacher"),
+  validate(createChapterSchema),
+  ensureTeacherOwnsUnitFromBody(),
+  asyncHandler(chapterController.create.bind(chapterController)),
+);
+router.get("/", asyncHandler(chapterController.getAll.bind(chapterController)));
+router.get(
+  "/:id",
+  validate(chapterIdParamSchema),
+  asyncHandler(chapterController.getOne.bind(chapterController)),
+);
+router.put(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles("teacher"),
+  validate(updateChapterSchema),
+  ensureTeacherOwnsChapterByParam(),
+  asyncHandler(chapterController.update.bind(chapterController)),
+);
+router.delete(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles("teacher"),
+  validate(chapterIdParamSchema),
+  ensureTeacherOwnsChapterByParam(),
+  asyncHandler(chapterController.delete.bind(chapterController)),
+);
 
 export default router;

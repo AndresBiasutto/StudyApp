@@ -11,10 +11,9 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../hooks/UseStore.hook";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   deleteUser,
-  fetchListedUsers,
 } from "../../../../store/slices/authSlice/auth.thunk";
 import Button from "../../atoms/button.atom";
 import { FaUserXmark } from "react-icons/fa6";
@@ -64,11 +63,6 @@ const AdminUserDetailAside = () => {
         ? "Cambiar Rol"
         : "";
   const { selected } = useAppSelector((state) => state.users);
-  useEffect(() => {
-    if (selected?.id_role) {
-      appDispatch(fetchListedUsers());
-    }
-  }, [appDispatch, selected?.id_role]);
 
   return (
     <div className=" w-full md:w-64 md:h-screen p-2 flex flex-col items-center justify-start gap-4 border rounded border-lightBorder dark:border-darkBorder">

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { UnauthorizedError } from "../utils/errors";
 
 export interface AuthRequest extends Request {
   user?: { id_user: string; role?: string };
@@ -7,14 +8,12 @@ export interface AuthRequest extends Request {
 
 export const authenticateJWT = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    console.log("token:", req.headers.authorization);
-
-    return res.status(401).json({ error: "Token requerido" });
+    return next(new UnauthorizedError("Token requerido"));
   }
 
   const token = authHeader.split(" ")[1];
@@ -22,11 +21,9 @@ export const authenticateJWT = (
 
   try {
     const decoded = jwt.verify(token, SECRET) as { id_user: string };
-    console.log("decoded:", decoded);
     req.user = { id_user: decoded.id_user };
-    next();
+    return next();
   } catch {
-    console.log("token mal");
-    return res.status(401).json({ error: "Token inválido o expirado" });
+    return next(new UnauthorizedError("Token inválido o expirado"));
   }
 };

@@ -17,7 +17,6 @@ const AdminUsersTab = () => {
   
   const appDispatch = useAppDispatch();
   const { items, loading, error } = useAppSelector((state) => state.users);
-  // const [IsOnEdit, setIsOnEdit] = useState(false);
   useEffect(() => {
     appDispatch(fetchListedUsers());
   }, [appDispatch]);

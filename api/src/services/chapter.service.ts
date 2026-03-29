@@ -1,4 +1,5 @@
 import chapterService from "../repositories/chapter.repository";
+import { NotFoundError } from "../utils/errors";
 
 class ChapterService {
   async create(data: any) {
@@ -7,7 +8,7 @@ class ChapterService {
 
   async getOne(id_chapter: string) {
     const chapter = await chapterService.getOne(id_chapter);
-    if (!chapter) throw new Error("Role not found");
+    if (!chapter) throw new NotFoundError("Chapter not found");
     return chapter;
   }
 
@@ -20,14 +21,14 @@ class ChapterService {
   }
 
   async update(id_chapter: string, data: any) {
-    const Role = await chapterService.update(id_chapter, data);
-    if (!Role) throw new Error("Role not found");
-    return Role;
+    const chapter = await chapterService.update(id_chapter, data);
+    if (!chapter) throw new NotFoundError("Chapter not found");
+    return chapter;
   }
 
   async delete(id_chapter: string) {
     const deleted = await chapterService.delete(id_chapter);
-    if (!deleted) throw new Error("Role not found");
+    if (!deleted) throw new NotFoundError("Chapter not found");
     return true;
   }
 }

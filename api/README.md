@@ -3,20 +3,26 @@
 ## 1. Overview
 
 The backend is a REST API built with Node.js, Express, TypeScript, Sequelize, and PostgreSQL.
-Its main responsibility is to manage:
+Its main responsibilities are:
 
 - authentication and session restoration
-- users and roles
-- subjects and student enrollment
-- academic content hierarchy: subject -> unit -> chapter -> media
+- user and role management
+- subject and enrollment management
+- academic content hierarchy: `subject -> unit -> chapter -> media`
 
 The current backend follows a layered architecture:
 
 ```text
-Route -> Controller -> Service -> Repository -> Sequelize Model -> PostgreSQL
+Route -> Middleware -> Controller -> Service -> Repository -> Sequelize -> PostgreSQL
 ```
 
-Cross-cutting concerns such as authentication and authorization are handled through Express middlewares.
+Cross-cutting concerns are now handled explicitly through middleware:
+
+- JWT authentication
+- role authorization
+- request validation
+- ownership authorization
+- centralized error handling
 
 ---
 
@@ -39,31 +45,29 @@ Cross-cutting concerns such as authentication and authorization are handled thro
 ```text
 api/
 ├── src/
-│   ├── app.ts                  # Express app and global middleware
-│   ├── server.ts               # Startup script
+│   ├── app.ts
+│   ├── server.ts
 │   ├── config/
-│   │   ├── database.ts         # Sequelize connection and model associations
-│   │   ├── initDb.ts           # DB connection and sync
-│   │   └── health.controller.ts
-│   ├── routes/                 # API routes
+│   ├── contracts/              # Stable response DTOs and response mappers
 │   ├── controllers/            # HTTP layer
-│   ├── services/               # Business orchestration
-│   ├── repositories/           # Data access with Sequelize
-│   │   ├── entities/
-│   │   └── mappers/
-│   ├── middlewares/            # Auth and role authorization
+│   ├── middlewares/            # Auth, role auth, validation, ownership, errors
 │   ├── models/                 # Sequelize model definitions
-│   ├── utils/                  # JWT, hashing, email, helpers
-│   └── tests/                  # Integration setup
+│   ├── repositories/           # Data access layer
+│   ├── routes/
+│   ├── services/              # Business orchestration
+│   ├── utils/
+│   ├── validators/            # Request validation schemas
+│   └── tests/
 ├── package.json
 └── tsconfig.json
 ```
 
-Notes:
+Important notes:
 
 - There is no `handlers/` layer in the current implementation.
-- Business logic is concentrated in `services/`.
-- Repositories shape many of the response DTOs returned to the frontend.
+- Business logic lives mainly in `services/`.
+- Response contracts are centralized in `src/contracts/`.
+- Request validation is centralized in `src/validators/` and `src/middlewares/validation.middleware.ts`.
 
 ---
 
@@ -76,18 +80,21 @@ Client
   -> Express route
   -> auth middleware (optional)
   -> role middleware (optional)
+  -> validation middleware (optional)
+  -> ownership middleware (optional)
   -> controller
   -> service
   -> repository
   -> Sequelize
   -> PostgreSQL
+  -> error handler
 ```
 
 ### Startup flow
 
 1. `server.ts` loads environment variables.
 2. `initDb()` authenticates Sequelize and runs `sequelize.sync({ alter: true })`.
-3. `app.ts` mounts middleware and exposes all routes under `/api`.
+3. `app.ts` mounts middleware, routes, 404 handling, and the global error handler.
 
 Relevant files:
 
@@ -115,26 +122,68 @@ The backend models an academic campus with these main relationships:
 - `Chapter hasMany Video`
 - `Chapter hasMany Image`
 
-This relationship graph is defined centrally in [database.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/config/database.ts).
+This graph is defined centrally in [database.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/config/database.ts).
 
 ---
 
-## 6. Data Flows
+## 6. Contracts, Validation, and Errors
+
+### Response contracts
+
+HTTP responses are normalized through DTOs and mappers:
+
+- [common.contract.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/common.contract.ts)
+- [user.contract.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/user.contract.ts)
+- [subject.contract.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/subject.contract.ts)
+- [response.mapper.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/mappers/response.mapper.ts)
+
+This prevents the frontend from depending directly on ad-hoc Sequelize response shapes.
+
+### Validation
+
+Requests are validated before entering controllers.
+
+Current modules using explicit validation:
+
+- users
+- subjects
+- units
+- chapters
+
+Relevant files:
+
+- [validation.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/validation.middleware.ts)
+- [user.validator.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/validators/user.validator.ts)
+- [subject.validator.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/validators/subject.validator.ts)
+- [unit.validator.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/validators/unit.validator.ts)
+- [chapter.validator.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/validators/chapter.validator.ts)
+
+### Error handling
+
+The backend now uses typed errors and a centralized error handler:
+
+- [errors.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/utils/errors.ts)
+- [error-handler.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/error-handler.middleware.ts)
+- [async-handler.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/async-handler.middleware.ts)
+
+---
+
+## 7. Authentication, Authorization, and Ownership
 
 ### Authentication flow
 
 #### Email/password
 
 1. Client sends credentials to `POST /api/users/login`.
-2. `user.controller.ts` looks up the user by email.
+2. The backend looks up the user by email.
 3. Password is compared with bcrypt.
-4. `user.service.ts` signs a JWT containing `id_user`.
-5. The response includes user profile data plus `token`.
+4. A JWT is signed with `id_user`.
+5. The response includes normalized user data plus `token`.
 
 #### Google Sign-In
 
 1. Client sends Google ID token to `POST /api/users/authUser`.
-2. `user.service.ts` verifies the token with Google.
+2. The backend verifies the token with Google.
 3. The repository finds or creates a local user.
 4. The backend signs its own JWT for API access.
 
@@ -142,36 +191,32 @@ This relationship graph is defined centrally in [database.ts](C:/Users/aquia/One
 
 1. Client sends `Authorization: Bearer <token>` to `GET /api/users/me`.
 2. `authenticateJWT` validates the token and extracts `id_user`.
-3. The repository returns the full user profile, role, created subjects, and enrolled subjects.
+3. The backend returns the normalized current user with role, created subjects, and enrolled subjects.
 
-### Authorization flow
+### Role authorization
 
 1. `authenticateJWT` validates the token.
 2. `authorizeRoles(...)` loads the role name from the database.
-3. Access is granted only if the user's role matches the route requirements.
+3. Access is granted only if the role matches the route requirements.
 
-### Academic content flow
+### Ownership authorization
 
-The main academic read path is:
+Teacher write operations on units and chapters now validate ownership, not only role.
 
-```text
-Subject
-  -> createdUnits
-     -> createdChapters
-```
+Examples:
 
-`GET /api/subjects/:id` returns a subject enriched with:
+- create unit: teacher must own the target `id_subject`
+- create chapter: teacher must own the target `id_unit`
+- update/delete unit: teacher must own the unit's parent subject
+- update/delete chapter: teacher must own the chapter's parent unit and subject
 
-- grade
-- units
-- chapters
-- students
+Relevant file:
 
-This endpoint is the main source for the teacher and student subject detail screens.
+- [ownership.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/ownership.middleware.ts)
 
 ---
 
-## 7. API Surface
+## 8. API Surface
 
 All routes are mounted under `/api`.
 
@@ -199,7 +244,7 @@ All routes are mounted under `/api`.
 |--------|----------|------|-------|-------------|
 | POST | `/subjects` | Yes | `admin` | Create subject |
 | GET | `/subjects` | No | - | List subjects |
-| GET | `/subjects/:id` | No | - | Get subject with units/chapters |
+| GET | `/subjects/:id` | No | - | Get subject with units and chapters |
 | PUT | `/subjects/:id` | Yes | `admin` | Update subject and student assignments |
 | DELETE | `/subjects/:id` | Yes | `admin` | Delete subject |
 
@@ -207,21 +252,21 @@ All routes are mounted under `/api`.
 
 | Method | Endpoint | Auth | Roles | Description |
 |--------|----------|------|-------|-------------|
-| POST | `/units` | Yes | `teacher` | Create unit |
+| POST | `/units` | Yes | `teacher` + ownership | Create unit |
 | GET | `/units` | No | - | List units |
 | GET | `/units/:id` | No | - | Get unit |
-| PUT | `/units/:id` | Yes | `teacher` | Update unit |
-| DELETE | `/units/:id` | Yes | `teacher` | Delete unit |
+| PUT | `/units/:id` | Yes | `teacher` + ownership | Update unit |
+| DELETE | `/units/:id` | Yes | `teacher` + ownership | Delete unit |
 
 ### Chapters
 
 | Method | Endpoint | Auth | Roles | Description |
 |--------|----------|------|-------|-------------|
-| POST | `/chapters` | Yes | `teacher` | Create chapter |
+| POST | `/chapters` | Yes | `teacher` + ownership | Create chapter |
 | GET | `/chapters` | No | - | List chapters |
 | GET | `/chapters/:id` | No | - | Get chapter |
-| PUT | `/chapters/:id` | Yes | `teacher` | Update chapter |
-| DELETE | `/chapters/:id` | Yes | `teacher` | Delete chapter |
+| PUT | `/chapters/:id` | Yes | `teacher` + ownership | Update chapter |
+| DELETE | `/chapters/:id` | Yes | `teacher` + ownership | Delete chapter |
 
 ### Roles
 
@@ -235,19 +280,18 @@ All routes are mounted under `/api`.
 |--------|----------|------|-------|-------------|
 | GET | `/grades` | No | - | List available grades |
 
-### Media
-
-The project includes media routes and repositories, intended for chapter-related image/video resources.
-
 ---
 
-## 8. Important Files by Responsibility
+## 9. Important Files by Responsibility
 
 ### HTTP and middleware
 
 - [app.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/app.ts)
 - [auth.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/auth.middleware.ts)
 - [role.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/role.middleware.ts)
+- [validation.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/validation.middleware.ts)
+- [ownership.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/ownership.middleware.ts)
+- [error-handler.middleware.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/middlewares/error-handler.middleware.ts)
 
 ### User flow
 
@@ -262,12 +306,12 @@ The project includes media routes and repositories, intended for chapter-related
 - [subject.controller.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/controllers/subject.controller.ts)
 - [subject.service.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/services/subject.service.ts)
 - [subject.repository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/subject.repository.ts)
-- [unit.repository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/unit.repository.ts)
-- [chapter.repository.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/chapter.repository.ts)
+- [unit.route.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/routes/unit.route.ts)
+- [chapter.route.ts](C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/routes/chapter.route.ts)
 
 ---
 
-## 9. Commands
+## 10. Commands
 
 ### Setup
 
@@ -297,12 +341,12 @@ npm start
 ### Type check
 
 ```bash
-npx tsc --noEmit
+cmd /c npx tsc --noEmit
 ```
 
 ---
 
-## 10. Environment Variables
+## 11. Environment Variables
 
 Create a `.env` file inside `api/`.
 
@@ -320,21 +364,23 @@ EMAIL_PASS=your_email_password
 
 Notes:
 
-- The runtime code currently expects `SECRET`, not `JWT_SECRET`.
-- `database.ts` contains a custom `dotenv.config({ path: "/custom/path/.env" })` call, but the server startup also calls `dotenv.config()`. The effective environment loading should be reviewed if deployment issues appear.
+- The runtime code expects `SECRET`, not `JWT_SECRET`.
+- `database.ts` still contains a custom `dotenv.config({ path: "/custom/path/.env" })` call, while `server.ts` also calls `dotenv.config()`. That should be normalized later.
 
 ---
 
-## 11. Implementation Notes
+## 12. Implementation Notes
 
 - Sequelize models are loaded dynamically from `src/models`.
 - The database is synchronized with `sequelize.sync({ alter: true })` at startup.
-- Repositories often return already-shaped payloads for frontend consumption instead of returning raw models.
-- Some endpoints are public for reads (`subjects`, `units`, `chapters`, `roles`, `grades`), while mutations are role-protected.
+- HTTP responses now go through explicit DTO mappers instead of ad-hoc shaping inside repositories.
+- `users`, `subjects`, `units`, and `chapters` already use centralized validation and error handling.
+- Teacher mutations on units and chapters are protected by ownership checks.
+- Public read endpoints still exist for `subjects`, `units`, `chapters`, `roles`, and `grades`.
 
 ---
 
-## 12. Testing
+## 13. Testing
 
 The repository contains unit and integration-oriented test files, especially around:
 

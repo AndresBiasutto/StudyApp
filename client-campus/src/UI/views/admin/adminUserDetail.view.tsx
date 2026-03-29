@@ -7,6 +7,7 @@ import type { User } from "../../../BR/domain/entities/user.interface";
 import AdminUserDetailPage from "../../components/organisms/admin/adminUserDetailPage.organism";
 import Spinner from "../../components/molecules/spinner.molecule";
 import { fetchRoles } from "../../../store/slices/roleSlice/role.thunk";
+import { clearSelectedUser } from "../../../store/slices/userSlice/user.slice";
 
 const AdminUserDetail = () => {
   const { id_user } = useParams();
@@ -17,15 +18,10 @@ const AdminUserDetail = () => {
     if (id_user) {
       appDispatch(fetchSelectedUser(id_user));
       return () => {
-        appDispatch({ type: "users/clearSelectedUser" });
+        appDispatch(clearSelectedUser());
       };
     }
   }, [id_user, appDispatch]);
-  useEffect(() => {
-    if (selected?.id_role && id_user) {
-      appDispatch(fetchSelectedUser(id_user));
-    }
-  }, [id_user, appDispatch, selected]);
 
   const {
     items,

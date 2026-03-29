@@ -1,4 +1,5 @@
 import unitRepository from "../repositories/unit.repository";
+import { NotFoundError } from "../utils/errors";
 
 class UnitService {
   async createUnit(data: any) {
@@ -7,7 +8,7 @@ class UnitService {
 
   async getUnit(id_unit: string) {
     const unit = await unitRepository.getOne(id_unit);
-    if (!unit) throw new Error("Unit not found");
+    if (!unit) throw new NotFoundError("Unit not found");
     return unit;
   }
 
@@ -21,13 +22,13 @@ class UnitService {
 
   async updateUnit(id_unit: string, data: any) {
     const unit = await unitRepository.update(id_unit, data);
-    if (!unit) throw new Error("Unit not found");
+    if (!unit) throw new NotFoundError("Unit not found");
     return unit;
   }
 
   async deleteUnit(id_unit: string) {
     const deleted = await unitRepository.delete(id_unit);
-    if (!deleted) throw new Error("Unit not found");
+    if (!deleted) throw new NotFoundError("Unit not found");
     return true;
   }
 }
