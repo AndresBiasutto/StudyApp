@@ -10,7 +10,7 @@ const ChapterCard: React.FC<creatorCardHeader> = ({ id, title, text, order, icon
   const dispatch = useDispatch();
   const chapterData: Partial<Chapter> = {
     id_chapter: id,
-    name: title,
+    name: title || "",
     order: order,
     description: text,
   };

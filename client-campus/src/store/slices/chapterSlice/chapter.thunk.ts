@@ -8,7 +8,7 @@ export const fetchChapters = createAsyncThunk("chapters/fetchAll", async () => {
 
 export const fetchChapterById = createAsyncThunk(
   "chapters/fetchById",
-  async (id: string) => {
+  async (id: string | undefined) => {
     return await getChapterUseCases().getChapterById.execute(id);
   }
 );

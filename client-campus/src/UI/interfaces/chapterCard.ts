@@ -4,6 +4,6 @@ export interface chapterCard {
   id: string | undefined;
   title: string;
   text: string;
-  chapterOrder: number;
+  chapterOrder: number|null |undefined;
   icon?: React.ReactNode;
 }

@@ -18,6 +18,7 @@ import AdminSubjects from "./views/admin/adminSubjects.view";
 import TeacherDetailSubject from "./views/teacher/teacherDetailSubject.view";
 import StudentHome from "./views/student/studentHome.view";
 import StudentDetailSubject from "./views/student/studentDetailSubject.view";
+import TeacherChapterEditor from "./views/teacher/teacherChapterEditor.view";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -68,6 +69,14 @@ function App() {
             element={
               <ProtectedRoutes role={"teacher"}>
                 <TeacherDetailSubject />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="dashboard/teacher/chapter/:id_chapter"
+            element={
+              <ProtectedRoutes role={"teacher"}>
+                <TeacherChapterEditor />
               </ProtectedRoutes>
             }
           />

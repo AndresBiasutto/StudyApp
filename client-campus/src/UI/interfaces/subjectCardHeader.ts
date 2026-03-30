@@ -1,6 +1,6 @@
 export interface subjectCardHeader {
   title?: string | undefined;
-  text?: string;
+  text?: string|null |undefined;
   image?: string;
 
 }

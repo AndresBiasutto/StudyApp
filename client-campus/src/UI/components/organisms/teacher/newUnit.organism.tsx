@@ -3,7 +3,7 @@ import Button from "../../atoms/button.atom";
 import { BsFillPostcardFill } from "react-icons/bs";
 import type { creatorCard } from "../../../interfaces/creatorCard";
 import UnitCardHeader from "../../molecules/cards/unitCardHeader";
-import NewChapter from "./NewChapter.organism";
+import NewChapter from "./newChapter.organism";
 import ButtonRounded from "../../atoms/buttonRounded.atom";
 import {
   FaChevronDown,
@@ -106,7 +106,7 @@ const NewUnit: React.FC<creatorCard> = ({
                   id={chap.id_chapter}
                   title={chap.name}
                   text={chap.description ?? ""}
-                  chapterOrder={chap.order ?? chap.chapterOrder}
+                  chapterOrder={chap.order ?? chap.order}
                 />
               ))
             : []}

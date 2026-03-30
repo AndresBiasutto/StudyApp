@@ -37,8 +37,17 @@ const chapterSlice = createSlice({
         state.loading = false;
         state.error = action.error.message ?? "Error al obtener capitulos";
       })
+      .addCase(fetchChapterById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchChapterById.fulfilled, (state, action) => {
+        state.loading = false;
         state.selected = action.payload;
+      })
+      .addCase(fetchChapterById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Error al obtener el capitulo";
       })
       .addCase(createChapter.pending, (state) => {
         state.loading = true;

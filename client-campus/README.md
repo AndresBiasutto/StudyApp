@@ -117,6 +117,79 @@ Redux is the main coordination point.
 
 ---
 
+## 4.1 Architecture Flow Diagram (ASCII)
+
+The following ASCII flow represents the frontend architecture used by the project:
+
+```text
+                    CAMPUS VIRTUAL - FRONTEND FLOW
+
+  Browser
+    |
+    v
+  +----------------------+
+  | React Views / UI     |
+  |----------------------|
+  | views                |
+  | organisms            |
+  | molecules            |
+  | atoms                |
+  +----------------------+
+    |
+    v
+  +----------------------+
+  | Redux Store          |
+  |----------------------|
+  | slices               |
+  | async thunks         |
+  | persisted auth token |
+  +----------------------+
+    |
+    v
+  +----------------------+
+  | BR/application       |
+  |----------------------|
+  | useCases             |
+  | mappers              |
+  | viewModels           |
+  +----------------------+
+    |
+    v
+  +----------------------+
+  | BR/infrastructure    |
+  |----------------------|
+  | API repositories     |
+  | repositoryFactory    |
+  | httpClient (Axios)   |
+  +----------------------+
+    |
+    v
+  +----------------------+
+  | Backend API (/api)   |
+  +----------------------+
+
+
+  Supporting frontend layers:
+
+  +----------------------+     +----------------------+
+  | BR/domain            |     | routes/              |
+  |----------------------|     |----------------------|
+  | entities             |     | ProtectedRoutes      |
+  | repository contracts |     | RedirectOnAuth       |
+  +----------------------+     +----------------------+
+                \                        /
+                 \                      /
+                  \                    /
+                   +------------------+
+                   | hooks/           |
+                   |------------------|
+                   | UseStore.hook    |
+                   | UseForm.hook     |
+                   +------------------+
+```
+
+---
+
 ## 5. Bootstrap and Routing
 
 ### App bootstrap

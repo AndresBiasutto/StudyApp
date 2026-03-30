@@ -8,7 +8,7 @@ export class GetChapterByIdUseCase {
     this.repository = repository;
   }
 
-  execute(id: string): Promise<Chapter> {
+  execute(id: string| undefined): Promise<Chapter> {
     return this.repository.getById(id);
   }
 }
