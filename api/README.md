@@ -126,6 +126,169 @@ This graph is defined centrally in [database.ts](C:/Users/aquia/OneDrive/Escrito
 
 ---
 
+## 5.1 Architecture Flow Diagram (ASCII)
+
+The following ASCII flow describes the backend architecture and how requests move through the project:
+
+```text
+                        CAMPUS VIRTUAL - BACKEND FLOW
+
+  Client / Frontend
+         |
+         v
+  +------------------+
+  |  Express Routes  |
+  +------------------+
+         |
+         v
+  +------------------------------+
+  | Middlewares                  |
+  |------------------------------|
+  | - authenticateJWT            |
+  | - authorizeRoles             |
+  | - validate(...)              |
+  | - ownership checks           |
+  | - asyncHandler               |
+  +------------------------------+
+         |
+         v
+  +------------------+
+  |   Controllers    |
+  +------------------+
+         |
+         v
+  +------------------+
+  |    Services      |
+  |------------------|
+  | business rules   |
+  | response mapping |
+  +------------------+
+         |
+         v
+  +------------------+
+  |  Repositories    |
+  |------------------|
+  | Sequelize access |
+  +------------------+
+         |
+         v
+  +------------------+
+  | Sequelize Models |
+  +------------------+
+         |
+         v
+  +------------------+
+  |   PostgreSQL     |
+  +------------------+
+
+
+  Cross-cutting backend support:
+
+  +--------------------------+     +---------------------------+
+  | validators/              |     | contracts/                |
+  |--------------------------|     |---------------------------|
+  | request schemas          |     | response DTOs             |
+  | field rules              |     | response mappers          |
+  +--------------------------+     +---------------------------+
+                 \                           /
+                  \                         /
+                   \                       /
+                    +---------------------+
+                    | error-handler       |
+                    | typed AppError tree |
+                    +---------------------+
+```
+
+---
+
+## 5.2 Database Diagram (ASCII)
+
+The following ASCII diagram represents the current database structure as defined by Sequelize models and associations:
+
+```text
++-------------------+         +-------------------+
+|       Role        |         |       Grade       |
+|-------------------|         |-------------------|
+| PK id_role        |         | PK id_grade       |
+| name              |         | name              |
++---------+---------+         +---------+---------+
+          |                             |
+          | 1                           | 1
+          |                             |
+          | N                           | N
+          v                             v
++-------------------+         +-------------------+
+|       User        |         |      Subject      |
+|-------------------|         |-------------------|
+| PK id_user        |<------->| PK id_subject     |
+| name              |   M:N   | name              |
+| last_name         | Subject | description       |
+| description       |Students | imageUrl          |
+| e_mail (unique)   |         | FK id_user        |
+| contact_number    |         | FK id_grade       |
+| image             |         +---------+---------+
+| FK id_role        |                   |
++---------+---------+                   | 1
+          |                             |
+          | 1                           | N
+          |                             v
+          |                   +-------------------+
+          |                   |       Unit        |
+          |                   |-------------------|
+          |                   | PK id_unit        |
+          |                   | name              |
+          |                   | description       |
+          |                   | order             |
+          |                   | imageUrl          |
+          |                   | FK id_subject     |
+          |                   +---------+---------+
+          |                             |
+          |                             | 1
+          |                             |
+          |                             | N
+          |                             v
+          |                   +-------------------+
+          |                   |      Chapter      |
+          |                   |-------------------|
+          |                   | PK id_chapter     |
+          |                   | name              |
+          |                   | description       |
+          |                   | order             |
+          |                   | FK id_unit        |
+          |                   +----+---------+----+
+          |                        |         |
+          |                    1   |         |   1
+          |                        |         |
+          |                    N   v         v   N
+          |                 +-----------+ +-----------+
+          |                 |   Video   | |   Image   |
+          |                 |-----------| |-----------|
+          |                 | PK id_video| | PK id_image|
+          |                 | url       | | url       |
+          |                 | FK id_chapter| FK id_chapter|
+          |                 +-----------+ +-----------+
+          |
+          | Created subjects:
+          +-------------------------------------------->
+                       Subject.FK id_user -> User.id_user
+
+
++---------------------------+
+|      SubjectStudents      |
+|---------------------------|
+| FK id_subject             |
+| FK id_user                |
++---------------------------+
+```
+
+Notes:
+
+- `SubjectStudents` is the join table for enrolled students.
+- A `User` can create many `Subject` records through `Subject.id_user`.
+- A `User` can also be enrolled in many subjects through `SubjectStudents`.
+
+---
+
 ## 6. Contracts, Validation, and Errors
 
 ### Response contracts

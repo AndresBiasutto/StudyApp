@@ -1,44 +1,59 @@
 # AGENTS.md: Guidelines for Agent Contributions
 
 ## Introduction
-This file is a guide for agents (or automated intelligence) working in this repository. It contains essential commands, code style guidelines, and best practices for maintaining both projects of the Campus Virtual:
-- `/api` - Backend (Node.js/Express)
-- `/client-campus` - Frontend (React/Vite)
+
+This file guides agents working in this repository.
+The workspace contains two main projects:
+
+- `/api` - Backend (Node.js/Express/TypeScript/Sequelize)
+- `/client-campus` - Frontend (React/Vite/TypeScript)
+
+Agents should prefer changes that improve consistency, safety, and maintainability over quick local fixes that increase coupling.
 
 ---
 
 ## 1. Project Structure
 
 ### Backend (`/api`)
-```
+
+```text
 api/
 ├── src/
-│   ├── routes/
+│   ├── app.ts
+│   ├── server.ts
+│   ├── config/
+│   ├── contracts/       # Stable response DTOs and response mappers
 │   ├── controllers/
-│   ├── services/
+│   ├── middlewares/     # auth, roles, validation, ownership, error handling
+│   ├── models/
 │   ├── repositories/
-│   ├── middlewares/
-│   └── index.ts
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   ├── validators/
+│   └── tests/
 ├── package.json
-└── .env
+└── tsconfig.json
 ```
 
 ### Frontend (`/client-campus`)
-```
+
+```text
 client-campus/
 ├── src/
-│   ├── BR/                    # Clean Architecture
-│   │   ├── application/       # Use Cases, Mappers, ViewModels
-│   │   ├── domain/            # Entities, Repository Interfaces
-│   │   └── infrastructure/   # API Repositories, httpClient
-│   ├── UI/                    # Presentation Layer
-│   │   ├── components/       # Atomic Design (atoms, molecules, organisms)
-│   │   ├── views/             # Pages
-│   │   └── interfaces/        # Props interfaces
-│   ├── store/                 # Redux Toolkit
+│   ├── BR/                    # Domain/Application/Infrastructure
+│   │   ├── application/
+│   │   ├── domain/
+│   │   └── infrastructure/
+│   ├── UI/                    # Presentation layer
+│   │   ├── components/
+│   │   ├── views/
+│   │   └── interfaces/
+│   ├── hooks/
+│   ├── routes/
+│   ├── store/
 │   │   └── slices/
-│   ├── routes/                # Routing
-│   └── hooks/                 # Custom hooks
+│   └── assets/
 ├── package.json
 ├── vite.config.ts
 └── tsconfig.json
@@ -48,116 +63,223 @@ client-campus/
 
 ## 2. Commands
 
-### 2.1 Backend Commands
+### 2.1 Backend
 
 #### Setup
+
 ```bash
 cd api
 npm install
 ```
 
-#### Build
-```bash
-npm run build
-```
+#### Run development server
 
-#### Run Development Server
 ```bash
 npm run dev
 ```
 
+#### Build
+
+```bash
+npm run build
+```
+
+#### Type check
+
+```bash
+cmd /c npx tsc --noEmit
+```
+
 #### Testing
+
 ```bash
 npm test
 npm run test:watch
-npx jest path/to/example.test.ts
+cmd /c npx jest path/to/example.test.ts
 npm run test:coverage
 ```
 
-#### Lint
-```bash
-ts-node ./node_modules/.bin/eslint .
-```
-
-#### Type Check
-```bash
-npx tsc --noEmit
-```
-
----
-
-### 2.2 Frontend Commands
+### 2.2 Frontend
 
 #### Setup
+
 ```bash
 cd client-campus
 npm install
 ```
 
-#### Build
-```bash
-npm run build
-```
+#### Run development server
 
-#### Run Development Server
 ```bash
 npm run dev
 ```
 
+#### Build
+
+```bash
+npm run build
+```
+
 #### Lint
+
 ```bash
 npm run lint
 ```
 
-#### Preview Production Build
-```bash
-npm run preview
-```
+#### Type check
 
-#### Type Check
 ```bash
-npx tsc --noEmit
+cmd /c npx tsc --noEmit
 ```
 
 ---
 
-## 3. Code Style Guidelines
+## 3. Architecture Rules
 
-### 3.1 Backend Conventions
+### 3.1 Backend
+
+The effective backend flow is:
+
+```text
+Route -> Middleware -> Controller -> Service -> Repository -> Sequelize
+```
+
+Agents must preserve these rules:
+
+- Controllers should stay thin.
+- Services should own business orchestration.
+- Repositories should focus on persistence and retrieval.
+- HTTP response shapes should be defined through `src/contracts/`, not ad-hoc inside repositories.
+- Request validation should happen before controllers whenever practical.
+- Errors should go through centralized error handling.
+
+#### Contracts
+
+When changing API responses:
+
+- Update `src/contracts/` first.
+- Update the response mappers.
+- Avoid returning raw Sequelize shapes directly to the frontend.
+
+#### Validation
+
+For new or modified routes:
+
+- Prefer adding schema validation in `src/validators/`.
+- Wire validation through `validation.middleware.ts`.
+- Avoid manual field checks inside controllers unless there is a strong reason.
+
+#### Errors
+
+Use typed errors from `src/utils/errors.ts`:
+
+- `ValidationError`
+- `UnauthorizedError`
+- `ForbiddenError`
+- `NotFoundError`
+- `ConflictError`
+
+Do not scatter custom `res.status(...).json(...)` error branches across controllers unless unavoidable.
+
+#### Authorization
+
+Role checks alone are not enough for teacher write operations.
+When a teacher mutates `subjects`, `units`, or `chapters`, verify resource ownership when applicable.
+
+Ownership logic currently matters especially for:
+
+- unit creation and updates
+- chapter creation and updates
+
+#### Database
+
+- Associations are defined in `src/config/database.ts`.
+- `sequelize.sync({ alter: true })` is still present, but agents should prefer changes that move the codebase toward explicit migrations in the future.
+
+### 3.2 Frontend
+
+The effective frontend flow is:
+
+```text
+View -> Thunk -> Use Case -> Repository -> httpClient -> Backend API
+```
+
+Agents should preserve these rules:
+
+- UI components should not call Axios directly.
+- Repositories should remain thin wrappers over the API.
+- Domain interfaces should stay aligned with backend DTOs.
+- Avoid introducing new hidden response-shape assumptions in components.
+
+#### Redux
+
+Current slices include:
+
+- `auth`
+- `users`
+- `subjects`
+- `units`
+- `chapters`
+- `roles`
+- `grades`
+- `ui`
+
+Use `createAsyncThunk` for async flows.
+
+Important caution:
+
+- Some slices still use shared `loading` flags for multiple operations.
+- Be careful not to trigger list requests from detail screens if the screen also depends on the same slice loading flag.
+- When possible, prefer stable dependencies in `useEffect`, such as IDs or `.length`, rather than whole objects or arrays.
+
+#### Admin User Detail
+
+The admin user detail flow had a request loop bug caused by repeated fetches plus shared loading state.
+
+When editing this area:
+
+- Keep `adminUserDetail.view.tsx` limited to fetching the selected user by `id_user`.
+- Do not trigger `fetchListedUsers()` from `adminUserDetailAside.organism.tsx`.
+- Be careful with `useEffect` dependencies tied to `selected` objects from the store.
+
+---
+
+## 4. Code Style Guidelines
+
+### Backend conventions
 
 #### Imports
+
 Group imports in this order:
-1. Node.js core modules (e.g., `fs`, `path`)
-2. External dependencies (e.g., `express`, `dotenv`)
-3. Internal modules (e.g., `./routes`, `../services`)
+
+1. Node.js core modules
+2. External dependencies
+3. Internal modules
 
 #### Formatting
-- Indentation: **2 spaces**
-- Line length: **120 characters** max
-- Single quotes for strings
-- Trailing commas for multiline objects/arrays
+
+- Indentation: 2 spaces
+- Line length: 120 characters max
+- Single quotes for strings when editing existing files if style is already established
+- Trailing commas for multiline objects and arrays
 
 #### TypeScript
-- Avoid `any`, use `unknown` for untrusted inputs
-- Prefer `interface` over `type`
-- Define function return types explicitly
+
+- Avoid `any` when practical
+- Prefer explicit return types in service and utility layers
+- Prefer `interface` for DTO-like structures where appropriate
 
 #### Naming
-- Files: kebab-case (`user-repository.ts`)
-- Variables: camelCase (`userProfile`)
-- Classes: PascalCase (`UserService`)
-- Constants: UPPER_SNAKE_CASE (`API_SECRET`)
-- Interfaces: Prefix with `I` (`IUser`, `IService`)
 
-#### Error Handling
-- Use `try...catch` for async operations
-- Throw custom errors for predictable issues
+- Files: kebab-case when creating new files
+- Classes: PascalCase
+- Variables: camelCase
+- Constants: UPPER_SNAKE_CASE
 
----
+### Frontend conventions
 
-### 3.2 Frontend Conventions
+#### Technology stack
 
-#### Technology Stack
 - React 19
 - Vite 7
 - TypeScript
@@ -165,101 +287,89 @@ Group imports in this order:
 - Redux Toolkit
 - React Router DOM 7
 
-#### Atomic Design Structure
-```
+#### Atomic Design
+
+```text
 UI/components/
-├── atoms/         # Button, Input, Icon, Label, etc.
-├── molecules/     # Sidebar, Cards, Forms, Navigation
-├── organisms/     # Complex components (Admin, Teacher, Forms)
-└── templates/    # Layout templates (Dashboard)
+├── atoms/
+├── molecules/
+├── organisms/
+└── templates/
 ```
 
-#### Clean Architecture (BR/)
-```
+#### Clean Architecture (`BR/`)
+
+```text
 BR/
 ├── application/
-│   ├── useCases/     # GetUsersUseCase, CreateUserUseCase, etc.
-│   ├── mappers/      # Data transformers
-│   └── viewModels/  # View-specific models
 ├── domain/
-│   ├── entities/    # User, Subject, Role, Grade (interfaces)
-│   └── services/    # Repository contracts (interfaces)
 └── infrastructure/
-    ├── repositories/ # API implementations (UserApiRepository, etc.)
-    ├── services/    # httpClient (Axios with interceptors)
-    └── errors/      # Error types
 ```
 
-#### Naming Conventions
-- Files: kebab-case (`button.atom.tsx`, `user-api-repository.ts`)
-- Components: PascalCase (`Button`, `UserApiRepository`)
-- Props Interfaces: Prefix with `I` (`IButtonProps`)
-- Hooks: camelCase with `use` prefix (`useForm`, `useStore`)
+#### Naming
 
-#### Redux Patterns
-- Slices in `src/store/slices/`
-- Thunks alongside slices
-- Use `createAsyncThunk` for async operations
-- Typed `RootState` and `AppDispatch`
-
-#### HttpClient
-- Located in `src/BR/infrastructure/services/httpClient.ts`
-- Uses Axios with interceptors for:
-  - Auto token injection from Redux store
-  - 401 error handling (auto logout)
-- Base URL from environment variable `VITE_API_URL`
+- Files: kebab-case where established
+- Components: PascalCase
+- Hooks: `use...`
 
 ---
 
-## 4. Environment Variables
+## 5. Environment Variables
 
 ### Backend
-```plaintext
+
+```text
 DB_NAME=campus
 DB_USER=postgres
 DB_PASS=1234
+DB_HOST=localhost
 PORT=3000
+SECRET=your_jwt_secret
 GOOGLE_CLIENT_ID=your-client-id
 ```
 
 ### Frontend
-```plaintext
+
+```text
 VITE_API_URL=http://localhost:3000/api/
+VITE_GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
 ```
 
 ---
 
-## 5. Development Guidelines
+## 6. Development Guidelines
 
-### Backend Changes
-1. Add routes in `src/routes/`
-2. Implement logic in `src/controllers/` or `src/services/`
-3. Add database queries in `src/repositories/`
-4. Write tests in `src/tests/`
+### Backend changes
 
-### Frontend Changes
-1. **Domain Layer**: Add entities/interfaces in `src/BR/domain/entities/`
-2. **Repository Interface**: Define contract in `src/BR/domain/services/`
-3. **Repository Implementation**: Implement in `src/BR/infrastructure/repositories/`
-4. **Use Case**: Add business logic in `src/BR/application/useCases/`
-5. **Thunk**: Add async action in `src/store/slices/*/`
-6. **Slice**: Add state management in `src/store/slices/*/`
-7. **Component**: Add UI in `src/UI/components/` (follow Atomic Design)
-8. **View**: Add page in `src/UI/views/`
-9. **Route**: Add route in `src/UI/App.tsx`
+1. Define or update request validation if the endpoint shape changes.
+2. Update `contracts/` if the response shape changes.
+3. Keep controllers thin and move logic to services.
+4. Keep repositories focused on persistence.
+5. Preserve centralized error handling.
+6. Add or update tests when behavior changes.
 
-### Additional Notes
-- Adhere to the modular structure of both projects
-- Maintain high test coverage
-- Document new configuration or features
-- Always use strict typing
+### Frontend changes
+
+1. Update domain interfaces if backend DTOs change.
+2. Keep API access in infrastructure repositories.
+3. Keep orchestration in thunks and slices.
+4. Avoid request loops caused by shared loading state.
+5. Prefer stable `useEffect` dependencies.
+6. Add or update view logic only after confirming the data contract.
+
+### Additional notes
+
+- Maintain strict typing.
+- Document architectural changes in the relevant README files.
+- Prefer consistency over clever local shortcuts.
 
 ---
 
-## 6. Commit Message Guidelines
+## 7. Commit Message Guidelines
 
 Follow this format:
-```
+
+```text
 [Type] Summary of changes (Max 50 characters)
 
 Detailed explanation (if needed, wrap at 72 characters).
@@ -267,23 +377,25 @@ Detailed explanation (if needed, wrap at 72 characters).
 ISSUE: #123 (if applicable)
 ```
 
-Common types: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`
+Common types:
 
-Example:
-```
-[fix] Correct error handling in UserService
-
-Fixed a bug where invalid emails were not properly caught.
-ISSUE: #45
-```
-
----
-
-## 7. General Reminders
-- Always keep dependencies up-to-date
-- Run type checking before submitting changes
-- Keep the project clean and maintainable for agents and humans alike
+- `feat`
+- `fix`
+- `test`
+- `refactor`
+- `docs`
+- `chore`
 
 ---
 
-With this guide, agents should be able to contribute effectively and maintain high-quality standards for both the `/api` backend and `/client-campus` frontend of the Campus Virtual project.
+## 8. General Reminders
+
+- Run type checking before finishing substantive changes.
+- Keep backend/frontend contracts synchronized.
+- Favor explicit contracts, validation, and safe defaults.
+- Do not reintroduce response-shape logic inside repositories when a contract mapper should own it.
+- Do not rely only on role checks when ownership matters.
+
+---
+
+With this guide, agents should be able to contribute safely and keep the Campus Virtual codebase more stable over time.
