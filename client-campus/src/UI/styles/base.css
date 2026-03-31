@@ -1,0 +1,28 @@
+/* Scrollbar base (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Fondo de la barra */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Barra deslizable */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.5); /* slate-500 aprox */
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* Hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.8);
+}
+
+/* Eliminar flechas */
+::-webkit-scrollbar-button {
+  display: none;
+}

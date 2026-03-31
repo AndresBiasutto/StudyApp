@@ -1,0 +1,7 @@
+@utility loader {
+  position: relative;
+  border: 24px solid #FFF;
+  border-radius: 50%;
+  transform: rotate(45deg);
+  animation: var(--animate-pie-fill);
+}

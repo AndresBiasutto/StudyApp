@@ -1,0 +1,36 @@
+@theme {
+  --font-display: "Satoshi", "sans-serif";
+  --font-vt323: "VT323", monospace;
+  --font-pixelify: "Pixelify Sans", sans-serif;
+  --font-sharetech: "Share Tech Mono", monospace;
+  --breakpoint-3xl: 120rem;
+  --color-darkText: #fdffd6;
+  --color-darkPrimary: #0b010a;
+  --color-darkSecondary: #2b164d;
+  --color-darkAccent: #60457e;
+  --color-darkBorder: #4e024b;
+  --color-darkDetail: #8b2661;
+  --color-darkWarning: #c9320c;
+  --color-darkSuccess: #367814;
+  --color-darkLink: #90d5f0;
+  --color-lightText: #37382a;
+  --color-lightPrimary: #f2f2f2;
+  --color-lightSecondary: #a6968d;
+  --color-lightAccent: #bf9393;
+  --color-lightBorder: #d9c1bf;
+  --color-lightDetail: #d9c6ba;
+  --color-lightWarning: #d44c4c;
+  --color-lightSuccess: #bdf5a2;
+  --color-lightLink: #55b0d4;
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+  --animate-pie-fill: pieFill 3s linear infinite;
+
+  @keyframes pieFill {
+    0%, 19% { border-color: #FFF #FFF #FFF #FFF; }
+    20%, 39% { border-color: #FF3D00 #FFF #FFF #FFF; }
+    40%, 59% { border-color: #FF3D00 #FF3D00 #FFF #FFF; }
+    60%, 79% { border-color: #FF3D00 #FF3D00 #FF3D00 #FFF; }
+    80%, 100% { border-color: #FF3D00 #FF3D00 #FF3D00 #FF3D00; }
+  }
+}
