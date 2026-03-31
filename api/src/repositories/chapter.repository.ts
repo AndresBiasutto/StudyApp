@@ -42,6 +42,27 @@ class ChapterRepository {
     return chapter.update(data);
   }
 
+  async saveDraft(id_chapter: string, data: any) {
+    const chapter = await Chapter.findByPk(id_chapter);
+    if (!chapter) return null;
+
+    return chapter.update({
+      ...data,
+      status: "draft",
+    });
+  }
+
+  async publish(id_chapter: string, data: any) {
+    const chapter = await Chapter.findByPk(id_chapter);
+    if (!chapter) return null;
+
+    return chapter.update({
+      ...data,
+      status: "published",
+      published_at: new Date(),
+    });
+  }
+
   async delete(id_chapter: string) {
     return Chapter.destroy({ where: { id_chapter } });
   }

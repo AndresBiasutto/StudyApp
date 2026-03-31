@@ -11,6 +11,8 @@ import {
 import {
   chapterIdParamSchema,
   createChapterSchema,
+  publishChapterSchema,
+  saveChapterDraftSchema,
   updateChapterSchema,
 } from "../validators/chapter.validator";
 
@@ -37,6 +39,22 @@ router.put(
   validate(updateChapterSchema),
   ensureTeacherOwnsChapterByParam(),
   asyncHandler(chapterController.update.bind(chapterController)),
+);
+router.put(
+  "/:id/draft",
+  authenticateJWT,
+  authorizeRoles("teacher"),
+  validate(saveChapterDraftSchema),
+  ensureTeacherOwnsChapterByParam(),
+  asyncHandler(chapterController.saveDraft.bind(chapterController)),
+);
+router.put(
+  "/:id/publish",
+  authenticateJWT,
+  authorizeRoles("teacher"),
+  validate(publishChapterSchema),
+  ensureTeacherOwnsChapterByParam(),
+  asyncHandler(chapterController.publish.bind(chapterController)),
 );
 router.delete(
   "/:id",

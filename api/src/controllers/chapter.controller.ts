@@ -27,6 +27,16 @@ class ChapterController {
     res.json(updated);
   }
 
+  async saveDraft(req: Request, res: Response) {
+    const chapter = await chapterService.saveDraft(req.params.id, req.body);
+    res.json(chapter);
+  }
+
+  async publish(req: Request, res: Response) {
+    const chapter = await chapterService.publish(req.params.id, req.body);
+    res.json(chapter);
+  }
+
   async delete(req: Request, res: Response) {
     await chapterService.delete(req.params.id);
     res.json({ message: "Chapter deleted" });

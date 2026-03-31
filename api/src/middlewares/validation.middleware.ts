@@ -115,3 +115,8 @@ export const isArrayOfStrings =
     Array.isArray(value) && value.every((item) => typeof item === "string")
       ? null
       : message;
+
+export const isNumber =
+  (message = "Debe ser un numero"): ValidationRule =>
+  (value) =>
+    typeof value === "number" && !Number.isNaN(value) ? null : message;

@@ -5,6 +5,13 @@ export interface ChapterResponseDto {
   name: string;
   description?: string | null;
   order?: number | null;
+  summary?: string | null;
+  content_html?: string | null;
+  video_url?: string | null;
+  image_urls: string[];
+  resource_links: string[];
+  status: "draft" | "published";
+  published_at?: string | null;
 }
 
 export interface UnitResponseDto {

@@ -91,6 +91,15 @@ export const mapChapterResponse = (chapter: unknown): ChapterResponseDto => {
     name: data.name,
     description: data.description ?? null,
     order: data.order ?? null,
+    summary: data.summary ?? null,
+    content_html: data.content_html ?? null,
+    video_url: data.video_url ?? null,
+    image_urls: Array.isArray(data.image_urls) ? data.image_urls : [],
+    resource_links: Array.isArray(data.resource_links) ? data.resource_links : [],
+    status: data.status === "published" ? "published" : "draft",
+    published_at: data.published_at
+      ? new Date(data.published_at).toISOString()
+      : null,
   };
 };
 
