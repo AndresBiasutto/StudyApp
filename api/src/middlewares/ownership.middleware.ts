@@ -157,15 +157,18 @@ export const ensureTeacherOwnsChapterByParam =
   async (req: AuthRequest, _res: Response, next: NextFunction) => {
     try {
       const id_chapter = req.params?.[paramName];
+      console.log(`[Ownership] Checking chapter: ${id_chapter} from param: ${paramName}`);
       if (!id_chapter || typeof id_chapter !== "string") {
         throw new ValidationError(`${paramName} es necesario`);
       }
 
       const ownerId = await getChapterOwnerId(id_chapter);
+      console.log(`[Ownership] Found owner: ${ownerId} for chapter: ${id_chapter}`);
       ensureOwner(ownerId, req.user?.id_user, "chapter");
 
       return next();
     } catch (error) {
+      console.error(`[Ownership] Error: ${error instanceof Error ? error.message : error}`);
       return next(error);
     }
   };

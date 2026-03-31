@@ -27,6 +27,20 @@ export const updateChapter = createAsyncThunk(
   }
 );
 
+export const saveChapterDraft = createAsyncThunk(
+  "chapters/saveDraft",
+  async ({ id, data }: { id: string; data: Partial<Chapter> }) => {
+    return await getChapterUseCases().saveChapterDraft.execute(id, data);
+  }
+);
+
+export const publishChapterContent = createAsyncThunk(
+  "chapters/publish",
+  async ({ id, data }: { id: string; data: Partial<Chapter> }) => {
+    return await getChapterUseCases().publishChapter.execute(id, data);
+  }
+);
+
 export const deleteChapter = createAsyncThunk(
   "chapters/delete",
   async (id: string) => {

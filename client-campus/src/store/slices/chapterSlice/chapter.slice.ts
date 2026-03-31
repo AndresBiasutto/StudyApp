@@ -6,6 +6,8 @@ import {
   fetchChapterById,
   fetchChapters,
   updateChapter,
+  saveChapterDraft,
+  publishChapterContent,
 } from "./chapter.thunk";
 
 const initialState: ChapterState = {
@@ -81,6 +83,48 @@ const chapterSlice = createSlice({
       .addCase(updateChapter.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message ?? "Error al actualizar el capitulo";
+      })
+      .addCase(saveChapterDraft.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(saveChapterDraft.fulfilled, (state, action) => {
+        state.loading = false;
+        const itemId = action.payload.id_chapter;
+        const index = state.items.findIndex(
+          (chapter) => chapter.id_chapter === itemId
+        );
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+        if (state.selected?.id_chapter === itemId) {
+          state.selected = action.payload;
+        }
+      })
+      .addCase(saveChapterDraft.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Error al guardar borrador";
+      })
+      .addCase(publishChapterContent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(publishChapterContent.fulfilled, (state, action) => {
+        state.loading = false;
+        const itemId = action.payload.id_chapter;
+        const index = state.items.findIndex(
+          (chapter) => chapter.id_chapter === itemId
+        );
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+        if (state.selected?.id_chapter === itemId) {
+          state.selected = action.payload;
+        }
+      })
+      .addCase(publishChapterContent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Error al publicar capitulo";
       })
       .addCase(deleteChapter.pending, (state) => {
         state.loading = true;

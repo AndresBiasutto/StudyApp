@@ -33,14 +33,6 @@ router.get(
   asyncHandler(chapterController.getOne.bind(chapterController)),
 );
 router.put(
-  "/:id",
-  authenticateJWT,
-  authorizeRoles("teacher"),
-  validate(updateChapterSchema),
-  ensureTeacherOwnsChapterByParam(),
-  asyncHandler(chapterController.update.bind(chapterController)),
-);
-router.put(
   "/:id/draft",
   authenticateJWT,
   authorizeRoles("teacher"),
@@ -55,6 +47,14 @@ router.put(
   validate(publishChapterSchema),
   ensureTeacherOwnsChapterByParam(),
   asyncHandler(chapterController.publish.bind(chapterController)),
+);
+router.put(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles("teacher"),
+  validate(updateChapterSchema),
+  ensureTeacherOwnsChapterByParam(),
+  asyncHandler(chapterController.update.bind(chapterController)),
 );
 router.delete(
   "/:id",

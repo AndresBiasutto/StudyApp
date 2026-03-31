@@ -30,6 +30,19 @@ class ChapterService {
   }
 
   async saveDraft(id_chapter: string, data: any) {
+    const currentChapter = await chapterService.getOne(id_chapter);
+    if (!currentChapter) throw new NotFoundError("Chapter not found");
+
+    const current = currentChapter.get({ plain: true }) as any;
+    const merged = {
+      ...current,
+      ...data,
+    };
+
+    if (!merged.name || String(merged.name).trim().length === 0) {
+      throw new ValidationError("El capitulo debe tener un nombre");
+    }
+
     const chapter = await chapterService.saveDraft(id_chapter, data);
     if (!chapter) throw new NotFoundError("Chapter not found");
     return mapChapterResponse(chapter);

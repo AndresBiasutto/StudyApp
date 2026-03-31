@@ -12,7 +12,7 @@ const ChapterReader: React.FC<chapterReader> = ({
   setSidebarOpen,
 }) => {
 
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   return (
     <main className="bg-lightPrimary dark:bg-darkPrimary flex flex-col w-full min-h-screen overflow-y-auto p-4 md:p-6 md:ml-64">
@@ -31,20 +31,19 @@ const ChapterReader: React.FC<chapterReader> = ({
       <section className="w-full mx-auto space-y-8">
         <ChapterHeader text={`capítulo ${chapter.chapterOrder}: ${chapter.name}`} />
         <ChapterArticle text={chapter.text} />
-          <H3 text="Material Adicional" />
-          <div className="bg-lightPrimary dark:bg-darkPrimary border border-lightBorder dark:border-darkBorder rounded-lg p-4">
-            <VideoModal
-              thumbnail={videoImage}
-              title={chapter.name}
-              videoUrl={chapter.videoUrl.replace(
-                "youtu.be/",
-                "www.youtube.com/embed/"
-              )}
-              type="iframe"
-            />
-            {/* <Modal /> */}
-          </div>
-        </section>
+        <H3 text="Material Adicional" />
+        <div className="bg-lightPrimary dark:bg-darkPrimary border border-lightBorder dark:border-darkBorder rounded-lg p-4">
+          <VideoModal
+            thumbnail={videoImage}
+            title={chapter.name}
+            videoUrl={chapter.videoUrl.replace(
+              "youtu.be/",
+              "www.youtube.com/embed/"
+            )}
+            type="iframe"
+          />
+        </div>
+      </section>
     </main>
   );
 };

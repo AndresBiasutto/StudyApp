@@ -8,10 +8,13 @@ import { fetchChapterById } from "../../../store/slices/chapterSlice/chapter.thu
 import Spinner from "../../components/molecules/spinner.molecule";
 import EditorCard from "../../components/atoms/editorCard.atom";
 import type { Chapter } from "../../../BR/domain/entities/chapter.interface";
-
 import ChapterBasicInfo from "../../components/organisms/teacher/chapterEditor/chapterBasicInfo.organism";
 import ChapterRichEditor from "../../components/organisms/teacher/chapterEditor/chapterRichEditor.organism";
 import ChapterResources from "../../components/organisms/teacher/chapterEditor/chapterResources.organism";
+import {
+  publishChapterContent,
+  saveChapterDraft,
+} from "../../../store/slices/chapterSlice/chapter.thunk";
 import {
   createResourceItem,
   type ResourceItem,
@@ -24,16 +27,64 @@ interface TeacherChapterEditorFormProps {
 const TeacherChapterEditorForm: React.FC<TeacherChapterEditorFormProps> = ({
   chapter,
 }) => {
+  const dispatch = useAppDispatch();
   const editorRef = useRef<HTMLDivElement>(null);
   const [chapterTitle, setChapterTitle] = useState(chapter.name ?? "");
   const [summary, setSummary] = useState(chapter.description ?? "");
-  const [images, setImages] = useState<ResourceItem[]>([createResourceItem()]);
-  const [links, setLinks] = useState<ResourceItem[]>([createResourceItem()]);
-  const [videoUrl, setVideoUrl] = useState("");
+  const [images, setImages] = useState<ResourceItem[]>(
+    chapter.image_urls && chapter.image_urls.length > 0
+      ? chapter.image_urls.map((url) => ({ id: crypto.randomUUID(), value: url }))
+      : [createResourceItem()]
+  );
+  const [links, setLinks] = useState<ResourceItem[]>(
+    chapter.resource_links && chapter.resource_links.length > 0
+      ? chapter.resource_links.map((link) => ({ id: crypto.randomUUID(), value: link }))
+      : [createResourceItem()]
+  );
+  const [videoUrl, setVideoUrl] = useState(chapter.video_url ?? "");
 
   const applyFormat = (command: string, value?: string) => {
     editorRef.current?.focus();
     document.execCommand(command, false, value);
+  };
+
+  useEffect(() => {
+    if (editorRef.current && chapter.content_html) {
+      editorRef.current.innerHTML = chapter.content_html;
+    }
+  }, [chapter.content_html]);
+
+  const getFormData = () => ({
+    name: chapterTitle,
+    description: summary,
+    content_html: editorRef.current?.innerHTML || "",
+    video_url: videoUrl.trim() !== "" ? videoUrl : null,
+    image_urls: images.map((i) => i.value).filter((val) => val.trim() !== ""),
+    resource_links: links.map((l) => l.value).filter((val) => val.trim() !== ""),
+  });
+
+  const handleSaveDraft = async () => {
+    try {
+      await dispatch(
+        saveChapterDraft({ id: chapter.id_chapter, data: getFormData() })
+      ).unwrap();
+      alert("Borrador guardado correctamente");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Error al guardar borrador";
+      alert(message);
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      await dispatch(
+        publishChapterContent({ id: chapter.id_chapter, data: getFormData() })
+      ).unwrap();
+      alert("Capitulo publicado correctamente");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Error al publicar capitulo";
+      alert(message);
+    }
   };
 
   return (
@@ -64,12 +115,14 @@ const TeacherChapterEditorForm: React.FC<TeacherChapterEditorFormProps> = ({
             icon={<FiRefreshCw />}
             bgLight="bg-lightDetail"
             bgDark="dark:bg-darkDetail"
+            action={handleSaveDraft}
           />
           <Button
             btnName="Publicar contenido"
             icon={<FiPlus />}
             bgLight="bg-lightAccent"
             bgDark="dark:bg-darkAccent"
+            action={handlePublish}
           />
         </div>
       </EditorCard>

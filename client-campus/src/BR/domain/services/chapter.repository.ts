@@ -5,5 +5,7 @@ export interface ChapterRepository {
   getById(id: string | undefined): Promise<Chapter>;
   create(chapter: Partial<Chapter>): Promise<Chapter>;
   update(id: string, chapter: Partial<Chapter>): Promise<Chapter>;
+  saveDraft(id: string, chapter: Partial<Chapter>): Promise<Chapter>;
+  publish(id: string, chapter: Partial<Chapter>): Promise<Chapter>;
   delete(id: string): Promise<void>;
 }

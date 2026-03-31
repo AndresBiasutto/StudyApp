@@ -23,6 +23,22 @@ export class ChapterApiRepository implements ChapterRepository {
     return data;
   }
 
+  async saveDraft(id_chapter: string, chapter: Partial<Chapter>): Promise<Chapter> {
+    const { data } = await httpClient.put<Chapter>(
+      `/chapters/${id_chapter}/draft`,
+      chapter
+    );
+    return data;
+  }
+
+  async publish(id_chapter: string, chapter: Partial<Chapter>): Promise<Chapter> {
+    const { data } = await httpClient.put<Chapter>(
+      `/chapters/${id_chapter}/publish`,
+      chapter
+    );
+    return data;
+  }
+
   async delete(id: string): Promise<void> {
     await httpClient.delete(`/chapters/${id}`);
   }

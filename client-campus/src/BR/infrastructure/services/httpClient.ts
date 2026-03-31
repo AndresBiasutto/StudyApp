@@ -30,8 +30,8 @@ httpClient.interceptors.response.use(
       store.dispatch(logout());
     }
 
-    if (error.response?.data?.error) {
-      return Promise.reject(new Error(error.response.data.error));
+    if (error.response?.data?.message) {
+      return Promise.reject(new Error(error.response.data.message));
     }
 
     return Promise.reject(error);

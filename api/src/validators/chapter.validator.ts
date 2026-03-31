@@ -36,20 +36,24 @@ export const updateChapterSchema = {
   },
 };
 
-export const saveChapterDraftSchema = updateChapterSchema;
+export const saveChapterDraftSchema = {
+  params: {
+    id: { required: true, rules: [isString(), minLength(1)] },
+  },
+  body: {
+    ...updateChapterSchema.body,
+    name: { required: true, rules: [isString(), minLength(1)] },
+  },
+};
 
 export const publishChapterSchema = {
   params: {
     id: { required: true, rules: [isString(), minLength(1)] },
   },
   body: {
-    name: { rules: [isString(), minLength(1)] },
-    description: { rules: [isString()] },
-    order: { rules: [isNumber()] },
-    summary: { rules: [isString()] },
-    content_html: { rules: [isString()] },
-    video_url: { rules: [isString()] },
-    image_urls: { rules: [isArrayOfStrings()] },
-    resource_links: { rules: [isArrayOfStrings()] },
+    ...updateChapterSchema.body,
+    name: { required: true, rules: [isString(), minLength(1)] },
+    content_html: { required: true, rules: [isString(), minLength(1)] },
   },
 };
+

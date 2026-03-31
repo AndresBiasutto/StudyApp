@@ -6,6 +6,7 @@ export const notFoundHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
+  console.log(`[404] ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     error: `Ruta no encontrada: ${req.method} ${req.originalUrl}`,
   });
