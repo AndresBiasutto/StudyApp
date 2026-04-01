@@ -92,9 +92,10 @@ Client
 
 ### Startup flow
 
-1. `server.ts` loads environment variables.
-2. `initDb()` authenticates Sequelize and runs `sequelize.sync({ alter: true })`.
-3. `app.ts` mounts middleware, routes, 404 handling, and the global error handler.
+1. `src/config/env.ts` loads and validates environment variables.
+2. `initDb()` authenticates Sequelize.
+3. Schema synchronization only runs if `DB_SYNC_MODE=alter` is set explicitly.
+4. `app.ts` mounts middleware, routes, 404 handling, and the global error handler.
 
 Relevant files:
 
@@ -518,24 +519,30 @@ DB_NAME=campus
 DB_USER=postgres
 DB_PASS=1234
 DB_HOST=localhost
+DB_PORT=5432
 PORT=3000
+APP_URL=http://localhost:3000
 SECRET=your_jwt_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_email_password
+EMAIL_PASSWORD=your_email_password
+DB_SYNC_MODE=none
 ```
 
 Notes:
 
-- The runtime code expects `SECRET`, not `JWT_SECRET`.
-- `database.ts` still contains a custom `dotenv.config({ path: "/custom/path/.env" })` call, while `server.ts` also calls `dotenv.config()`. That should be normalized later.
+- `SECRET` is the canonical JWT secret. `JWT_SECRET` is only accepted as a temporary compatibility alias.
+- `DB_SYNC_MODE=alter` is an explicit development-only escape hatch. The default is `none`.
+- If `DB_SYNC_MODE=none`, the app authenticates against PostgreSQL but does not alter schema automatically.
+- `APP_URL` is used to build verification links in emails.
 
 ---
 
 ## 12. Implementation Notes
 
 - Sequelize models are loaded dynamically from `src/models`.
-- The database is synchronized with `sequelize.sync({ alter: true })` at startup.
+- The database no longer alters schema automatically at startup unless `DB_SYNC_MODE=alter` is set.
+- The next step should be replacing that opt-in sync mode with explicit migrations.
 - HTTP responses now go through explicit DTO mappers instead of ad-hoc shaping inside repositories.
 - `users`, `subjects`, `units`, and `chapters` already use centralized validation and error handling.
 - Teacher mutations on units and chapters are protected by ownership checks.

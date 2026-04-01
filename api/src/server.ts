@@ -1,12 +1,15 @@
 import app from "./app";
+import { env } from "./config/env";
 import { initDb } from "./config/initDb";
-import dotenv from "dotenv";
-dotenv.config();
-const PORT = process.env.PORT || 3000;
 
-(async () => {
+const bootstrap = async () => {
   await initDb();
-  app.listen(PORT, () => {
-    console.log(`Servidor listo en el puerto ${PORT}`);
+  app.listen(env.port, () => {
+    console.log(`Servidor listo en el puerto ${env.port}`);
   });
-})();
+};
+
+void bootstrap().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});

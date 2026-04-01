@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 
+import { env } from "../config/env";
 import {
   mapAuthResponse,
   mapUserListResponse,
@@ -17,7 +18,7 @@ import {
 import hashPassword from "../utils/hashPassword";
 import sendVerificationEmail from "../utils/sendVerificationEmail";
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(env.googleClientId);
 
 interface CreateUserInput {
   name?: string;
@@ -46,16 +47,6 @@ interface GoogleUserInput {
   image?: string;
 }
 
-const getJwtSecret = (): string => {
-  const secret = process.env.SECRET;
-
-  if (!secret) {
-    throw new Error("SECRET no esta configurado");
-  }
-
-  return secret;
-};
-
 const extractUserId = (
   value: { id_user?: string; get?: (options: { plain: boolean }) => unknown },
 ): string => {
@@ -76,9 +67,13 @@ const extractUserId = (
 
 class UserService {
   async authUser(googleToken: string) {
+    if (!env.googleClientId) {
+      throw new Error("GOOGLE_CLIENT_ID no esta configurado");
+    }
+
     const ticket = await client.verifyIdToken({
       idToken: googleToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: env.googleClientId,
     });
 
     const payload = ticket.getPayload();
@@ -93,7 +88,7 @@ class UserService {
       image: payload.picture,
     } as GoogleUserInput);
 
-    const jwtToken = jwt.sign({ id_user: user.id_user }, getJwtSecret(), {
+    const jwtToken = jwt.sign({ id_user: user.id_user }, env.jwtSecret, {
       expiresIn: "1d",
     });
     const fullUser = await userRepository.getUser(user.id_user);
@@ -152,7 +147,7 @@ class UserService {
     }
 
     const userId = extractUserId(user);
-    const token = jwt.sign({ id_user: userId }, getJwtSecret(), {
+    const token = jwt.sign({ id_user: userId }, env.jwtSecret, {
       expiresIn: 84600,
     });
     const fullUser = await userRepository.getUser(userId);

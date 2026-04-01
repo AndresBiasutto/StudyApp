@@ -1,5 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+
+import { env } from "../config/env";
 import { UnauthorizedError } from "../utils/errors";
 
 export interface AuthRequest extends Request {
@@ -17,13 +19,12 @@ export const authenticateJWT = (
   }
 
   const token = authHeader.split(" ")[1];
-  const SECRET = process.env.SECRET as string;
 
   try {
-    const decoded = jwt.verify(token, SECRET) as { id_user: string };
+    const decoded = jwt.verify(token, env.jwtSecret) as { id_user: string };
     req.user = { id_user: decoded.id_user };
     return next();
   } catch {
-    return next(new UnauthorizedError("Token inválido o expirado"));
+    return next(new UnauthorizedError("Token invalido o expirado"));
   }
 };

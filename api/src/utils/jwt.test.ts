@@ -1,47 +1,57 @@
-import { signToken } from '../utils/jwt';
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
-describe('JWT Utils', () => {
-  const testSecret = 'test-secret-key';
+import { signToken } from "../utils/jwt";
+
+describe("JWT Utils", () => {
+  const testSecret = "test-secret-key";
 
   beforeAll(() => {
-    process.env.JWT_SECRET = testSecret;
+    process.env.SECRET = testSecret;
   });
 
-  describe('signToken', () => {
-    it('should sign a token with payload', () => {
-      const payload = { id_user: '123-456', email: 'test@test.com' };
+  describe("signToken", () => {
+    it("should sign a token with payload", () => {
+      const payload = { id_user: "123-456", email: "test@test.com" };
       const token = signToken(payload);
 
-      expect(typeof token).toBe('string');
+      expect(typeof token).toBe("string");
       expect(token.length).toBeGreaterThan(0);
     });
 
-    it('should generate a token that can be verified', () => {
-      const payload = { id_user: 'test-id' };
+    it("should generate a token that can be verified", () => {
+      const payload = { id_user: "test-id" };
       const token = signToken(payload);
 
       const decoded = jwt.verify(token, testSecret) as { id_user: string };
-      
-      expect(decoded.id_user).toBe('test-id');
+
+      expect(decoded.id_user).toBe("test-id");
     });
 
-    it('should include expiration in token', () => {
-      const payload = { id_user: 'test-id' };
+    it("should include expiration in token", () => {
+      const payload = { id_user: "test-id" };
       const token = signToken(payload);
 
       const decoded = jwt.decode(token) as { exp: number };
-      
+
       expect(decoded.exp).toBeDefined();
       expect(decoded.exp).toBeGreaterThan(Date.now() / 1000);
     });
 
-    it('should use fallback secret if JWT_SECRET is not provided', () => {
+    it("should throw if no configured secret is available", () => {
+      const previousSecret = process.env.SECRET;
+      const previousJwtSecret = process.env.JWT_SECRET;
+
+      delete process.env.SECRET;
       delete process.env.JWT_SECRET;
-      
-      // El código actual tiene un fallback "secret", no lanza error
-      const token = signToken({ id_user: 'test' });
-      expect(typeof token).toBe('string');
+      jest.resetModules();
+
+      expect(() => {
+        const { signToken: freshSignToken } = require("../utils/jwt");
+        freshSignToken({ id_user: "test" });
+      }).toThrow("Environment variable SECRET is required");
+
+      process.env.SECRET = previousSecret;
+      process.env.JWT_SECRET = previousJwtSecret;
     });
   });
 });

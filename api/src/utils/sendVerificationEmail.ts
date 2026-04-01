@@ -1,20 +1,26 @@
-const nodemailer = require('nodemailer');
+import { env } from "../config/env";
+
+const nodemailer = require("nodemailer");
 
 const sendVerificationEmail = async (email: string, token: string) => {
+  if (!env.emailUser || !env.emailPassword) {
+    throw new Error("Email service is not configured");
+  }
+
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
+      user: env.emailUser,
+      pass: env.emailPassword,
     },
   });
 
-  const verificationUrl = `http://localhost:3000/api/users/verify?token=${token}`;
+  const verificationUrl = `${env.appUrl}/api/users/verify?token=${token}`;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: env.emailUser,
     to: email,
-    subject: 'Verifica tu cuenta',
+    subject: "Verifica tu cuenta",
     text: `Haz clic en el siguiente enlace para verificar tu cuenta: ${verificationUrl}`,
   };
 
