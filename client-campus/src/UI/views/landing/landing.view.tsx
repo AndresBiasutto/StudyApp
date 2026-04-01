@@ -7,8 +7,8 @@ import Section from "../../components/molecules/section.molecule";
 import Ptxt from "../../components/atoms/P.atom";
 import H1 from "../../components/atoms/h1.atom";
 import { useEffect, useState } from "react";
-import type { Subject } from "../../../../BR/domain/entities/subject.interface";
-import { SubjectApiRepository } from "../../../../BR/infrastructure/repositories/subjectApiRepository";
+import { SubjectApiRepository } from "../../../BR/infrastructure/repositories/subjectApiRepository";
+import type { Subject } from "../../../BR/domain/entities/subject.interface";
 
 const Landing = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);

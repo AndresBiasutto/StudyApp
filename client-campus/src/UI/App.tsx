@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Landing from "./views/landing/landing.view";
+import Header from "./components/organisms/common/header.organism";
 import type { RootState } from "../store/store";
 import { useSelector } from "react-redux";
 import Dashboard from "./components/templates/dashboard.template";
@@ -19,6 +20,7 @@ import TeacherDetailSubject from "./views/teacher/teacherDetailSubject.view";
 import StudentHome from "./views/student/studentHome.view";
 import StudentDetailSubject from "./views/student/studentDetailSubject.view";
 import TeacherChapterEditor from "./views/teacher/teacherChapterEditor.view";
+import Register from "./views/landing/register.view";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -35,9 +37,12 @@ function App() {
 
   return (
     <div className={`${isDark ? "dark" : ""} min-h-screen transition-all`}>
+      <Header />
       <RedirectOnAuth />
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<Missing />} />
         <Route element={<Dashboard />}>
           <Route

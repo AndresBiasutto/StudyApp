@@ -1,9 +1,9 @@
-import FormInput from "../../molecules/formInput.molecule";
+import { validateRegister } from "../../../../../BR/domain/services/validators/register.validator";
+import { useForm } from "../../../../../hooks/UseForm.hook";
+import type { RegisterFormData } from "../../../../interfaces/registerForm";
+import Button from "../../../atoms/button.atom";
+import FormInput from "../../../molecules/formInput.molecule";
 
-import { useForm } from "../../../../hooks/UseForm.hook";
-import { validateRegister } from "../../../../BR/domain/services/validators/register.validator";
-import type { RegisterFormData } from "../../../interfaces/registerForm";
-import Button from "../../atoms/button.atom";
 
 const initialState: RegisterFormData = {
   firstName: "",
