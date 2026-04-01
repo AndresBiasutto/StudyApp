@@ -3,7 +3,7 @@ import Button from "../../../atoms/button.atom";
 import Ptxt from "../../../atoms/P.atom";
 import { useState } from "react";
 import { useAppDispatch } from "../../../../../hooks/UseStore.hook";
-import { deleteUser } from "../../../../../store/slices/authSlice/auth.thunk";
+import { deleteUser } from "../../../../../store/slices/userSlice/user.thunk";
 import { useDispatch } from "react-redux";
 import { toggleModal } from "../../../../../store/slices/uiSlice";
 import { useNavigate } from "react-router-dom";

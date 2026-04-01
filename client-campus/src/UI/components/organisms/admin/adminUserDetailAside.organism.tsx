@@ -12,9 +12,7 @@ import {
   useAppSelector,
 } from "../../../../hooks/UseStore.hook";
 import { useState } from "react";
-import {
-  deleteUser,
-} from "../../../../store/slices/authSlice/auth.thunk";
+import { deleteUser } from "../../../../store/slices/userSlice/user.thunk";
 import Button from "../../atoms/button.atom";
 import { FaUserXmark } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
