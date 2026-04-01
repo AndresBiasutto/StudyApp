@@ -25,7 +25,7 @@ const TeacherAssignedSubjects = () => {
             <Image src={subject.imageUrl || avatar} className="rounded border border-lightBorder dark:border-darkBorder" alt="" />
           </div>
           <div className="flex flex-col justify-start items-start">
-            <Span text={subject.Grade.name} />
+            <Span text={subject?.Grade?.name} />
             <H3 text={subject.name} aditionalStyle=" group-hover:scale-95" />
           </div>
         </NavLink>

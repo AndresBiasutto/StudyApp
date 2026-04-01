@@ -3,7 +3,7 @@ import Button from "../../atoms/button.atom";
 import { BsFillPostcardFill } from "react-icons/bs";
 import type { creatorCard } from "../../../interfaces/creatorCard";
 import UnitCardHeader from "../../molecules/cards/unitCardHeader";
-import NewChapter from "./newChapter.organism";
+import NewChapter from "./NewChapter.organism";
 import ButtonRounded from "../../atoms/buttonRounded.atom";
 import {
   FaChevronDown,
@@ -75,15 +75,15 @@ const NewUnit: React.FC<creatorCard> = ({
             btnName="editar unidad"
             action={handleEditUnit}
             icon={<FaRegEdit />}
-            bgLight="bg-lightLink"
-            bgDark="dark:bg-darkLink"
+            bgLight="bg-lightAccent"
+            bgDark="dark:bg-darkAccent"
           />
           <ButtonSquare
             btnName="eliminar unidad"
             action={handleDeleteUnit}
             icon={<FaRegTrashAlt />}
-            bgLight="bg-lightWarning"
-            bgDark="dark:bg-darkWarning"
+            bgLight="bg-lightAccent"
+            bgDark="dark:bg-darkAccent"
           />
         </div>
       </div>

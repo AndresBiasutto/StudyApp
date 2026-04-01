@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import SubjectCardHeader from "../../components/molecules/cards/subjectCardHeader.molecule";
 import { SiBookstack } from "react-icons/si";
 import { setModalContent, toggleModal } from "../../../store/slices/uiSlice";
-import imagen from "../../../../public/vite.svg";
 import NewUnit from "../../components/organisms/teacher/newUnit.organism";
 import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
@@ -14,7 +13,9 @@ import Spinner from "../../components/molecules/spinner.molecule";
 const TeacherDetailSubject = () => {
   const { id_subject } = useParams();
   const appDispatch = useAppDispatch();
-  const { selected,loading, error } = useAppSelector((state) => state.subjects);
+  const { selected, loading, error } = useAppSelector(
+    (state) => state.subjects,
+  );
   const dispatch = useDispatch();
   const handleCreateUnit = () => {
     dispatch(toggleModal());
@@ -34,16 +35,12 @@ const TeacherDetailSubject = () => {
       };
     }
   }, [id_subject, appDispatch]);
-    if (loading) return <Spinner />;
+  if (loading) return <Spinner />;
 
   if (error) return <p>{error}</p>;
   return (
     <div className="w-full flex flex-col justify-start items-end rounded border border-lightBorder dark:border-darkBorder p-4 gap-4">
-      <SubjectCardHeader
-        title={selected?.name}
-        text={selected?.description}
-        image={imagen}
-      />
+      <SubjectCardHeader title={selected?.name} text={selected?.description} />
       <div className="w-full flex flex-col justify-start items-end gap-4">
         {selected?.createdUnits
           ? selected?.createdUnits.map((unit) => (

@@ -36,8 +36,8 @@ const ChapterCard: React.FC<creatorCardHeader> = ({ id, title, text, order, icon
     );
   };
   return (
-    <div className="w-full flex flex-row justify-start items-center gap-2">
-      <div className="w-8 h-8 flex items-center justify-center border rounded border-darkBorder dark:border-lightBorder">
+    <div className="w-full flex flex-row justify-start items-center gap-2 border rounded border-darkBorder dark:border-lightBorder">
+      <div className="w-8 h-8 flex items-center justify-center ">
         <i className="font-pixelify text-center items-center text-lightText dark:text-darkText">
           {icon}
         </i>

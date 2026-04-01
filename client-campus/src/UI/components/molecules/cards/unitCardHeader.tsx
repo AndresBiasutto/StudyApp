@@ -12,7 +12,7 @@ const UnitCardHeader: React.FC<creatorCardHeader> = ({
   return (
     <div className="w-full flex flex-col justify-center items-start gap-2">
       <div className="w-full flex flex-row items-center justify-start gap-2">
-        <div className="w-8 h-8 flex items-center justify-center border rounded border-darkBorder dark:border-lightBorder">
+        <div className="text-3xl p-1 flex items-center justify-center border rounded border-darkBorder dark:border-lightBorder">
           <Icon icon={icon} />
         </div>
         <div className="w-full flex items-start justify-between">
