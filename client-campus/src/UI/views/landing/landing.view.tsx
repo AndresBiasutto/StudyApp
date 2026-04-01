@@ -13,12 +13,14 @@ import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const repo = new SubjectApiRepository();
     repo.getAll().then(setSubjects).catch((err) => {
       console.error("Failed to load subjects", err);
     });
+    return () => {};
   }, []);
 
   const navigate = useNavigate();
@@ -60,22 +62,42 @@ const Landing = () => {
             <div className="rounded border border-lightBorder dark:border-darkBorder bg-lightDetail dark:bg-darkDetail p-6">
               <div className="flex items-start gap-6">
                 <div className="flex-1">
-                  <h3 className="text-2xl font-semibold font-pixelify text-lightText dark:text-darkText">{subjects[0].name}</h3>
-                  <Ptxt text={subjects[0].description ?? ""} aditionalStyle="mt-2" />
-                  <Ptxt text={`Profesor: ${subjects[0].creator?.name ?? "-"}`} aditionalStyle="mt-3 text-sm" />
+                  <h3 className="text-2xl font-semibold font-pixelify text-lightText dark:text-darkText">{subjects[index].name}</h3>
+                  <Ptxt text={subjects[index].description ?? ""} aditionalStyle="mt-2" />
+                  <Ptxt text={`Profesor: ${subjects[index].creator?.name ?? "-"}`} aditionalStyle="mt-3 text-sm" />
                 </div>
               </div>
             </div>
             {/* controls */}
             <div className="absolute top-1/2 left-2 -translate-y-1/2">
-              <button className="p-2 rounded-full bg-lightPrimary/80 dark:bg-darkPrimary/80 text-lightText dark:text-darkText border border-lightBorder dark:border-darkBorder">
+              <button
+                onClick={() => setIndex((i) => (i === 0 ? subjects.length - 1 : i - 1))}
+                className="p-2 rounded-full bg-lightPrimary/80 dark:bg-darkPrimary/80 text-lightText dark:text-darkText border border-lightBorder dark:border-darkBorder"
+                aria-label="Anterior"
+              >
                 <FiChevronLeft />
               </button>
             </div>
             <div className="absolute top-1/2 right-2 -translate-y-1/2">
-              <button className="p-2 rounded-full bg-lightPrimary/80 dark:bg-darkPrimary/80 text-lightText dark:text-darkText border border-lightBorder dark:border-darkBorder">
+              <button
+                onClick={() => setIndex((i) => (i === subjects.length - 1 ? 0 : i + 1))}
+                className="p-2 rounded-full bg-lightPrimary/80 dark:bg-darkPrimary/80 text-lightText dark:text-darkText border border-lightBorder dark:border-darkBorder"
+                aria-label="Siguiente"
+              >
                 <FiChevronRight />
               </button>
+            </div>
+
+            {/* dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {subjects.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setIndex(i)}
+                  className={`w-2 h-2 rounded-full ${i === index ? "bg-lightAccent dark:bg-darkAccent" : "bg-lightBorder dark:bg-darkBorder"}`}
+                  aria-label={`Ir a slide ${i + 1}`}
+                />
+              ))}
             </div>
           </div>
         ) : (
