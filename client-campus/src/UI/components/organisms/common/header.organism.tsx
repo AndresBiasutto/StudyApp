@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import image from "../../../../assets/monopc.svg";
 import { FiLogIn, FiSun, FiMoon } from "react-icons/fi";

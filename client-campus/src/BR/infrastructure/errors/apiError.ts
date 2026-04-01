@@ -1,4 +1,6 @@
 export interface ApiError {
-  message: string;
+  message?: string;
+  error?: string;
   status?: number;
+  details?: unknown;
 }

@@ -140,7 +140,7 @@ const EditChapterForm: React.FC<EditChapterFormProps> = ({ item }) => {
       />
 
       <FormInput
-        label={`Orden actual: ${item?.order ?? item?.chapterOrder ?? ""}`}
+        label={`Orden actual: ${item?.order ?? ""}`}
         name="order"
         type="number"
         value={values.order}

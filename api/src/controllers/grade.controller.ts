@@ -7,7 +7,7 @@ class GradeController {
       const grade = await gradeService.createGrade(req.body);
       res.status(201).json(grade);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ message: err.message, error: err.message });
     }
   }
 
@@ -16,7 +16,7 @@ class GradeController {
       const grade = await gradeService.getGrade(req.params.id);
       res.json(grade);
     } catch (err: any) {
-      res.status(404).json({ error: err.message });
+      res.status(404).json({ message: err.message, error: err.message });
     }
   }
 
@@ -25,7 +25,7 @@ class GradeController {
       const grades = await gradeService.getAllGrades();
       res.json(grades);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message, error: err.message });
     }
   }
 
@@ -33,12 +33,15 @@ class GradeController {
     try {
       const grade = await gradeService.getGradeByName(req.params.name);
       if (!grade) {
-        return res.status(404).json({ error: "Grade not found" });
+        return res.status(404).json({
+          message: "Grade not found",
+          error: "Grade not found",
+        });
       }
 
       res.json(grade);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message, error: err.message });
     }
   }
 
@@ -47,16 +50,16 @@ class GradeController {
       const updated = await gradeService.updateGrade(req.params.id, req.body);
       res.json(updated);
     } catch (err: any) {
-      res.status(404).json({ error: err.message });
+      res.status(404).json({ message: err.message, error: err.message });
     }
   }
 
   async delete(req: Request, res: Response) {
     try {
       await gradeService.deleteGrade(req.params.id);
-      res.json({ message: "Role deleted" });
+      res.json({ message: "Grade deleted" });
     } catch (err: any) {
-      res.status(404).json({ error: err.message });
+      res.status(404).json({ message: err.message, error: err.message });
     }
   }
 }

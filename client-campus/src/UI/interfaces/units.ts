@@ -5,7 +5,7 @@ export interface unitCard {
         name: string;
         shortDescription: string;
         unitOrder: number;
-        chapters: { id: number; name: string; chapterOrder: number }[];
+        chapters: { id: number; name: string; order: number }[];
       }
     | {
         id: number;

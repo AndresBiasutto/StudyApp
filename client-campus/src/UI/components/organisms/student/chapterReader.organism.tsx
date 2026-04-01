@@ -11,8 +11,11 @@ const ChapterReader: React.FC<chapterReader> = ({
   chapter,
   setSidebarOpen,
 }) => {
-
   const dispatch = useDispatch();
+  const embeddedVideoUrl = (chapter.video_url ?? "").replace(
+    "youtu.be/",
+    "www.youtube.com/embed/",
+  );
 
   return (
     <main className="bg-lightPrimary dark:bg-darkPrimary flex flex-col w-full min-h-screen overflow-y-auto p-4 md:p-6 md:ml-64">
@@ -20,26 +23,27 @@ const ChapterReader: React.FC<chapterReader> = ({
         className="md:hidden mb-6 px-4 py-2 rounded border border-lightBorder dark:border-darkBorder font-sharetech text-sm"
         onClick={() => setSidebarOpen(true)}
       >
-        Ver índice
+        Ver indice
       </button>
       <button
-        className=" mb-6 px-4 py-2 rounded border border-lightBorder dark:border-darkBorder font-sharetech text-sm"
+        className="mb-6 px-4 py-2 rounded border border-lightBorder dark:border-darkBorder font-sharetech text-sm"
         onClick={() => dispatch(toggleModal())}
       >
         Ver modal
       </button>
       <section className="w-full mx-auto space-y-8">
-        <ChapterHeader text={`capítulo ${chapter.chapterOrder}: ${chapter.name}`} />
-        <ChapterArticle text={chapter.text} />
-        <H3 text="Material Adicional" />
+        <ChapterHeader
+          text={chapter.name}
+          text2={`Capítulo ${chapter.order ?? "-"}`}
+          text3={chapter.description ?? ""}
+        />
+        <ChapterArticle text={chapter.content_html ?? ""} />
+        <H3 text="Material adicional" />
         <div className="bg-lightPrimary dark:bg-darkPrimary border border-lightBorder dark:border-darkBorder rounded-lg p-4">
           <VideoModal
             thumbnail={videoImage}
             title={chapter.name}
-            videoUrl={chapter.videoUrl.replace(
-              "youtu.be/",
-              "www.youtube.com/embed/"
-            )}
+            videoUrl={embeddedVideoUrl}
             type="iframe"
           />
         </div>

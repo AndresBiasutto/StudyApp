@@ -1,4 +1,4 @@
-import { navInfo } from "./navInfo";
+import type { navInfo } from "./navInfo";
 
 export interface navigation {
   navInfo: navInfo[];

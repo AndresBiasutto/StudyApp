@@ -1,15 +1,15 @@
-import type { Chapter } from "../UI/types/chapter";
-import type { Subject } from "../UI/types/subject";
+import type { Chapter } from "../../BR/domain/entities/chapter.interface";
+import type { Subject } from "../../BR/domain/entities/subject.interface";
 
 export interface subjectSidebar{
   subject: Subject;
-  openUnit: number | null;
-  activeUnit: number | null;
+  openUnit: string | null;
+  activeUnit: string | null;
   activeChapter: number | null;
   sidebarOpen: boolean;
-  onToggleUnit: (unitId: number) => void;
+  onToggleUnit: (unitId: string) => void;
   onSelectChapter: (
-    unitId: number,
+    unitId: string,
     chapterIndex: number,
     chapter: Chapter
   ) => void;

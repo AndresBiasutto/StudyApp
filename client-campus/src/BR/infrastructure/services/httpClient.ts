@@ -30,8 +30,11 @@ httpClient.interceptors.response.use(
       store.dispatch(logout());
     }
 
-    if (error.response?.data?.message) {
-      return Promise.reject(new Error(error.response.data.message));
+    const apiMessage =
+      error.response?.data?.message ?? error.response?.data?.error;
+
+    if (apiMessage) {
+      return Promise.reject(new Error(apiMessage));
     }
 
     return Promise.reject(error);

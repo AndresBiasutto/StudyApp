@@ -66,7 +66,7 @@ const AdminUserDetailAside = () => {
 
   return (
     <div className=" w-full md:w-64 md:h-screen p-2 flex flex-col items-center justify-start gap-4 border rounded border-lightBorder dark:border-darkBorder">
-      <img className=" w-32 h-32 rounded-full" src={selected?.image} />
+      <img className=" w-32 h-32 rounded-full" src={selected?.image ?? undefined} />
       <H2 text={`${selected?.name} ${selected?.last_name}`} />
       <div className="flex justify-start items-center gap-2">
         <H3 text={`${selected?.Role?.name ?? "-"}`} />

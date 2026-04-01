@@ -7,7 +7,7 @@ class MediaController {
       const video = await mediaService.createVideo(req.body);
       res.status(201).json(video);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ message: err.message, error: err.message });
     }
   }
 
@@ -16,7 +16,7 @@ class MediaController {
       const image = await mediaService.createImage(req.body);
       res.status(201).json(image);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ message: err.message, error: err.message });
     }
   }
 
@@ -25,7 +25,7 @@ class MediaController {
       const medias = await mediaService.getAllVideos();
       res.json(medias);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message, error: err.message });
     }
   }
 
@@ -34,7 +34,7 @@ class MediaController {
       const medias = await mediaService.getAllImages();
       res.json(medias);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message, error: err.message });
     }
   }
 }

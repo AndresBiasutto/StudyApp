@@ -41,7 +41,7 @@ class UserController {
   }
 
   async registerUser(req: Request, res: Response) {
-    const newUser = req.body as UserPayload;
+    const newUser = req.body as Parameters<typeof userService.registerUser>[0];
     const dbUserEmail = await userService.getUserByEmail(newUser.e_mail);
     if (dbUserEmail) {
       throw new ConflictError("El usuario ya existe");

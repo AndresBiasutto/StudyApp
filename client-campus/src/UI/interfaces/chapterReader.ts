@@ -1,4 +1,4 @@
-import type { Chapter } from "../UI/types/chapter";
+import type { Chapter } from "../../BR/domain/entities/chapter.interface";
 
 export interface chapterReader{
     chapter: Chapter,

@@ -23,6 +23,7 @@ const StudentSubjects = () => {
         <GridSection gridCols="1">
           {enrolledSubjects.map((subject) => (
             <NavLink
+              key={subject.id_subject}
               to={`/dashboard/student/subject/${subject.id_subject}`}
               className={`group w-full h-16 flex items-start justify-start
           gap-2 p-2 cursor-pointer rounded bg-lightDetail dark:bg-darkDetail
@@ -36,7 +37,7 @@ const StudentSubjects = () => {
                 />
               </div>
               <div className="flex flex-col justify-start items-start">
-                <Span text={subject.Grade.name} />
+                <Span text={subject.Grade?.name ?? "Sin año"} />
                 <H3
                   text={subject.name}
                   aditionalStyle=" group-hover:scale-95"

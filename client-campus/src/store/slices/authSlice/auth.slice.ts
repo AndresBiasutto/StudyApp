@@ -28,7 +28,7 @@ const authSlice = createSlice({
       })
       .addCase(authenticateUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.token;
+        state.token = action.payload.token ?? null;
         state.selected = action.payload;
         state.isAuthenticated = true;
       })

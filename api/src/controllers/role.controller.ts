@@ -7,7 +7,7 @@ class RoleController {
       const role = await roleService.createRole(req.body);
       res.status(201).json(role);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ message: err.message, error: err.message });
     }
   }
 
@@ -16,7 +16,7 @@ class RoleController {
       const role = await roleService.getRole(req.params.id);
       res.json(role);
     } catch (err: any) {
-      res.status(404).json({ error: err.message });
+      res.status(404).json({ message: err.message, error: err.message });
     }
   }
 
@@ -25,7 +25,7 @@ class RoleController {
       const roles = await roleService.getAllRoles();
       res.json(roles);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message, error: err.message });
     }
   }
 
@@ -33,12 +33,15 @@ class RoleController {
     try {
       const role = await roleService.getRoleByName(req.params.name);
       if (!role) {
-        return res.status(404).json({ error: "Role not found" });
+        return res.status(404).json({
+          message: "Role not found",
+          error: "Role not found",
+        });
       }
 
       res.json(role);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message, error: err.message });
     }
   }
 
@@ -47,7 +50,7 @@ class RoleController {
       const updated = await roleService.updateRole(req.params.id, req.body);
       res.json(updated);
     } catch (err: any) {
-      res.status(404).json({ error: err.message });
+      res.status(404).json({ message: err.message, error: err.message });
     }
   }
 
@@ -56,7 +59,7 @@ class RoleController {
       await roleService.deleteRole(req.params.id);
       res.json({ message: "Role deleted" });
     } catch (err: any) {
-      res.status(404).json({ error: err.message });
+      res.status(404).json({ message: err.message, error: err.message });
     }
   }
 }

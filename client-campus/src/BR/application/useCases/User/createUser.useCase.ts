@@ -9,7 +9,7 @@ export class CreateUserUseCase {
     this.repository = repository;
   }
 
-  execute(user: Omit<User, "id">): Promise<User> {
+  execute(user: Omit<User, "id_user">): Promise<User> {
     return this.repository.create(user);
   }
 }
