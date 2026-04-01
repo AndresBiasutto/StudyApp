@@ -18,7 +18,7 @@ const SetStudentsForm: React.FC<SetStudentsFormProps> = ({ item }) => {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
-  const { students, loading, error } = useAppSelector((state) => state.users);
+  const { students, loadingStudents, error } = useAppSelector((state) => state.users);
 
   useEffect(() => {
     if (students.length === 0) {
@@ -62,7 +62,7 @@ const SetStudentsForm: React.FC<SetStudentsFormProps> = ({ item }) => {
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loadingStudents) return <Spinner />;
   if (error) return <p>{error}</p>;
 
   return (

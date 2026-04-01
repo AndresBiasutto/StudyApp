@@ -12,7 +12,7 @@ import { clearSelectedUser } from "../../../store/slices/userSlice/user.slice";
 const AdminUserDetail = () => {
   const { id_user } = useParams();
   const appDispatch = useAppDispatch();
-  const { selected, loading, error } = useAppSelector((state) => state.users);
+  const { selected, loadingSelected, error } = useAppSelector((state) => state.users);
   
   useEffect(() => {
     if (id_user) {
@@ -32,7 +32,7 @@ const AdminUserDetail = () => {
   useEffect(() => {
     if (items.length === 0) appDispatch(fetchRoles());
   }, [appDispatch, items]);
-  if (loading || loadingRoles) return <Spinner />;
+  if (loadingSelected || loadingRoles) return <Spinner />;
   if (error || errorRoles) return <p>{error || errorRoles}</p>;
   return (
     <div className="w-full min-h-screen p-2 flex flex-col md:flex-row justify-start items-start gap-4">

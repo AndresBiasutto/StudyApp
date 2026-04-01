@@ -13,7 +13,7 @@ import Spinner from "../../components/molecules/spinner.molecule";
 const TeacherDetailSubject = () => {
   const { id_subject } = useParams();
   const appDispatch = useAppDispatch();
-  const { selected, loading, error } = useAppSelector(
+  const { selected, loadingSelected, error } = useAppSelector(
     (state) => state.subjects,
   );
   const dispatch = useDispatch();
@@ -35,7 +35,7 @@ const TeacherDetailSubject = () => {
       };
     }
   }, [id_subject, appDispatch]);
-  if (loading) return <Spinner />;
+  if (loadingSelected) return <Spinner />;
 
   if (error) return <p>{error}</p>;
   return (

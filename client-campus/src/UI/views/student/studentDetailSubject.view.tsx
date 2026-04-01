@@ -15,7 +15,7 @@ import { FiChevronDown, FiVideo, FiLink } from "react-icons/fi";
 const StudentDetailSubject = () => {
   const { id_subject } = useParams();
   const dispatch = useAppDispatch();
-  const { selected, loading, error } = useAppSelector(
+  const { selected, loadingSelected, error } = useAppSelector(
     (state) => state.subjects,
   );
   const { selected: selectedChapter, loading: loadingChapter } = useAppSelector(
@@ -55,7 +55,7 @@ const StudentDetailSubject = () => {
     }
   }, [selected, dispatch]);
 
-  if (loading) return <Spinner />;
+  if (loadingSelected) return <Spinner />;
   if (error) return <p>{error}</p>;
   if (!selected) return <Ptxt text="No se pudo cargar la materia." />;
 

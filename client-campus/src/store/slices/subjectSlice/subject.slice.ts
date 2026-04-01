@@ -1,19 +1,33 @@
 import { createSlice } from "@reduxjs/toolkit";
+
+import type { Subject } from "../../../BR/domain/entities/subject.interface";
 import type { SubjectState } from "./subject.types";
 import {
-  fetchSubjects,
-  fetchSubjectById,
   createSubject,
-  updateSubject,
   deleteSubject,
+  fetchSubjectById,
+  fetchSubjects,
+  updateSubject,
 } from "./subject.thunk";
 
 const initialState: SubjectState = {
   items: [],
   selected: undefined,
-  loading: false,
+  loadingList: false,
+  loadingSelected: false,
+  creating: false,
+  updating: false,
+  deleting: false,
   error: null,
 };
+
+const replaceSubjectInCollection = (
+  collection: Subject[],
+  updatedSubject: Subject,
+): Subject[] =>
+  collection.map((subject) =>
+    subject.id_subject === updatedSubject.id_subject ? updatedSubject : subject,
+  );
 
 const subjectSlice = createSlice({
   name: "subjects",
@@ -25,54 +39,79 @@ const subjectSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      /* FETCH ALL */
       .addCase(fetchSubjects.pending, (state) => {
-        state.loading = true;
+        state.loadingList = true;
         state.error = null;
       })
       .addCase(fetchSubjects.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingList = false;
         state.items = action.payload;
       })
       .addCase(fetchSubjects.rejected, (state, action) => {
-        state.loading = false;
+        state.loadingList = false;
         state.error = action.error.message ?? "Error al obtener subjects";
       })
 
-      /* FETCH BY ID */
       .addCase(fetchSubjectById.pending, (state) => {
-        state.loading = true;
+        state.loadingSelected = true;
         state.error = null;
       })
       .addCase(fetchSubjectById.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingSelected = false;
         state.selected = action.payload;
       })
       .addCase(fetchSubjectById.rejected, (state, action) => {
-        state.loading = false;
+        state.loadingSelected = false;
         state.error = action.error.message ?? "Error al obtener la materia";
       })
 
-      /* CREATE */
+      .addCase(createSubject.pending, (state) => {
+        state.creating = true;
+        state.error = null;
+      })
       .addCase(createSubject.fulfilled, (state, action) => {
+        state.creating = false;
         state.items.push(action.payload);
       })
-
-      /* UPDATE */
-      .addCase(updateSubject.fulfilled, (state, action) => {
-        const index = state.items.findIndex(
-          (s) => s.id_subject === action.payload.id_subject,
-        );
-        if (index !== -1) {
-          state.items[index] = action.payload;
-        }
+      .addCase(createSubject.rejected, (state, action) => {
+        state.creating = false;
+        state.error = action.error.message ?? "Error al crear la materia";
       })
 
-      /* DELETE */
+      .addCase(updateSubject.pending, (state) => {
+        state.updating = true;
+        state.error = null;
+      })
+      .addCase(updateSubject.fulfilled, (state, action) => {
+        state.updating = false;
+        state.items = replaceSubjectInCollection(state.items, action.payload);
+
+        if (state.selected?.id_subject === action.payload.id_subject) {
+          state.selected = action.payload;
+        }
+      })
+      .addCase(updateSubject.rejected, (state, action) => {
+        state.updating = false;
+        state.error = action.error.message ?? "Error al actualizar la materia";
+      })
+
+      .addCase(deleteSubject.pending, (state) => {
+        state.deleting = true;
+        state.error = null;
+      })
       .addCase(deleteSubject.fulfilled, (state, action) => {
+        state.deleting = false;
         state.items = state.items.filter(
-          (s) => s.id_subject !== action.payload,
+          (subject) => subject.id_subject !== action.payload,
         );
+
+        if (state.selected?.id_subject === action.payload) {
+          state.selected = undefined;
+        }
+      })
+      .addCase(deleteSubject.rejected, (state, action) => {
+        state.deleting = false;
+        state.error = action.error.message ?? "Error al eliminar la materia";
       });
   },
 });

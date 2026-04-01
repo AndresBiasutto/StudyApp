@@ -43,7 +43,7 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
 
   const {
     teachers,
-    loading,
+    loadingTeachers,
     error,
   } = useAppSelector((state) => state.users);
 
@@ -61,7 +61,7 @@ const SetTeacherForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
     }
   }, [dispatch, teachers.length]);
 
-  if (loading) return <Spinner />;
+  if (loadingTeachers) return <Spinner />;
   if (error) return <p>{error}</p>;
 
   const onSubmit = async (data: UpdateUserFormValues) => {

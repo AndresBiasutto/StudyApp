@@ -14,11 +14,11 @@ import Content from "../../components/molecules/content.molecule";
 const AdminUsersTab = () => {
   
   const appDispatch = useAppDispatch();
-  const { items, loading, error } = useAppSelector((state) => state.users);
+  const { items, loadingList, error } = useAppSelector((state) => state.users);
   useEffect(() => {
     appDispatch(fetchListedUsers());
   }, [appDispatch]);
-  if (loading ) return <Spinner />;
+  if (loadingList) return <Spinner />;
   if (error) return <p>{error}</p>;
   return (
     <Content title="administrar usuarios">

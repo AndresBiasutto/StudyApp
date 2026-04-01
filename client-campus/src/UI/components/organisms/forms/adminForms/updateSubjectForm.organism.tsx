@@ -51,8 +51,7 @@ const UpdateSubjectForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
 
   const { items: gradesState } = useAppSelector((state) => state.grades);
   const {
-    items: subjects,
-    loading,
+    updating,
     error,
   } = useAppSelector((state) => state.subjects);
 
@@ -66,9 +65,9 @@ const UpdateSubjectForm: React.FC<UpdateSubjectFormProps> = ({ item }) => {
 
   useEffect(() => {
     if (gradesState.length === 0) dispatch(fetchGrades());
-  }, [dispatch, subjects.length, gradesState.length]);
+  }, [dispatch, gradesState.length]);
 
-  if (loading) return <Spinner />;
+  if (updating) return <Spinner />;
   if (error) return <p>{error}</p>;
 
 const onSubmit = async (data: UpdateSubjectFormValues) => {
