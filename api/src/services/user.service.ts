@@ -115,19 +115,48 @@ class UserService {
   }
   async getAllUsers() {
     const users = await userRepository.getAllUsers();
-    return users.map(mapUserResponse);
+    const mapped = users.map(mapUserResponse);
+    // sort alphabetically by name then last_name
+    mapped.sort((a, b) => {
+      const na = (a.name || "").toString().toLowerCase();
+      const nb = (b.name || "").toString().toLowerCase();
+      if (na < nb) return -1;
+      if (na > nb) return 1;
+      const la = (a.last_name || "").toString().toLowerCase();
+      const lb = (b.last_name || "").toString().toLowerCase();
+      if (la < lb) return -1;
+      if (la > lb) return 1;
+      return 0;
+    });
+    return mapped;
   }
   async getAllLiDataUsers() {
     const users = await userRepository.getAllLiDataUsers();
-    return users.map(mapUserListResponse);
+    const mapped = users.map(mapUserListResponse);
+    mapped.sort((a, b) => {
+      const na = (a.name || "").toString().toLowerCase();
+      const nb = (b.name || "").toString().toLowerCase();
+      if (na < nb) return -1;
+      if (na > nb) return 1;
+      const la = (a.last_name || "").toString().toLowerCase();
+      const lb = (b.last_name || "").toString().toLowerCase();
+      if (la < lb) return -1;
+      if (la > lb) return 1;
+      return 0;
+    });
+    return mapped;
   }
   async getAllTeachers() {
     const users = await userRepository.getAllUsersByRole("teacher");
-    return users.map(mapUserListResponse);
+    const mapped = users.map(mapUserListResponse);
+    mapped.sort((a, b) => ((a.name || "").toString().toLowerCase() < (b.name || "").toString().toLowerCase() ? -1 : 1));
+    return mapped;
   }
   async getAllStudents() {
     const users = await userRepository.getAllUsersByRole("student");
-    return users.map(mapUserListResponse);
+    const mapped = users.map(mapUserListResponse);
+    mapped.sort((a, b) => ((a.name || "").toString().toLowerCase() < (b.name || "").toString().toLowerCase() ? -1 : 1));
+    return mapped;
   }
   async getUserByName(name: string) {
     return userRepository.getUserByName(name);

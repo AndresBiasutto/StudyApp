@@ -14,7 +14,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
           <img src={image} alt="Campus logo" className="w-10 h-10" />
-          <span className="font-pixelify text-xl text-lightText dark:text-darkText">Campus</span>
+          <span className="font-pixelify text-xl text-lightText dark:text-darkText">Campusapiens</span>
         </Link>
 
         <div className="flex items-center gap-3">

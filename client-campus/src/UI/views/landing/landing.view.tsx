@@ -50,13 +50,13 @@ const Landing = () => {
 
       {/* Intro text */}
       <div className="max-w-3xl mx-auto text-center py-8">
-        <H1 text="Aprendé con metodología activa" />
-        <Ptxt text="En Campus trabajamos con proyectos y práctica constante. Descubrí contenidos diseñados por docentes con experiencia." aditionalStyle="mt-4" />
+        <H1 text="Metodología de mono" />
+        <Ptxt text="En mono sapiens trabajamos con proyectos y práctica constante. Descubrí contenidos diseñados por mono con experiencia." aditionalStyle="mt-4" />
       </div>
 
       {/* Simple carousel implemented with atoms */}
       <div className="max-w-4xl mx-auto py-8">
-        <H2 text="Algunas materias" />
+        <H2 text="Cosas para aprender" />
         {subjects.length > 0 ? (
           <div className="relative mt-4">
             <div className="rounded border border-lightBorder dark:border-darkBorder bg-lightDetail dark:bg-darkDetail p-6">
@@ -108,7 +108,7 @@ const Landing = () => {
       {/* CTA login google */}
       <div className="max-w-2xl mx-auto text-center py-8">
         <H2 text="Empezá ahora" />
-        <Ptxt text="Registrate con tu cuenta de Google para acceder a materiales y cursos." aditionalStyle="mb-6" />
+        <Ptxt text="Mono que accede a materiales y cursos es mono feliz." aditionalStyle="mb-6" />
         <div className="flex justify-center">
           <LoginButton />
         </div>

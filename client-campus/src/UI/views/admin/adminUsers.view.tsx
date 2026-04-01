@@ -1,6 +1,4 @@
-import Button from "../../components/atoms/button.atom";
 import SearchBar from "../../components/molecules/searchBar.molecule";
-import { FaUserPlus } from "react-icons/fa6";
 import LiHeader from "../../components/molecules/cards/liHeader.molecule";
 import LiItem from "../../components/molecules/cards/liItem.molecule";
 import {
@@ -25,18 +23,9 @@ const AdminUsersTab = () => {
   return (
     <Content title="administrar usuarios">
       <div className="w-full grid grid-cols-3 gap-4 items-center mt-4 md:mt-0">
-        <div className=" col-span-3 md:col-span-2 ">
+        <div className=" col-span-3 flex justify-center items-center">
           <SearchBar />
         </div>
-        <div className=" col-span-3 md:col-span-1 ">
-        <Button
-          btnName={"Invitar Usuario"}
-          icon={<FaUserPlus />}
-          bgLight="bg-lightSecondary"
-          bgDark="dark:bg-darkSecondary"
-        />          
-        </div>
-
       </div>
       <div className="w-full flex items-center justify-end">
         <ul className="w-full flex flex-col items-start justify-start border border-lightBorder dark:border-darkBorder rounded">

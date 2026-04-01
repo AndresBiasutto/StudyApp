@@ -13,7 +13,17 @@ class UnitService {
   }
 
   async getAllUnits() {
-    return unitRepository.getAll();
+    const units = await unitRepository.getAll();
+    // ensure ordering by order ascending
+    if (Array.isArray(units)) {
+      units.sort((a: any, b: any) => (Number(a.order ?? 0) - Number(b.order ?? 0)));
+      units.forEach((u: any) => {
+        if (Array.isArray(u.createdChapters)) {
+          u.createdChapters.sort((c1: any, c2: any) => (Number(c1.order ?? 0) - Number(c2.order ?? 0)));
+        }
+      });
+    }
+    return units;
   }
 
   async getUnitByName(name: string) {

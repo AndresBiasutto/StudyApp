@@ -8,13 +8,13 @@ const Login = () => {
   return (
     <Content title="Iniciar Sesión">
       <LoginForm />
-
+      <span className="w-1/4 my-4 h-0.5 bg-lightSecondary dark:bg-darkSecondary" ></span>
       <div className="mt-4 flex justify-center">
         <LoginButton />
       </div>
 
       <div className="mt-6 text-center">
-        <Ptxt text="¿Aún no tienes cuenta?" />
+        <Ptxt text="¿Mono sin cuenta?" />
         <ul className="inline-block mt-2">
           <NavItem to="/register" text="Registrate" />
         </ul>

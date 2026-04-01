@@ -18,7 +18,27 @@ class SubjectService {
 
   async getAllSubjects() {
     const subjects = await subjectRepository.getAllSubjects();
-    return subjects.map(mapSubjectResponse);
+    const mapped = subjects.map(mapSubjectResponse);
+    // Sort subjects by name A-Z
+    mapped.sort((a, b) => {
+      const na = (a.name || "").toString().toLowerCase();
+      const nb = (b.name || "").toString().toLowerCase();
+      if (na < nb) return -1;
+      if (na > nb) return 1;
+      return 0;
+    });
+    // ensure units and chapters are ordered by 'order' ascending
+    mapped.forEach((s) => {
+      if (Array.isArray(s.createdUnits)) {
+        s.createdUnits.sort((u1, u2) => (Number(u1.order ?? 0) - Number(u2.order ?? 0)));
+        s.createdUnits.forEach((u) => {
+          if (Array.isArray(u.createdChapters)) {
+            u.createdChapters.sort((c1, c2) => (Number(c1.order ?? 0) - Number(c2.order ?? 0)));
+          }
+        });
+      }
+    });
+    return mapped;
   }
 
   getSubjectByName(name: string) {

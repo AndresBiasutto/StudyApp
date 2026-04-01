@@ -16,6 +16,10 @@ class ChapterService {
 
   async getAll() {
     const chapters = await chapterService.getAll();
+    // sort chapters by order ascending
+    if (Array.isArray(chapters)) {
+      chapters.sort((a: any, b: any) => (Number(a.order ?? 0) - Number(b.order ?? 0)));
+    }
     return chapters.map(mapChapterResponse);
   }
 

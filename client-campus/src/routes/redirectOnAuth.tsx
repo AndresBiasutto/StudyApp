@@ -8,8 +8,10 @@ const RedirectOnAuth = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!isAuthenticated || !selected?.Role?.name) return;
-    if (location.pathname !== "/") return;
+if (!isAuthenticated || !selected?.Role?.name) return;
+// permitir que la redirección ocurra desde páginas públicas
+const publicPaths = ["/", "/login", "/register"];
+if (!publicPaths.includes(location.pathname)) return;
 
     switch (selected.Role.name) {
       case "admin":
