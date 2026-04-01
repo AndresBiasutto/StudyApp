@@ -1,17 +1,25 @@
 import subjectRepository from "../repositories/subject.repository";
 import { mapSubjectResponse } from "../contracts/mappers/response.mapper";
+import { NotFoundError } from "../utils/errors";
+
+interface SubjectInput {
+  name?: string;
+  id_grade?: string;
+  id_user?: string;
+  description?: string;
+  imageUrl?: string;
+  student_ids?: string[];
+}
 
 class SubjectService {
-  async createSubject(data: any) {
+  async createSubject(data: SubjectInput) {
     const subject = await subjectRepository.createSubject(data);
     return mapSubjectResponse(subject);
   }
 
   async getSubject(id: string) {
     const subject = await subjectRepository.getSubject(id);
-    if (!subject) {
-      return null;
-    }
+    if (!subject) throw new NotFoundError("Subject not found");
 
     return mapSubjectResponse(subject);
   }
@@ -45,17 +53,17 @@ class SubjectService {
     return subjectRepository.getSubjectByName(name);
   }
 
-  async updateSubject(id: string, data: any) {
+  async updateSubject(id: string, data: SubjectInput) {
     const subject = await subjectRepository.updateSubject(id, data);
-    if (!subject) {
-      return null;
-    }
+    if (!subject) throw new NotFoundError("Subject not found");
 
     return mapSubjectResponse(subject);
   }
 
-  deleteSubject(id: string) {
-    return subjectRepository.deleteSubject(id);
+  async deleteSubject(id: string) {
+    const deleted = await subjectRepository.deleteSubject(id);
+    if (!deleted) throw new NotFoundError("Subject not found");
+    return true;
   }
 }
 export default new SubjectService();

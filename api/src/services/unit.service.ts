@@ -1,9 +1,17 @@
 import unitRepository from "../repositories/unit.repository";
 import { NotFoundError } from "../utils/errors";
 
+interface UnitInput {
+  name?: string;
+  description?: string;
+  order?: number;
+  imageUrl?: string;
+  id_subject?: string;
+}
+
 class UnitService {
-  async createUnit(data: any) {
-    return unitRepository.create(data,);
+  async createUnit(data: UnitInput) {
+    return unitRepository.create(data);
   }
 
   async getUnit(id_unit: string) {
@@ -14,12 +22,20 @@ class UnitService {
 
   async getAllUnits() {
     const units = await unitRepository.getAll();
-    // ensure ordering by order ascending
     if (Array.isArray(units)) {
-      units.sort((a: any, b: any) => (Number(a.order ?? 0) - Number(b.order ?? 0)));
-      units.forEach((u: any) => {
+      const sortableUnits = units as Array<{
+        order?: number | null;
+        createdChapters?: Array<{ order?: number | null }>;
+      }>;
+
+      sortableUnits.sort(
+        (a, b) => Number(a.order ?? 0) - Number(b.order ?? 0),
+      );
+      sortableUnits.forEach((u) => {
         if (Array.isArray(u.createdChapters)) {
-          u.createdChapters.sort((c1: any, c2: any) => (Number(c1.order ?? 0) - Number(c2.order ?? 0)));
+          u.createdChapters.sort(
+            (c1, c2) => Number(c1.order ?? 0) - Number(c2.order ?? 0),
+          );
         }
       });
     }
@@ -30,7 +46,7 @@ class UnitService {
     return unitRepository.getByName(name);
   }
 
-  async updateUnit(id_unit: string, data: any) {
+  async updateUnit(id_unit: string, data: UnitInput) {
     const unit = await unitRepository.update(id_unit, data);
     if (!unit) throw new NotFoundError("Unit not found");
     return unit;

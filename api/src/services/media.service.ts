@@ -1,10 +1,15 @@
 import MediaRepository from "../repositories/media.repository";
 
+interface MediaInput {
+  url: string;
+  id_chapter?: string;
+}
+
 class MediaService {
-  async createVideo(data: any) {
+  async createVideo(data: MediaInput) {
     return MediaRepository.createVideo(data);
   }
-  async createImage(data: any) {
+  async createImage(data: MediaInput) {
     return MediaRepository.createImage(data);
   }
 
@@ -14,12 +19,12 @@ class MediaService {
 //     return role;
 //   }
 
-   async getAllVideos() {
-     return MediaRepository.getAllVideos();
-   }
-   async getAllImages() {
-     return MediaRepository.getAllImages();
-   }
+  async getAllVideos() {
+    return MediaRepository.getAllVideos();
+  }
+  async getAllImages() {
+    return MediaRepository.getAllImages();
+  }
 
 //   async getRoleByName(name: string) {
 //     return MediaRepository.getRoleByName(name);

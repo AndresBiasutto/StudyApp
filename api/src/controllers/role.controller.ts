@@ -1,66 +1,31 @@
 import { Request, Response } from "express";
+
 import roleService from "../services/role.service";
 
 class RoleController {
   async create(req: Request, res: Response) {
-    try {
-      const role = await roleService.createRole(req.body);
-      res.status(201).json(role);
-    } catch (err: any) {
-      res.status(400).json({ message: err.message, error: err.message });
-    }
+    const role = await roleService.createRole(req.body);
+    res.status(201).json(role);
   }
 
   async getOne(req: Request, res: Response) {
-    try {
-      const role = await roleService.getRole(req.params.id);
-      res.json(role);
-    } catch (err: any) {
-      res.status(404).json({ message: err.message, error: err.message });
-    }
+    const role = await roleService.getRole(req.params.id);
+    res.json(role);
   }
 
-  async getAll(req: Request, res: Response) {
-    try {
-      const roles = await roleService.getAllRoles();
-      res.json(roles);
-    } catch (err: any) {
-      res.status(500).json({ message: err.message, error: err.message });
-    }
-  }
-
-  async getByName(req: Request, res: Response) {
-    try {
-      const role = await roleService.getRoleByName(req.params.name);
-      if (!role) {
-        return res.status(404).json({
-          message: "Role not found",
-          error: "Role not found",
-        });
-      }
-
-      res.json(role);
-    } catch (err: any) {
-      res.status(500).json({ message: err.message, error: err.message });
-    }
+  async getAll(_req: Request, res: Response) {
+    const roles = await roleService.getAllRoles();
+    res.json(roles);
   }
 
   async update(req: Request, res: Response) {
-    try {
-      const updated = await roleService.updateRole(req.params.id, req.body);
-      res.json(updated);
-    } catch (err: any) {
-      res.status(404).json({ message: err.message, error: err.message });
-    }
+    const updated = await roleService.updateRole(req.params.id, req.body);
+    res.json(updated);
   }
 
   async delete(req: Request, res: Response) {
-    try {
-      await roleService.deleteRole(req.params.id);
-      res.json({ message: "Role deleted" });
-    } catch (err: any) {
-      res.status(404).json({ message: err.message, error: err.message });
-    }
+    await roleService.deleteRole(req.params.id);
+    res.json({ message: "Role deleted" });
   }
 }
 
