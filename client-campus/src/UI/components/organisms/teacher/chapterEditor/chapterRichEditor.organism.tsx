@@ -1,10 +1,8 @@
 import type React from "react";
 import type { RefObject } from "react";
-
 import EditorToolbar from "../../../molecules/teacher/editorToolbar.molecule";
 import EditorCard from "../../../atoms/editorCard.atom";
 import H2 from "../../../atoms/h2.atom";
-import Ptxt from "../../../atoms/P.atom";
 
 interface ChapterRichEditorProps {
   editorRef: RefObject<HTMLDivElement | null>;
@@ -17,11 +15,7 @@ const ChapterRichEditor: React.FC<ChapterRichEditorProps> = ({ editorRef, applyF
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <H2 text="Texto del capitulo" />
-            <Ptxt
-              text="Editor simple con parrafos, negrita, cursiva y listas."
-              aditionalStyle="mt-1"
-            />
+            <H2 text="Escribe tu contenido" />
           </div>
         </div>
 

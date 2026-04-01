@@ -41,7 +41,7 @@ function App() {
       <RedirectOnAuth />
       <Routes>
         <Route path="*" element={<Missing />} />
-        <Route element={<LandingPageTemplate />} >
+        <Route element={<LandingPageTemplate />}>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -113,7 +113,11 @@ function App() {
           />
           <Route
             path="dashboard/admin/users/:id_user"
-            element={<AdminUserDetail />}
+            element={
+              <ProtectedRoutes role={"admin"}>
+                <AdminUserDetail />
+              </ProtectedRoutes>
+            }
           />
         </Route>
       </Routes>
