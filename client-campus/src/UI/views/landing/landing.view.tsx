@@ -107,8 +107,8 @@ const Landing = () => {
 
       {/* CTA login google */}
       <div className="max-w-2xl mx-auto text-center py-8">
-        <h2 className="text-xl font-semibold mb-4">Empezá ahora</h2>
-        <p className="mb-6">Registrate con tu cuenta de Google para acceder a materiales y cursos.</p>
+        <H2 text="Empezá ahora" />
+        <Ptxt text="Registrate con tu cuenta de Google para acceder a materiales y cursos." aditionalStyle="mb-6" />
         <div className="flex justify-center">
           <LoginButton />
         </div>
