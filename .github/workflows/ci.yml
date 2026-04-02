@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  api:
+    name: API Validate
+    runs-on: ubuntu-latest
+    env:
+      DB_NAME: campus_test
+      DB_USER: postgres
+      DB_PASS: 1234
+      DB_HOST: localhost
+      DB_PORT: 5432
+      PORT: 3000
+      APP_URL: http://localhost:3000
+      SECRET: test-secret-key
+      JWT_SECRET: test-secret-key
+      GOOGLE_CLIENT_ID: test-client-id
+      DB_SYNC_MODE: none
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npm run validate
+
+  client:
+    name: Client Validate
+    runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: http://localhost:3000/api/
+      VITE_GOOGLE_OAUTH_CLIENT_ID: test-client-id
+    defaults:
+      run:
+        working-directory: client-campus
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client-campus/package-lock.json
+      - run: npm ci
+      - run: npm run validate

@@ -1,5 +1,9 @@
 import { useAppSelector } from "../../../../hooks/UseStore.hook";
 import type { RootState } from "../../../../store/store";
+import type { Chapter } from "../../../../BR/domain/entities/chapter.interface";
+import type { Subject } from "../../../../BR/domain/entities/subject.interface";
+import type { Unit } from "../../../../BR/domain/entities/unit.interface";
+import type { User } from "../../../../BR/domain/entities/user.interface";
 import Modal from "../dashboard/modal.organism";
 import CreateSubjectForm from "../forms/adminForms/createSubjectForm.organism";
 import DeleteSubjectForm from "../forms/adminForms/deleteSubjectForm.organism";
@@ -18,6 +22,14 @@ import EditUnitForm from "../forms/teacherForms/editUnitForm.organism";
 
 const FormInModal = () => {
   const { modalContent } = useAppSelector((state: RootState) => state.ui);
+  const assignStudentsKey =
+    modalContent.type === "ASSIGN_STUDENTS" &&
+    modalContent.data &&
+    typeof modalContent.data === "object" &&
+    "id_subject" in modalContent.data
+      ? String(modalContent.data.id_subject)
+      : "assign-students";
+
   const form = (() => {
     switch (modalContent.type) {
       case "CREATE_SUBJECT":
@@ -25,27 +37,32 @@ const FormInModal = () => {
       case "CREATE_UNIT":
         return <CreateUnitForm />;
       case "EDIT_UNIT":
-        return <EditUnitForm item={modalContent?.data} />;
+        return <EditUnitForm item={modalContent.data as Unit | null} />;
       case "DELETE_UNIT":
-        return <DeleteUnitForm item={modalContent?.data} />;
+        return <DeleteUnitForm item={modalContent.data as Unit | null} />;
       case "CREATE_CHAPTER":
-        return <CreateChapterForm item={modalContent?.data} />;
+        return <CreateChapterForm item={modalContent.data as Unit | null} />;
       case "EDIT_SUBJECT":
-        return <UpdateSubjectForm item={modalContent?.data} />;
+        return <UpdateSubjectForm item={modalContent.data as Subject | null} />;
       case "EDIT_CHAPTER":
-        return <EditChapterForm item={modalContent?.data} />;
+        return <EditChapterForm item={modalContent.data as Chapter | null} />;
       case "UPDATE_USER_ROLE":
         return <UpdateUserRoleForm />;
       case "DELETE_USER":
-        return <DeleteUserForm item={modalContent?.data} />;
+        return <DeleteUserForm item={modalContent.data as User | null} />;
       case "DELETE_SUBJECT":
-        return <DeleteSubjectForm item={modalContent?.data} />;
+        return <DeleteSubjectForm item={modalContent.data as Subject | null} />;
       case "DELETE_CHAPTER":
-        return <DeleteChapterForm item={modalContent?.data} />;
+        return <DeleteChapterForm item={modalContent.data as Chapter | null} />;
       case "ASSIGN_TEACHER":
-        return <SetTeacherForm item={modalContent?.data} />;
+        return <SetTeacherForm item={modalContent.data as Subject | null} />;
       case "ASSIGN_STUDENTS":
-        return <SetStudentsForm item={modalContent?.data} />;
+        return (
+          <SetStudentsForm
+            key={assignStudentsKey}
+            item={modalContent.data as Subject | null}
+          />
+        );
       default:
         return null;
     }

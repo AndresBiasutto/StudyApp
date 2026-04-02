@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import userController from "../controllers/user.controller";
 import userService from "../services/user.service";
 import comparePassword from "../utils/comparePassword";
+import { ConflictError } from "../utils/errors";
 
 jest.mock("../services/user.service");
 jest.mock("../utils/comparePassword");
@@ -45,7 +46,7 @@ describe("UserController", () => {
       expect(res.json).toHaveBeenCalledWith(mockUser);
     });
 
-    it("should return 400 if user already exists", async () => {
+    it("should throw ConflictError if user already exists", async () => {
       const req = {
         body: { e_mail: "existing@test.com" },
       } as Request;
@@ -55,12 +56,10 @@ describe("UserController", () => {
         .fn()
         .mockResolvedValue({ id_user: "existing-user" } as any);
 
-      await userController.registerUser(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        error: "El usuario ya existe",
-      });
+      await expect(userController.registerUser(req, res)).rejects.toThrow(
+        ConflictError,
+      );
+      expect(mockService.registerUser).not.toHaveBeenCalled();
     });
   });
 

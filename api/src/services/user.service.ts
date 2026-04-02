@@ -132,9 +132,10 @@ class UserService {
     };
 
     // El email es best-effort por ahora; no bloquea el alta si falla.
-    void sendVerificationEmail(data.e_mail, verificationToken).catch((error) => {
-      console.error("No se pudo enviar el email de verificacion:", error);
-    });
+    void Promise.resolve(sendVerificationEmail(data.e_mail, verificationToken))
+      .catch((error) => {
+        console.error("No se pudo enviar el email de verificacion:", error);
+      });
 
     return userRepository.registerUser(newUser);
   }

@@ -15,7 +15,9 @@ interface SetStudentsFormProps {
 
 const SetStudentsForm: React.FC<SetStudentsFormProps> = ({ item }) => {
   const dispatch = useAppDispatch();
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>(
+    () => item?.students?.map((student) => student.id_user) ?? [],
+  );
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   const { students, loadingStudents, error } = useAppSelector((state) => state.users);
@@ -25,10 +27,6 @@ const SetStudentsForm: React.FC<SetStudentsFormProps> = ({ item }) => {
       dispatch(fetchStudents());
     }
   }, [dispatch, students.length]);
-
-  useEffect(() => {
-    setSelectedStudents(item?.students?.map((student) => student.id_user) ?? []);
-  }, [item]);
 
   const sortedStudents = [...students].sort((a, b) =>
     `${a.name} ${a.last_name}`.localeCompare(`${b.name} ${b.last_name}`),

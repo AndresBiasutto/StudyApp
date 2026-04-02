@@ -53,7 +53,7 @@ const StudentDetailSubject = () => {
         );
       }
     }
-  }, [selected, dispatch]);
+  }, [selected, selectedChapter, loadingChapter, dispatch]);
 
   if (loadingSelected) return <Spinner />;
   if (error) return <p>{error}</p>;

@@ -2,6 +2,7 @@ import userService from '../services/user.service';
 import userRepository from '../repositories/user.repository';
 import * as jwt from 'jsonwebtoken';
 import hashPassword from '../utils/hashPassword';
+import sendVerificationEmail from '../utils/sendVerificationEmail';
 
 jest.mock('../repositories/user.repository');
 jest.mock('../utils/hashPassword');
@@ -11,6 +12,8 @@ jest.mock('google-auth-library');
 
 describe('UserService', () => {
   const mockRepository = userRepository as jest.Mocked<typeof userRepository>;
+  const mockSendVerificationEmail =
+    sendVerificationEmail as jest.MockedFunction<typeof sendVerificationEmail>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -18,13 +21,13 @@ describe('UserService', () => {
 
   describe('registerUser', () => {
     it('should create user if email does not exist', async () => {
-      mockRepository.getUserByEmail = jest.fn().mockResolvedValue(null);
       mockRepository.registerUser = jest.fn().mockResolvedValue({
         id_user: 'new-id',
         name: 'John',
         e_mail: 'new@test.com',
       });
       (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
+      mockSendVerificationEmail.mockResolvedValue(undefined);
 
       const newUser = {
         name: 'John',
@@ -35,7 +38,16 @@ describe('UserService', () => {
 
       const result = await userService.registerUser(newUser);
       
-      expect(mockRepository.registerUser).toHaveBeenCalled();
+      expect(mockRepository.registerUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          e_mail: 'new@test.com',
+          password: 'hashedPassword',
+        }),
+      );
+      expect(mockSendVerificationEmail).toHaveBeenCalledWith(
+        'new@test.com',
+        expect.any(String),
+      );
       expect(result).toBeDefined();
     });
   });
@@ -65,6 +77,7 @@ describe('UserService', () => {
       };
 
       mockRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser);
+      mockRepository.getUser = jest.fn().mockResolvedValue(mockUser);
       (jwt.sign as jest.Mock).mockReturnValue('mock-token');
 
       const loginData = { e_mail: 'test@test.com', password: 'correctPassword' };
@@ -78,13 +91,37 @@ describe('UserService', () => {
 
   describe('getMe', () => {
     it('should return user by id', async () => {
-      const mockUser = { id_user: 'user-123', name: 'John' };
+      const mockUser = {
+        id_user: 'user-123',
+        name: 'John',
+        last_name: 'Doe',
+        e_mail: 'john@test.com',
+        id_role: 'role-1',
+        contact_number: null,
+        description: null,
+        image: null,
+        Role: { id_role: 'role-1', name: 'student' },
+        createdSubjects: [],
+        enrolledSubjects: [],
+      };
       mockRepository.getUser = jest.fn().mockResolvedValue(mockUser);
 
       const result = await userService.getMe('user-123');
 
       expect(mockRepository.getUser).toHaveBeenCalledWith('user-123');
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({
+        id_user: 'user-123',
+        name: 'John',
+        last_name: 'Doe',
+        e_mail: 'john@test.com',
+        image: null,
+        Role: { id_role: 'role-1', name: 'student' },
+        contact_number: null,
+        description: null,
+        id_role: 'role-1',
+        subjects: [],
+        enrolledSubjects: [],
+      });
     });
   });
 
@@ -107,13 +144,43 @@ describe('UserService', () => {
 
   describe('getAllUsers', () => {
     it('should return all users', async () => {
-      const mockUsers = [{ id_user: '1' }, { id_user: '2' }];
+      const mockUsers = [
+        {
+          id_user: '2',
+          name: 'Zoe',
+          last_name: 'B',
+          e_mail: 'zoe@test.com',
+          contact_number: null,
+          description: null,
+          image: null,
+          id_role: 'role-1',
+          Role: { id_role: 'role-1', name: 'student' },
+          createdSubjects: [],
+          enrolledSubjects: [],
+        },
+        {
+          id_user: '1',
+          name: 'Ana',
+          last_name: 'A',
+          e_mail: 'ana@test.com',
+          contact_number: null,
+          description: null,
+          image: null,
+          id_role: 'role-1',
+          Role: { id_role: 'role-1', name: 'student' },
+          createdSubjects: [],
+          enrolledSubjects: [],
+        },
+      ];
       mockRepository.getAllUsers = jest.fn().mockResolvedValue(mockUsers);
 
       const result = await userService.getAllUsers();
 
       expect(mockRepository.getAllUsers).toHaveBeenCalled();
-      expect(result).toEqual(mockUsers);
+      expect(result).toEqual([
+        expect.objectContaining({ id_user: '1', name: 'Ana' }),
+        expect.objectContaining({ id_user: '2', name: 'Zoe' }),
+      ]);
     });
   });
 
@@ -131,13 +198,29 @@ describe('UserService', () => {
 
   describe('updateUser', () => {
     it('should update user and return updated user', async () => {
-      const updatedUser = { id_user: 'user-123', name: 'Jane' };
+      const updatedUser = {
+        id_user: 'user-123',
+        name: 'Jane',
+        last_name: 'Doe',
+        e_mail: 'jane@test.com',
+        image: null,
+        contact_number: null,
+        Role: { id_role: 'role-1', name: 'student' },
+      };
       mockRepository.updateUser = jest.fn().mockResolvedValue(updatedUser);
 
       const result = await userService.updateUser('user-123', { name: 'Jane' });
 
       expect(mockRepository.updateUser).toHaveBeenCalledWith('user-123', { name: 'Jane' });
-      expect(result).toEqual(updatedUser);
+      expect(result).toEqual({
+        id_user: 'user-123',
+        name: 'Jane',
+        last_name: 'Doe',
+        e_mail: 'jane@test.com',
+        image: null,
+        Role: { id_role: 'role-1', name: 'student' },
+        contact_number: null,
+      });
     });
 
     it('should throw error if user not found', async () => {

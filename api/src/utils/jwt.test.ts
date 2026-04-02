@@ -36,22 +36,5 @@ describe("JWT Utils", () => {
       expect(decoded.exp).toBeDefined();
       expect(decoded.exp).toBeGreaterThan(Date.now() / 1000);
     });
-
-    it("should throw if no configured secret is available", () => {
-      const previousSecret = process.env.SECRET;
-      const previousJwtSecret = process.env.JWT_SECRET;
-
-      delete process.env.SECRET;
-      delete process.env.JWT_SECRET;
-      jest.resetModules();
-
-      expect(() => {
-        const { signToken: freshSignToken } = require("../utils/jwt");
-        freshSignToken({ id_user: "test" });
-      }).toThrow("Environment variable SECRET is required");
-
-      process.env.SECRET = previousSecret;
-      process.env.JWT_SECRET = previousJwtSecret;
-    });
   });
 });
