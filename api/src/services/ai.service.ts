@@ -1,7 +1,10 @@
 import { OpenRouter } from "@openrouter/sdk";
 
+import { mapExamQuestionResponse, mapExamResponse } from "../contracts/mappers/response.mapper";
 import { env } from "../config/env";
-import { ValidationError } from "../utils/errors";
+import chapterRepository from "../repositories/chapter.repository";
+import examRepository from "../repositories/exam.repository";
+import { NotFoundError, ValidationError } from "../utils/errors";
 
 interface QuizQuestion {
   question: string;
@@ -9,8 +12,20 @@ interface QuizQuestion {
   correctAnswer: string;
 }
 
-const chapter =
-  "Analisis y Desarrollo de Sistemas. Los Sistemas de Informacion (SI) y las Tecnologias de Informacion (TI) han cambiado la forma en que operan las organizaciones actuales. A traves de su uso se logran importantes mejoras, ya que automatizan los procesos operativos, suministran una plataforma de informacion necesaria para la toma de decisiones y, lo mas importante, su implementacion logra ventajas competitivas. Dentro de los SI tambien debemos contemplar algunos conceptos y metodologias de alto impacto. La informacion es uno de los principales recursos con que cuenta la organizacion. Los entes que toman decisiones han comenzado a comprender que la informacion no es solo un subproducto de la conduccion, sino que alimenta al propio sistema y puede ser uno de los factores criticos para determinar el exito o fracaso. Si deseamos maximizar la utilidad de la informacion, el sistema organizacional debe manejarla de forma correcta y eficiente, como los demas recursos existentes. Los administradores deben comprender que hay costos asociados con la produccion, distribucion, seguridad, almacenamiento y recuperacion de la informacion. Aunque la informacion se encuentra a nuestro alrededor, no es gratis y su uso es estrategico para posicionar de forma ventajosa a la empresa dentro de un negocio. Condiciones del dato para transformarse en informacion: utilidad, relevancia, interpretable y perceptible. Caracteristicas de la informacion: transportabilidad, ilimitada, subjetividad y significativa para la toma de decisiones.";
+const MAX_SOURCE_TEXT_LENGTH = 6000;
+const MAX_COMPLETION_TOKENS = 700;
+
+const stripHtml = (content: string): string =>
+  content
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const extractJson = (content: string): string => {
   const trimmed = content.trim();
@@ -82,6 +97,14 @@ const normalizeQuiz = (payload: unknown): QuizQuestion[] => {
       );
     }
 
+    const uniqueOptions = new Set(options);
+
+    if (uniqueOptions.size !== 3) {
+      throw new ValidationError(
+        `La pregunta ${index + 1} contiene opciones repetidas`,
+      );
+    }
+
     if (!options.includes(correctAnswer)) {
       throw new ValidationError(
         `La pregunta ${index + 1} no tiene una respuesta correcta valida`,
@@ -101,14 +124,41 @@ class AiService {
     apiKey: env.openRouterApiKey || "",
   });
 
-  async generateQuiz(): Promise<QuizQuestion[]> {
+  async generateQuiz(id_chapter: string) {
+    const existingExam = await examRepository.getByChapterId(id_chapter);
+
+    if (existingExam) {
+      return mapExamResponse(existingExam).questions;
+    }
+
+    const chapter = await chapterRepository.getOne(id_chapter);
+
+    if (!chapter) {
+      throw new NotFoundError("Chapter not found");
+    }
+
+    const chapterData = chapter.get({
+      plain: true,
+    }) as { content_html?: string | null };
+
+    const sourceText = stripHtml(chapterData.content_html ?? "").slice(
+      0,
+      MAX_SOURCE_TEXT_LENGTH,
+    );
+
+    if (!sourceText) {
+      throw new ValidationError(
+        "El capitulo no tiene contenido para generar un examen",
+      );
+    }
+
     if (!env.openRouterApiKey) {
       throw new ValidationError("OPENROUTER_API_KEY no esta configurada");
     }
 
     const prompt = `
 Lee y comprende el siguiente texto:
-${chapter}
+${sourceText}
 
 Actua como profesor de la materia tratada en el texto.
 Genera exactamente 4 preguntas de opcion multiple basadas solo en ese texto.
@@ -149,6 +199,7 @@ Formato exacto:
     const completion = await this.openRouter.chat.send({
       chatRequest: {
         model: "deepseek/deepseek-r1",
+        maxTokens: MAX_COMPLETION_TOKENS,
         messages: [
           {
             role: "system",
@@ -170,8 +221,10 @@ Formato exacto:
     }
 
     const parsed = JSON.parse(extractJson(content)) as unknown;
+    const questions = normalizeQuiz(parsed);
+    const savedExam = await examRepository.saveByChapterId(id_chapter, questions);
 
-    return normalizeQuiz(parsed);
+    return mapExamResponse(savedExam).questions.map(mapExamQuestionResponse);
   }
 }
 

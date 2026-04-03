@@ -10,6 +10,7 @@ import {
   SubjectSummaryResponseDto,
   UnitResponseDto,
 } from "../subject.contract";
+import { ExamQuestionResponseDto, ExamResponseDto } from "../exam.contract";
 import {
   AuthResponseDto,
   UserListResponseDto,
@@ -100,6 +101,32 @@ export const mapChapterResponse = (chapter: unknown): ChapterResponseDto => {
     published_at: data.published_at
       ? new Date(data.published_at).toISOString()
       : null,
+  };
+};
+
+export const mapExamQuestionResponse = (
+  question: unknown,
+): ExamQuestionResponseDto => {
+  const data = toPlain(question);
+
+  return {
+    question: String(data.question ?? ""),
+    options: Array.isArray(data.options)
+      ? data.options.map((option: unknown) => String(option))
+      : [],
+    correctAnswer: String(data.correctAnswer ?? ""),
+  };
+};
+
+export const mapExamResponse = (exam: unknown): ExamResponseDto => {
+  const data = toPlain(exam);
+
+  return {
+    id_exam: String(data.id_exam),
+    id_chapter: String(data.id_chapter),
+    questions: Array.isArray(data.questions)
+      ? data.questions.map(mapExamQuestionResponse)
+      : [],
   };
 };
 

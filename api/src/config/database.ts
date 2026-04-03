@@ -41,10 +41,10 @@ fs.readdirSync(modelsDir)
 
 modelDefiners.forEach((defineModel) => defineModel(sequelize));
 
-const { User, Subject, Role, Grade, Unit, Chapter, Video, Image } =
+const { User, Subject, Role, Grade, Unit, Chapter, Video, Image, Exam } =
   sequelize.models;
 
-if (User && Subject && Role && Grade && Unit && Chapter && Video && Image) {
+if (User && Subject && Role && Grade && Unit && Chapter && Video && Image && Exam) {
   User.belongsTo(Role, { foreignKey: "id_role" });
   Subject.belongsTo(Grade, { foreignKey: "id_grade" });
 
@@ -75,6 +75,9 @@ if (User && Subject && Role && Grade && Unit && Chapter && Video && Image) {
 
   Chapter.hasMany(Image, { as: "createdImages", foreignKey: "id_chapter" });
   Image.belongsTo(Chapter, { as: "ChapterImages", foreignKey: "id_chapter" });
+
+  Chapter.hasOne(Exam, { as: "exam", foreignKey: "id_chapter" });
+  Exam.belongsTo(Chapter, { as: "chapter", foreignKey: "id_chapter" });
 } else {
   console.error("ERROR: algun modelo no esta definido.");
 }
