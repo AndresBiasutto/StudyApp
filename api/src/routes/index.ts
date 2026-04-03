@@ -7,9 +7,11 @@ import ChapterRoutes from "./chapter.route";
 import MediaRoutes from "./media.route";
 import roleRoutes from "./role.route";
 import gradeRoutes from "./grade.route";
+import { aiRouter } from "./ai";
 
 const router = Router();
 router.use("/users", userRoutes);
+router.use("/ai", aiRouter)
 // router.get("/health", healthCheck);
 router.use("/subjects", subjectRoutes);
 router.use("/units", UnitRoutes);

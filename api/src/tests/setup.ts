@@ -15,3 +15,4 @@ process.env.DB_HOST = "localhost";
 process.env.DB_PORT = "5432";
 process.env.PORT = "3000";
 process.env.APP_URL = "http://localhost:3000";
+process.env.OPENROUTER_API_KEY = "test-openrouter-key";

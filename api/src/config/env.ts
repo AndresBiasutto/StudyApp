@@ -56,6 +56,9 @@ export const env = {
   port,
   appUrl: process.env.APP_URL?.trim() || `http://localhost:${port}`,
   jwtSecret,
+  openRouterApiKey:
+    process.env.OPENROUTER_API_KEY?.trim() ||
+    process.env.OPENROUTER_KEY?.trim(),
   googleClientId: process.env.GOOGLE_CLIENT_ID?.trim(),
   emailUser: process.env.EMAIL_USER?.trim(),
   emailPassword:
