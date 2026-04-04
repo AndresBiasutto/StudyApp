@@ -124,10 +124,10 @@ class AiService {
     apiKey: env.openRouterApiKey || "",
   });
 
-  async generateQuiz(id_chapter: string) {
+  async generateQuiz(id_chapter: string, force = false) {
     const existingExam = await examRepository.getByChapterId(id_chapter);
 
-    if (existingExam) {
+    if (existingExam && !force) {
       return mapExamResponse(existingExam).questions;
     }
 

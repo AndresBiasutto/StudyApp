@@ -12,3 +12,9 @@ aiRouter.get(
   validate(chapterExamParamSchema),
   asyncHandler(aiController.getQuiz.bind(aiController)),
 );
+
+aiRouter.get(
+  "/multiple-choise/:id_chapter",
+  validate(chapterExamParamSchema),
+  asyncHandler(aiController.getQuiz.bind(aiController)),
+);

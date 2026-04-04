@@ -18,6 +18,7 @@ import DeleteChapterForm from "../forms/teacherForms/deleteChapterForm.organism"
 import DeleteUnitForm from "../forms/teacherForms/deleteUnitForm.organism";
 import EditChapterForm from "../forms/teacherForms/editChapterForm.organism";
 import EditUnitForm from "../forms/teacherForms/editUnitForm.organism";
+import TeacherExamForm from "../teacher/teacherExamForm.organism";
 
 
 const FormInModal = () => {
@@ -63,6 +64,8 @@ const FormInModal = () => {
             item={modalContent.data as Subject | null}
           />
         );
+      case "TEACHER_EXAM":
+        return <TeacherExamForm item={modalContent.data as Chapter | null} />;
       default:
         return null;
     }

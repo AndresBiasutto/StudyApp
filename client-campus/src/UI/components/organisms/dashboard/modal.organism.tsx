@@ -18,7 +18,7 @@ const Modal: React.FC<modal> = ({ text, children }) => {
         action={() => dispatch(toggleModal())}
       />
       <div
-        className={`fixed max-h-min min-h-auto w-full md:w-4/5 max-w-5xl p-2 z-50 inset-y-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded overflow-hidden border border-lightBorder dark:border-darkBorder overflow-y-auto bg-lightPrimary dark:bg-darkPrimary transform transition duration-300  ${
+        className={`fixed min-h-96 max-h-screen w-full md:w-4/5 max-w-5xl p-2 z-50 inset-y-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded overflow-y-scroll border border-lightBorder dark:border-darkBorder bg-lightPrimary dark:bg-darkPrimary transform transition duration-300  ${
           modalOpen ? "" : "hidden"
         }`}
       >
@@ -32,7 +32,7 @@ const Modal: React.FC<modal> = ({ text, children }) => {
             bgDark="dark:bg-darkWarning"
           />
         </div>
-        <div className="w-full flex justify-center items-center">{children}</div>
+        <div className="w-full flex justify-center items-center ">{children}</div>
       </div>
     </>
   );

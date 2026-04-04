@@ -4,12 +4,14 @@ import { RoleApiRepository } from '../repositories/roleApi.repository';
 import { GradeApiRepository } from '../repositories/grade.repository';
 import { UnitApiRepository } from '../repositories/unitApiRepository';
 import { ChapterApiRepository } from '../repositories/chapterApiRepository';
+import { ExamApiRepository } from '../repositories/examApiRepository';
 import type { UserRepository } from '../../domain/services/user.repository';
 import type { SubjectRepository } from '../../domain/services/subjectRepository';
 import type { RoleRepository } from '../../domain/services/role.repository';
 import type { GradeRepository as GradeRepoInterface } from '../../domain/services/grade.repository';
 import type { UnitRepository } from '../../domain/services/unit.repository';
 import type { ChapterRepository } from '../../domain/services/chapter.repository';
+import type { ExamRepository } from '../../domain/services/exam.repository';
 
 export const RepositoryType = {
   USER: 'USER',
@@ -18,6 +20,7 @@ export const RepositoryType = {
   GRADE: 'GRADE',
   UNIT: 'UNIT',
   CHAPTER: 'CHAPTER',
+  EXAM: 'EXAM',
 } as const;
 
 export type RepositoryType = (typeof RepositoryType)[keyof typeof RepositoryType];
@@ -30,6 +33,7 @@ class RepositoryFactory {
   private gradeRepository: GradeApiRepository | null = null;
   private unitRepository: UnitApiRepository | null = null;
   private chapterRepository: ChapterApiRepository | null = null;
+  private examRepository: ExamApiRepository | null = null;
 
   private constructor() {}
 
@@ -82,6 +86,13 @@ class RepositoryFactory {
     return this.chapterRepository;
   }
 
+  public getExamRepository(): ExamRepository {
+    if (!this.examRepository) {
+      this.examRepository = new ExamApiRepository();
+    }
+    return this.examRepository;
+  }
+
   public get<T>(type: RepositoryType): T {
     switch (type) {
       case RepositoryType.USER:
@@ -96,6 +107,8 @@ class RepositoryFactory {
         return this.getUnitRepository() as T;
       case RepositoryType.CHAPTER:
         return this.getChapterRepository() as T;
+      case RepositoryType.EXAM:
+        return this.getExamRepository() as T;
       default:
         throw new Error(`Unknown repository type: ${type}`);
     }

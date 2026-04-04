@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FiPlus, FiRefreshCw } from "react-icons/fi";
+import { LiaRobotSolid } from "react-icons/lia";
 import Content from "../../components/molecules/content.molecule";
 import Button from "../../components/atoms/button.atom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
 import { fetchChapterById } from "../../../store/slices/chapterSlice/chapter.thunk";
+import { generateChapterExam } from "../../../store/slices/examSlice/exam.thunk";
 import Spinner from "../../components/molecules/spinner.molecule";
 import EditorCard from "../../components/atoms/editorCard.atom";
 import type { Chapter } from "../../../BR/domain/entities/chapter.interface";
@@ -15,6 +17,10 @@ import {
   publishChapterContent,
   saveChapterDraft,
 } from "../../../store/slices/chapterSlice/chapter.thunk";
+import {
+  openModal,
+  setModalContent,
+} from "../../../store/slices/uiSlice";
 import {
   createResourceItem,
   type ResourceItem,
@@ -87,6 +93,20 @@ const TeacherChapterEditorForm: React.FC<TeacherChapterEditorFormProps> = ({
     }
   };
 
+  const handleGenerateExam = async () => {
+    dispatch(
+      setModalContent({
+        type: "TEACHER_EXAM",
+        data: chapter,
+        title: "generar examen",
+      }),
+    );
+    dispatch(openModal());
+    await dispatch(
+      generateChapterExam({ id_chapter: chapter.id_chapter, force: false }),
+    );
+  };
+
   return (
     <div className="w-full max-w-6xl flex flex-col gap-4">
       <ChapterBasicInfo
@@ -125,6 +145,16 @@ const TeacherChapterEditorForm: React.FC<TeacherChapterEditorFormProps> = ({
             action={handlePublish}
           />
         </div>
+      </EditorCard>
+
+      <EditorCard>
+        <Button
+          btnName="generar examen"
+          icon={<LiaRobotSolid />}
+          bgLight="bg-lightLink"
+          bgDark="dark:bg-darkLink"
+          action={handleGenerateExam}
+        />
       </EditorCard>
     </div>
   );
