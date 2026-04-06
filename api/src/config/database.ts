@@ -52,8 +52,7 @@ const {
   Image,
   Exam,
   ExamResult,
-} =
-  sequelize.models;
+} = sequelize.models;
 
 if (
   User &&

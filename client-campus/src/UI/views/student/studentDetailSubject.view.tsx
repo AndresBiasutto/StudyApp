@@ -1,29 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PiExam } from "react-icons/pi";
+import { FiChevronDown, FiLink, FiMenu, FiVideo, FiX } from "react-icons/fi";
+
+import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
+import { fetchChapterById } from "../../../store/slices/chapterSlice/chapter.thunk";
+import { clearSelectedChapter } from "../../../store/slices/chapterSlice/chapter.slice";
+import { fetchMyStudentChapterExamResult, fetchStudentChapterExam } from "../../../store/slices/studentExamSlice/studentExam.thunk";
+import { clearStudentExamState } from "../../../store/slices/studentExamSlice/studentExam.slice";
+import { fetchSubjectById } from "../../../store/slices/subjectSlice/subject.thunk";
+import { openModal, setModalContent } from "../../../store/slices/uiSlice";
+import Button from "../../components/atoms/button.atom";
+import ButtonCircle from "../../components/atoms/buttonCircle.atom";
+import EditorCard from "../../components/atoms/editorCard.atom";
 import H2 from "../../components/atoms/h2.atom";
 import H3 from "../../components/atoms/h3.atom";
 import Ptxt from "../../components/atoms/P.atom";
-import Button from "../../components/atoms/button.atom";
-import EditorCard from "../../components/atoms/editorCard.atom";
-import Spinner from "../../components/molecules/spinner.molecule";
-import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
-import { fetchSubjectById } from "../../../store/slices/subjectSlice/subject.thunk";
-import { fetchChapterById } from "../../../store/slices/chapterSlice/chapter.thunk";
-import { clearSelectedChapter } from "../../../store/slices/chapterSlice/chapter.slice";
-import { openModal, setModalContent } from "../../../store/slices/uiSlice";
-import { clearStudentExamState } from "../../../store/slices/studentExamSlice/studentExam.slice";
-import {
-  fetchMyStudentChapterExamResult,
-  fetchStudentChapterExam,
-} from "../../../store/slices/studentExamSlice/studentExam.thunk";
-import ChapterHeader from "../../components/molecules/chapterReader/chapterHeader.molecule";
 import Carousel from "../../components/molecules/carousel.molecule";
-import { FiChevronDown, FiVideo, FiLink } from "react-icons/fi";
+import ChapterHeader from "../../components/molecules/chapterReader/chapterHeader.molecule";
+import Spinner from "../../components/molecules/spinner.molecule";
 
 const StudentDetailSubject = () => {
   const { id_subject } = useParams();
   const dispatch = useAppDispatch();
+  const [isIndexOpen, setIsIndexOpen] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : false,
+  );
   const { selected, loadingSelected, error } = useAppSelector(
     (state) => state.subjects,
   );
@@ -46,6 +48,10 @@ const StudentDetailSubject = () => {
 
   const handleSelectChapter = (id_chapter: string) => {
     dispatch(fetchChapterById(id_chapter));
+
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setIsIndexOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -95,10 +101,31 @@ const StudentDetailSubject = () => {
   if (!selected) return <Ptxt text="No se pudo cargar la materia." />;
 
   return (
-    <div className="flex w-full min-h-[calc(100vh-4rem)]">
-      {/* Sidebar Acordeón */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-lightBorder dark:border-darkBorder bg-lightPrimary dark:bg-darkPrimary shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto">
-        <div className="p-4 border-b border-lightBorder dark:border-darkBorder">
+    <div className="relative flex min-h-[calc(100vh-4rem)] w-full bg-lightPrimary dark:bg-darkPrimary">
+      {isIndexOpen && (
+        <button
+          type="button"
+          aria-label="Cerrar indice"
+          className="fixed inset-0 top-16 z-20 bg-black/30 lg:hidden"
+          onClick={() => setIsIndexOpen(false)}
+        />
+      )}
+
+      <ButtonCircle
+        ariaLabel={isIndexOpen ? "Cerrar indice" : "Abrir indice"}
+        icon={isIndexOpen ? <FiX /> : <FiMenu />}
+        action={() => setIsIndexOpen((prev) => !prev)}
+        className={`fixed top-20 z-40 ${
+          isIndexOpen ? "left-[15.5rem] lg:left-[17rem]" : "left-4"
+        }`}
+      />
+
+      <aside
+        className={`fixed left-0 top-16 z-30 flex h-[calc(100vh-4rem)] w-72 flex-col overflow-y-auto border-r border-lightBorder bg-lightPrimary transition-transform duration-300 dark:border-darkBorder dark:bg-darkPrimary ${
+          isIndexOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="border-b border-lightBorder p-4 dark:border-darkBorder">
           <H2 text={selected.name} />
           <Ptxt text={selected.Grade?.name ?? "Sin año"} />
         </div>
@@ -114,16 +141,15 @@ const StudentDetailSubject = () => {
                 key={unit.id_unit}
                 className="group border-b border-lightBorder dark:border-darkBorder"
               >
-                <summary className="p-4 flex items-center justify-between cursor-pointer hover:bg-lightDetail dark:hover:bg-darkDetail transition-colors font-semibold">
-                  <span className="text-lightText dark:text-darkText font-pixelify">
+                <summary className="flex cursor-pointer items-center justify-between p-4 font-semibold transition-colors hover:bg-lightDetail dark:hover:bg-darkDetail">
+                  <span className="font-pixelify text-lightText dark:text-darkText">
                     {unit.order} - {unit.name}
                   </span>
-                  <FiChevronDown className="transition-transform group-open:rotate-180 text-lightText dark:text-darkText" />
+                  <FiChevronDown className="text-lightText transition-transform group-open:rotate-180 dark:text-darkText" />
                 </summary>
-                <div className="flex flex-col pb-2 bg-lightPrimary dark:bg-darkPrimary">
-                  {!unit.createdChapters ||
-                  unit.createdChapters.length === 0 ? (
-                    <div className="px-4 py-2 text-sm text-gray-500 font-sharetech">
+                <div className="flex flex-col bg-lightPrimary pb-2 dark:bg-darkPrimary">
+                  {!unit.createdChapters || unit.createdChapters.length === 0 ? (
+                    <div className="px-4 py-2 font-sharetech text-sm text-gray-500">
                       Sin capítulos
                     </div>
                   ) : (
@@ -131,10 +157,10 @@ const StudentDetailSubject = () => {
                       <button
                         key={chapter.id_chapter}
                         onClick={() => handleSelectChapter(chapter.id_chapter)}
-                        className={`text-left px-6 py-2 text-sm font-sharetech transition-colors ${
+                        className={`px-6 py-2 text-left font-sharetech text-sm transition-colors ${
                           selectedChapter?.id_chapter === chapter.id_chapter
-                            ? "bg-lightDetail dark:bg-darkDetail text-lightText dark:text-darkText font-medium border-l-4 border-lightAccent dark:border-darkAccent"
-                            : "hover:bg-lightDetail/50 dark:hover:bg-darkDetail/50 text-lightText dark:text-darkText"
+                            ? "border-l-4 border-lightAccent bg-lightDetail font-medium text-lightText dark:border-darkAccent dark:bg-darkDetail dark:text-darkText"
+                            : "text-lightText hover:bg-lightDetail/50 dark:text-darkText dark:hover:bg-darkDetail/50"
                         }`}
                       >
                         {chapter.order}. {chapter.name}
@@ -148,53 +174,53 @@ const StudentDetailSubject = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6 md:p-8 bg-lightPrimary dark:bg-darkPrimary overflow-y-auto overflow-x-hidden min-h-[calc(100vh-4rem)]">
-        {/* Mobile Sidebar Toggle - Opcional, pero util */}
-        <div className="md:hidden mb-4">
-          <Ptxt text="Nota: El índice lateral es visible en pantallas más grandes." />
+      <main
+        className={`min-h-[calc(100vh-4rem)] flex-1 overflow-x-hidden overflow-y-auto bg-lightPrimary p-6 transition-[padding] duration-300 md:p-8 dark:bg-darkPrimary ${
+          isIndexOpen ? "lg:pl-[21rem]" : ""
+        }`}
+      >
+        <div className="mb-4 pr-16 lg:hidden">
+          <Ptxt text="Usa el botón circular para abrir o cerrar el índice del capítulo." />
         </div>
 
         {loadingChapter ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex h-full items-center justify-center">
             <Spinner />
           </div>
         ) : !selectedChapter ? (
-          <div className="flex items-center justify-center h-full text-center">
+          <div className="flex h-full items-center justify-center text-center">
             <Ptxt text="Seleccione un capítulo en el índice para comenzar a leer." />
           </div>
         ) : (
-          <article className="max-w-4xl mx-auto space-y-8 pb-12 w-full">
+          <article className="mx-auto w-full max-w-4xl space-y-8 pb-12">
             <ChapterHeader
               text={selectedChapter.name}
-              text2={`Capítulo ${selectedChapter.order ?? "-"} `}
+              text2={`Capítulo ${selectedChapter.order ?? "-"}`}
               text3={selectedChapter.description ?? ""}
             />
 
-            {/* Contenido Principal HTML */}
             {selectedChapter.content_html && (
               <div
-                className="prose dark:prose-invert max-w-none font-sharetech wrap-break-word w-full text-lightText dark:text-darkText"
+                className="prose max-w-none w-full wrap-break-word font-sharetech text-lightText dark:prose-invert dark:text-darkText"
                 dangerouslySetInnerHTML={{
                   __html: selectedChapter.content_html,
                 }}
               />
             )}
 
-            {/* Video */}
             {selectedChapter.video_url && (
               <div className="space-y-4 pt-6">
                 <div className="flex items-center gap-2 text-lightAccent dark:text-darkAccent">
                   <FiVideo size={24} />
                   <H3 text="Video de la clase" />
                 </div>
-                <div className="aspect-video w-full rounded overflow-hidden shadow-lg border border-lightBorder dark:border-darkBorder">
+                <div className="aspect-video w-full overflow-hidden rounded border border-lightBorder shadow-lg dark:border-darkBorder">
                   <iframe
                     src={selectedChapter.video_url.replace(
                       "youtu.be/",
                       "www.youtube.com/embed/",
                     )}
-                    className="w-full h-full border-0"
+                    className="h-full w-full border-0"
                     allowFullScreen
                     title={`Video del capítulo ${selectedChapter.name}`}
                   />
@@ -202,31 +228,29 @@ const StudentDetailSubject = () => {
               </div>
             )}
 
-            {/* Carousel de Imágenes */}
             {selectedChapter.image_urls &&
               selectedChapter.image_urls.length > 0 && (
-                <div className="space-y-4 pt-6 w-full">
+                <div className="w-full space-y-4 pt-6">
                   <H3 text="Material Visual" />
                   <Carousel images={selectedChapter.image_urls} />
                 </div>
               )}
 
-            {/* Links */}
             {selectedChapter.resource_links &&
               selectedChapter.resource_links.length > 0 && (
-                <div className="space-y-4 pt-8 border-t border-lightBorder dark:border-darkBorder w-full">
+                <div className="w-full space-y-4 border-t border-lightBorder pt-8 dark:border-darkBorder">
                   <div className="flex items-center gap-2 text-lightAccent dark:text-darkAccent">
                     <FiLink size={20} />
                     <H3 text="Enlaces de interés" />
                   </div>
-                  <ul className="list-disc list-inside space-y-2 pl-2">
+                  <ul className="list-inside list-disc space-y-2 pl-2">
                     {selectedChapter.resource_links.map((link, idx) => (
                       <li key={idx}>
                         <a
                           href={link}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-lightAccent dark:text-darkAccent hover:underline break-all font-sharetech inline-block"
+                          className="inline-block break-all font-sharetech text-lightAccent hover:underline dark:text-darkAccent"
                         >
                           {link}
                         </a>
@@ -235,6 +259,7 @@ const StudentDetailSubject = () => {
                   </ul>
                 </div>
               )}
+
             <div className="pt-8">
               <Button
                 btnName="ponete a prueba"
