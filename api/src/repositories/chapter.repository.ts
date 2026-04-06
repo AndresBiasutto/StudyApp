@@ -1,6 +1,6 @@
 import sequelize from "../config/database";
 
-const { Unit, Chapter, Video, Image } = sequelize.models;
+const { Subject, Unit, Chapter, Video, Image } = sequelize.models;
 
 class ChapterRepository {
   async create(data: any) {
@@ -9,6 +9,24 @@ class ChapterRepository {
 
   async getOne(id_chapter: string) {
     return Chapter.findByPk(id_chapter);
+  }
+
+  async getOneWithContext(id_chapter: string) {
+    return Chapter.findByPk(id_chapter, {
+      include: [
+        {
+          model: Unit,
+          as: "UnitChapters",
+          include: [
+            {
+              model: Subject,
+              as: "subjectUnits",
+              attributes: ["id_subject"],
+            },
+          ],
+        },
+      ],
+    });
   }
 
   async getAll() {

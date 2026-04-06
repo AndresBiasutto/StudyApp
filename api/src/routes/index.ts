@@ -8,14 +8,18 @@ import MediaRoutes from "./media.route";
 import roleRoutes from "./role.route";
 import gradeRoutes from "./grade.route";
 import { aiRouter } from "./ai";
+import examRoutes from "./exam.route";
+import examResultRoutes from "./exam-result.route";
 
 const router = Router();
 router.use("/users", userRoutes);
-router.use("/ai", aiRouter)
+router.use("/ai", aiRouter);
 // router.get("/health", healthCheck);
 router.use("/subjects", subjectRoutes);
 router.use("/units", UnitRoutes);
 router.use("/chapters", ChapterRoutes);
+router.use("/exams", examRoutes);
+router.use("/exam-results", examResultRoutes);
 router.use("/media", MediaRoutes);
 router.use("/roles", roleRoutes);
 router.use("/grades", gradeRoutes);

@@ -1,8 +1,14 @@
 import type { User } from "../entities/user.interface";
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+} from "../entities/authCredentials.interface";
 
 export interface UserRepository {
   authUser(token: string): Promise<User>;
   authMe(): Promise<User>;
+  login(credentials: LoginCredentials): Promise<User>;
+  register(credentials: RegisterCredentials): Promise<User>;
   getAll(): Promise<User[]>;
   getAllTeachers(): Promise<User[]>;
   getAllStudents(): Promise<User[]>;

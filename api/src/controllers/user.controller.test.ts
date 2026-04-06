@@ -1,17 +1,12 @@
 import { Request, Response } from "express";
 import userController from "../controllers/user.controller";
 import userService from "../services/user.service";
-import comparePassword from "../utils/comparePassword";
 import { ConflictError } from "../utils/errors";
 
 jest.mock("../services/user.service");
-jest.mock("../utils/comparePassword");
 
 describe("UserController", () => {
   const mockService = userService as jest.Mocked<typeof userService>;
-  const mockComparePassword = comparePassword as jest.MockedFunction<
-    typeof comparePassword
-  >;
 
   const createResponse = () => {
     const res = {} as Response;
@@ -25,7 +20,7 @@ describe("UserController", () => {
   });
 
   describe("registerUser", () => {
-    it("should create a user when email does not exist", async () => {
+    it("should create a user through the service", async () => {
       const req = {
         body: {
           name: "John",
@@ -36,7 +31,6 @@ describe("UserController", () => {
       const res = createResponse();
       const mockUser = { id_user: "1", name: "John", e_mail: "test@test.com" };
 
-      mockService.getUserByEmail = jest.fn().mockResolvedValue(null);
       mockService.registerUser = jest.fn().mockResolvedValue(mockUser);
 
       await userController.registerUser(req, res);
@@ -46,20 +40,20 @@ describe("UserController", () => {
       expect(res.json).toHaveBeenCalledWith(mockUser);
     });
 
-    it("should throw ConflictError if user already exists", async () => {
+    it("should bubble ConflictError from the service", async () => {
       const req = {
         body: { e_mail: "existing@test.com" },
       } as Request;
       const res = createResponse();
 
-      mockService.getUserByEmail = jest
+      mockService.registerUser = jest
         .fn()
-        .mockResolvedValue({ id_user: "existing-user" } as any);
+        .mockRejectedValue(new ConflictError("El usuario ya existe"));
 
       await expect(userController.registerUser(req, res)).rejects.toThrow(
         ConflictError,
       );
-      expect(mockService.registerUser).not.toHaveBeenCalled();
+      expect(mockService.registerUser).toHaveBeenCalledWith(req.body);
     });
   });
 
@@ -78,18 +72,12 @@ describe("UserController", () => {
         name: "John",
       };
 
-      mockService.getUserByEmail = jest.fn().mockResolvedValue({
-        id_user: "1",
-        e_mail: "test@test.com",
-        password: "hashed",
-      } as any);
-      mockComparePassword.mockResolvedValue(true);
       mockService.loginUser = jest.fn().mockResolvedValue(mockResponse as any);
 
       await userController.loginUser(req, res);
 
       expect(mockService.loginUser).toHaveBeenCalledWith(req.body);
-      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockResponse);
     });
   });

@@ -1,9 +1,17 @@
 import jwt from "jsonwebtoken";
 import request from "supertest";
 
+jest.mock("../../services/ai.service", () => ({
+  __esModule: true,
+  default: {
+    generateQuiz: jest.fn(),
+  },
+}));
+
 import app from "../../app";
 import userService from "../../services/user.service";
 import comparePassword from "../../utils/comparePassword";
+import { ConflictError, NotFoundError } from "../../utils/errors";
 
 jest.mock("../../services/user.service");
 jest.mock("../../utils/comparePassword");
@@ -22,11 +30,11 @@ describe("User API Integration Tests", () => {
 
   describe("POST /api/users/register", () => {
     it("should register a new user", async () => {
-      mockUserService.getUserByEmail.mockResolvedValue(null);
       mockUserService.registerUser.mockResolvedValue({
         id_user: "user-123",
         name: "John",
         e_mail: "new@test.com",
+        token: "jwt-token",
       } as never);
 
       const response = await request(app).post("/api/users/register").send({
@@ -47,7 +55,9 @@ describe("User API Integration Tests", () => {
     });
 
     it("should return 409 if email already exists", async () => {
-      mockUserService.getUserByEmail.mockResolvedValue({ id_user: "existing" } as never);
+      mockUserService.registerUser.mockRejectedValue(
+        new ConflictError("El usuario ya existe"),
+      );
 
       const response = await request(app).post("/api/users/register").send({
         name: "John",
@@ -64,13 +74,6 @@ describe("User API Integration Tests", () => {
 
   describe("POST /api/users/login", () => {
     it("should login with valid credentials", async () => {
-      mockUserService.getUserByEmail.mockResolvedValue({
-        id_user: "user-123",
-        e_mail: "test@test.com",
-        password: "hashed-password",
-        e_mail_verified: true,
-      } as never);
-      mockComparePassword.mockResolvedValue(true);
       mockUserService.loginUser.mockResolvedValue({
         token: "jwt-token",
         id_user: "user-123",
@@ -82,12 +85,14 @@ describe("User API Integration Tests", () => {
         password: "correctPassword",
       });
 
-      expect(response.status).toBe(201);
+      expect(response.status).toBe(200);
       expect(response.body.token).toBe("jwt-token");
     });
 
     it("should return 404 with unknown email", async () => {
-      mockUserService.getUserByEmail.mockResolvedValue(null);
+      mockUserService.loginUser.mockRejectedValue(
+        new NotFoundError("Usuario no encontrado"),
+      );
 
       const response = await request(app).post("/api/users/login").send({
         e_mail: "notfound@test.com",

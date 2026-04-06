@@ -1,13 +1,22 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { PiExam } from "react-icons/pi";
 import H2 from "../../components/atoms/h2.atom";
 import H3 from "../../components/atoms/h3.atom";
 import Ptxt from "../../components/atoms/P.atom";
+import Button from "../../components/atoms/button.atom";
+import EditorCard from "../../components/atoms/editorCard.atom";
 import Spinner from "../../components/molecules/spinner.molecule";
 import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
 import { fetchSubjectById } from "../../../store/slices/subjectSlice/subject.thunk";
 import { fetchChapterById } from "../../../store/slices/chapterSlice/chapter.thunk";
 import { clearSelectedChapter } from "../../../store/slices/chapterSlice/chapter.slice";
+import { openModal, setModalContent } from "../../../store/slices/uiSlice";
+import { clearStudentExamState } from "../../../store/slices/studentExamSlice/studentExam.slice";
+import {
+  fetchMyStudentChapterExamResult,
+  fetchStudentChapterExam,
+} from "../../../store/slices/studentExamSlice/studentExam.thunk";
 import ChapterHeader from "../../components/molecules/chapterReader/chapterHeader.molecule";
 import Carousel from "../../components/molecules/carousel.molecule";
 import { FiChevronDown, FiVideo, FiLink } from "react-icons/fi";
@@ -21,6 +30,7 @@ const StudentDetailSubject = () => {
   const { selected: selectedChapter, loading: loadingChapter } = useAppSelector(
     (state) => state.chapters,
   );
+  const { result: examResult } = useAppSelector((state) => state.studentExam);
 
   useEffect(() => {
     if (id_subject) {
@@ -30,6 +40,7 @@ const StudentDetailSubject = () => {
     return () => {
       dispatch({ type: "subjects/clearSelectedSubject" });
       dispatch(clearSelectedChapter());
+      dispatch(clearStudentExamState());
     };
   }, [dispatch, id_subject]);
 
@@ -54,6 +65,30 @@ const StudentDetailSubject = () => {
       }
     }
   }, [selected, selectedChapter, loadingChapter, dispatch]);
+
+  useEffect(() => {
+    dispatch(clearStudentExamState());
+
+    if (selectedChapter?.id_chapter) {
+      dispatch(fetchMyStudentChapterExamResult(selectedChapter.id_chapter));
+    }
+  }, [dispatch, selectedChapter?.id_chapter]);
+
+  const handleOpenExam = () => {
+    if (!selectedChapter) {
+      return;
+    }
+
+    dispatch(
+      setModalContent({
+        type: "STUDENT_EXAM",
+        data: selectedChapter,
+        title: "ponete a prueba",
+      }),
+    );
+    dispatch(openModal());
+    dispatch(fetchStudentChapterExam(selectedChapter.id_chapter));
+  };
 
   if (loadingSelected) return <Spinner />;
   if (error) return <p>{error}</p>;
@@ -200,6 +235,24 @@ const StudentDetailSubject = () => {
                   </ul>
                 </div>
               )}
+            <div className="pt-8">
+              <Button
+                btnName="ponete a prueba"
+                icon={<PiExam />}
+                bgLight="bg-lightLink"
+                bgDark="dark:bg-darkLink"
+                action={handleOpenExam}
+              />
+            </div>
+
+            {examResult?.id_chapter === selectedChapter.id_chapter && (
+              <EditorCard>
+                <Ptxt
+                  text={`Nota del capitulo: ${examResult.displayScore}`}
+                  aditionalStyle="font-semibold text-lightLink dark:text-darkLink"
+                />
+              </EditorCard>
+            )}
           </article>
         )}
       </main>

@@ -20,6 +20,7 @@ import gradesReducer from "./slices/gradeSlice/grade.slice";
 import unitsReducer from "./slices/unitSlice/unit.slice";
 import chaptersReducer from "./slices/chapterSlice/chapter.slice";
 import examReducer from "./slices/examSlice/exam.slice";
+import studentExamReducer from "./slices/studentExamSlice/studentExam.slice";
 
 // 🔹 Persist config SOLO para auth
 const authPersistConfig = {
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   units: unitsReducer,
   chapters: chaptersReducer,
   exam: examReducer,
+  studentExam: studentExamReducer,
   roles: rolesReducer,
   grades: gradesReducer,
 });

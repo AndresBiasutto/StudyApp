@@ -29,7 +29,7 @@ export const registerUserSchema = {
     last_name: { required: true, rules: [isString(), minLength(1)] },
     e_mail: { required: true, rules: [isString(), isEmail()] },
     password: { required: true, rules: [isString(), minLength(6)] },
-    id_role: { required: true, rules: [isString(), minLength(1)] },
+    id_role: { rules: [isString(), minLength(1)] },
     description: { rules: [isString()] },
     contact_number: { rules: [isString()] },
     image: { rules: [isString()] },

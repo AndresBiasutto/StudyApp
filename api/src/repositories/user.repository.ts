@@ -4,6 +4,10 @@ import { mapUserModelToEntity } from "./mappers/user.mapper";
 const { User, Role, Subject, Grade } = sequelize.models;
 
 class UserRepository {
+  async getRoleByName(name: string) {
+    return Role.findOne({ where: { name } });
+  }
+
   async createUser(data: any) {
     return User.create(data);
   }
@@ -16,12 +20,16 @@ class UserRepository {
     });
 
     if (existingUser) return mapUserModelToEntity(existingUser) as UserEntity;
-    const defaultRole: any = await Role.findOne({ where: { name: "user" } });
+    const defaultRole: any =
+      (await this.getRoleByName("student")) ??
+      (await this.getRoleByName("user"));
 
     const newUser = await User.create({
       ...data,
-      id_role: defaultRole.id_role,
+      id_role: defaultRole?.id_role ?? null,
       provider: "google",
+      e_mail_verified: true,
+      verification_token: null,
     });
 
     return mapUserModelToEntity(newUser);

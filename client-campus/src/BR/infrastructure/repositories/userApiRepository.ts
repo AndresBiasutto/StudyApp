@@ -1,4 +1,8 @@
 import type { AxiosResponse } from "axios";
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+} from "../../domain/entities/authCredentials.interface";
 import type { User } from "../../domain/entities/user.interface";
 import type { UserRepository } from "../../domain/services/user.repository";
 import { httpClient } from "../services/httpClient";
@@ -21,6 +25,14 @@ export class UserApiRepository implements UserRepository {
   }
   async authMe(): Promise<User> {
     const { data } = await httpClient.get<User>("/users/me");
+    return data;
+  }
+  async login(credentials: LoginCredentials): Promise<User> {
+    const { data } = await httpClient.post<User>("/users/login", credentials);
+    return data;
+  }
+  async register(credentials: RegisterCredentials): Promise<User> {
+    const { data } = await httpClient.post<User>("/users/register", credentials);
     return data;
   }
   async getAll(): Promise<User[]> {
@@ -59,7 +71,6 @@ export class UserApiRepository implements UserRepository {
     );
   }
   async delete(id_user: string): Promise<void> {
-
     await httpClient.delete(`/users/${id_user}`);
   }
 }

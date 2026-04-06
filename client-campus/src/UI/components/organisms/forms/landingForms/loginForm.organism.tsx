@@ -1,6 +1,10 @@
+import { validateLogin } from "../../../../../BR/domain/services/validators/login.validator";
 import { useForm } from "../../../../../hooks/UseForm.hook";
+import { useAppDispatch, useAppSelector } from "../../../../../hooks/UseStore.hook";
+import { loginWithCredentials } from "../../../../../store/slices/authSlice/auth.thunk";
 import type { LoginFormData } from "../../../../interfaces/loginForm";
 import Button from "../../../atoms/button.atom";
+import Ptxt from "../../../atoms/P.atom";
 import FormInput from "../../../molecules/formInput.molecule";
 
 const initialState: LoginFormData = {
@@ -9,14 +13,20 @@ const initialState: LoginFormData = {
 };
 
 const LoginForm = () => {
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.auth);
   const { values, errors, handleChange, handleSubmit } = useForm<LoginFormData>(
     initialState,
-    () => ({})
+    validateLogin,
   );
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log("login data", data);
-    // dispatch login thunk
+  const onSubmit = async (data: LoginFormData) => {
+    await dispatch(
+      loginWithCredentials({
+        e_mail: data.e_mail.trim(),
+        password: data.password,
+      }),
+    );
   };
 
   const inputBaseStyles =
@@ -54,7 +64,14 @@ const LoginForm = () => {
         errorTextStyles={errorTextStyles}
       />
 
-      <Button btnName="Login" type="submit" />
+      {error && <Ptxt text={error} aditionalStyle={errorTextStyles} />}
+
+      <Button
+        btnName={loading ? "Ingresando..." : "Login"}
+        type="submit"
+        bgLight="bg-lightLink"
+        bgDark="dark:bg-darkLink"
+      />
     </form>
   );
 };

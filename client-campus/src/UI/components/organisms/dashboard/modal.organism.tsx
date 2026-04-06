@@ -32,7 +32,9 @@ const Modal: React.FC<modal> = ({ text, children }) => {
             bgDark="dark:bg-darkWarning"
           />
         </div>
-        <div className="w-full flex justify-center items-center ">{children}</div>
+        <div className="w-full flex justify-center items-center ">
+          {children}
+        </div>
       </div>
     </>
   );

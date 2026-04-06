@@ -1,6 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+
 import type { AuthState } from "./auth.types";
-import { authenticateMe, authenticateUser } from "./auth.thunk";
+import {
+  authenticateMe,
+  authenticateUser,
+  loginWithCredentials,
+  registerWithCredentials,
+} from "./auth.thunk";
 
 const initialState: AuthState = {
   token: null,
@@ -9,16 +15,17 @@ const initialState: AuthState = {
   error: null,
   isAuthenticated: false,
 };
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-  logout(state) {
-    state.token = null;
-    state.selected = null;
-    state.isAuthenticated = false;
-    state.error = null;
-  },
+    logout(state) {
+      state.token = null;
+      state.selected = null;
+      state.isAuthenticated = false;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -49,7 +56,37 @@ const authSlice = createSlice({
         state.loading = false;
         state.selected = null;
         state.isAuthenticated = false;
-        state.error = action.error.message ?? "No se pudo restaurar la sesión";
+        state.error = action.error.message ?? "No se pudo restaurar la sesion";
+      })
+      .addCase(loginWithCredentials.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginWithCredentials.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token ?? null;
+        state.selected = action.payload;
+        state.isAuthenticated = true;
+      })
+      .addCase(loginWithCredentials.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "No se pudo iniciar sesion";
+        state.isAuthenticated = false;
+      })
+      .addCase(registerWithCredentials.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerWithCredentials.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token ?? null;
+        state.selected = action.payload;
+        state.isAuthenticated = true;
+      })
+      .addCase(registerWithCredentials.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "No se pudo registrar la cuenta";
+        state.isAuthenticated = false;
       });
   },
 });

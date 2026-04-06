@@ -9,6 +9,8 @@ import { GetListedUsersUseCase } from "./getListedUsers.useCase";
 import { GetUserByIdUseCase } from "./getUserById.useCase";
 import { GetUserData } from "./getUserData.useCase";
 import { GetUsersUseCase } from "./getUsers.useCase";
+import { LoginUseCase } from "./login.useCase";
+import { RegisterUseCase } from "./register.useCase";
 import { UpdateRoleUseCase } from "./updateRole.useCase";
 import { UpdateUserUseCase } from "./updateUser.useCase";
 
@@ -23,6 +25,8 @@ let cachedUserUseCases: {
   getUserById: GetUserByIdUseCase;
   getUserData: GetUserData;
   getUsers: GetUsersUseCase;
+  login: LoginUseCase;
+  register: RegisterUseCase;
   updateRole: UpdateRoleUseCase;
   updateUser: UpdateUserUseCase;
 } | null = null;
@@ -41,6 +45,8 @@ export const getUserUseCases = () => {
       getUserById: new GetUserByIdUseCase(repository),
       getUserData: new GetUserData(repository),
       getUsers: new GetUsersUseCase(repository),
+      login: new LoginUseCase(repository),
+      register: new RegisterUseCase(repository),
       updateRole: new UpdateRoleUseCase(repository),
       updateUser: new UpdateUserUseCase(repository),
     };

@@ -11,6 +11,7 @@ import {
   UnitResponseDto,
 } from "../subject.contract";
 import { ExamQuestionResponseDto, ExamResponseDto } from "../exam.contract";
+import { ExamResultResponseDto } from "../exam-result.contract";
 import {
   AuthResponseDto,
   UserListResponseDto,
@@ -127,6 +128,25 @@ export const mapExamResponse = (exam: unknown): ExamResponseDto => {
     questions: Array.isArray(data.questions)
       ? data.questions.map(mapExamQuestionResponse)
       : [],
+  };
+};
+
+export const mapExamResultResponse = (
+  examResult: unknown,
+): ExamResultResponseDto => {
+  const data = toPlain(examResult);
+
+  return {
+    id_exam_result: String(data.id_exam_result),
+    id_exam: String(data.id_exam),
+    id_user: String(data.id_user),
+    id_subject: String(data.id_subject),
+    id_chapter: String(data.id_chapter),
+    score: Number(data.score ?? 0),
+    total_questions: Number(data.total_questions ?? 0),
+    displayScore: `${Number(data.score ?? 0)}/${Number(
+      data.total_questions ?? 0,
+    )}`,
   };
 };
 

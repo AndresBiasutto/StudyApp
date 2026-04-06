@@ -2,32 +2,49 @@ import userService from '../services/user.service';
 import userRepository from '../repositories/user.repository';
 import * as jwt from 'jsonwebtoken';
 import hashPassword from '../utils/hashPassword';
-import sendVerificationEmail from '../utils/sendVerificationEmail';
+import comparePassword from '../utils/comparePassword';
 
 jest.mock('../repositories/user.repository');
 jest.mock('../utils/hashPassword');
-jest.mock('../utils/sendVerificationEmail');
+jest.mock('../utils/comparePassword');
 jest.mock('jsonwebtoken');
 jest.mock('google-auth-library');
 
 describe('UserService', () => {
   const mockRepository = userRepository as jest.Mocked<typeof userRepository>;
-  const mockSendVerificationEmail =
-    sendVerificationEmail as jest.MockedFunction<typeof sendVerificationEmail>;
+  const mockComparePassword =
+    comparePassword as jest.MockedFunction<typeof comparePassword>;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('registerUser', () => {
-    it('should create user if email does not exist', async () => {
+    it('should create and authenticate a new local user', async () => {
       mockRepository.registerUser = jest.fn().mockResolvedValue({
         id_user: 'new-id',
         name: 'John',
         e_mail: 'new@test.com',
       });
+      mockRepository.getUserByEmail = jest.fn().mockResolvedValue(null);
+      mockRepository.getRoleByName = jest.fn().mockResolvedValue({
+        get: () => ({ id_role: 'student-role' }),
+      } as any);
+      mockRepository.getUser = jest.fn().mockResolvedValue({
+        id_user: 'new-id',
+        name: 'John',
+        last_name: 'Doe',
+        e_mail: 'new@test.com',
+        image: null,
+        contact_number: null,
+        description: null,
+        id_role: 'student-role',
+        Role: { id_role: 'student-role', name: 'student' },
+        createdSubjects: [],
+        enrolledSubjects: [],
+      });
       (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
-      mockSendVerificationEmail.mockResolvedValue(undefined);
+      (jwt.sign as jest.Mock).mockReturnValue('mock-token');
 
       const newUser = {
         name: 'John',
@@ -42,13 +59,16 @@ describe('UserService', () => {
         expect.objectContaining({
           e_mail: 'new@test.com',
           password: 'hashedPassword',
+          provider: 'local',
+          e_mail_verified: true,
         }),
       );
-      expect(mockSendVerificationEmail).toHaveBeenCalledWith(
-        'new@test.com',
-        expect.any(String),
+      expect(result).toEqual(
+        expect.objectContaining({
+          token: 'mock-token',
+          id_user: 'new-id',
+        }),
       );
-      expect(result).toBeDefined();
     });
   });
 
@@ -76,8 +96,9 @@ describe('UserService', () => {
         Role: { id_role: '1', name: 'student' },
       };
 
-      mockRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser);
+      mockRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser as any);
       mockRepository.getUser = jest.fn().mockResolvedValue(mockUser);
+      mockComparePassword.mockResolvedValue(true);
       (jwt.sign as jest.Mock).mockReturnValue('mock-token');
 
       const loginData = { e_mail: 'test@test.com', password: 'correctPassword' };

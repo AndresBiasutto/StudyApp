@@ -1,9 +1,11 @@
 import { validateRegister } from "../../../../../BR/domain/services/validators/register.validator";
 import { useForm } from "../../../../../hooks/UseForm.hook";
+import { useAppDispatch, useAppSelector } from "../../../../../hooks/UseStore.hook";
+import { registerWithCredentials } from "../../../../../store/slices/authSlice/auth.thunk";
 import type { RegisterFormData } from "../../../../interfaces/registerForm";
 import Button from "../../../atoms/button.atom";
+import Ptxt from "../../../atoms/P.atom";
 import FormInput from "../../../molecules/formInput.molecule";
-
 
 const initialState: RegisterFormData = {
   firstName: "",
@@ -14,16 +16,22 @@ const initialState: RegisterFormData = {
 };
 
 const RegisterForm = () => {
-  const {
-    values,
-    errors,
-    handleChange,
-    handleSubmit,
-  } = useForm<RegisterFormData>(initialState, validateRegister);
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.auth);
+  const { values, errors, handleChange, handleSubmit } = useForm<RegisterFormData>(
+    initialState,
+    validateRegister,
+  );
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log("Formulario válido:", data);
-    // llamada a servicio / API
+  const onSubmit = async (data: RegisterFormData) => {
+    await dispatch(
+      registerWithCredentials({
+        name: data.firstName.trim(),
+        last_name: data.lastName.trim(),
+        e_mail: data.e_mail.trim(),
+        password: data.password,
+      }),
+    );
   };
 
   const inputBaseStyles =
@@ -95,7 +103,14 @@ const RegisterForm = () => {
         errorTextStyles={errorTextStyles}
       />
 
-      <Button btnName="Registrar" type="submit" />
+      {error && <Ptxt text={error} aditionalStyle={errorTextStyles} />}
+
+      <Button
+        btnName={loading ? "Registrando..." : "Registrar"}
+        type="submit"
+        bgLight="bg-lightLink"
+        bgDark="dark:bg-darkLink"
+      />
     </form>
   );
 };

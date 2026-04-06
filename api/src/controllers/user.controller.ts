@@ -1,18 +1,12 @@
 import { Request, Response } from "express";
+
 import { AuthRequest } from "../middlewares/auth.middleware";
 import userService from "../services/user.service";
-import comparePassword from "../utils/comparePassword";
 import {
-  ConflictError,
   NotFoundError,
   UnauthorizedError,
   ValidationError,
 } from "../utils/errors";
-
-interface UserPayload {
-  e_mail: string;
-  [key: string]: any;
-}
 
 class UserController {
   async createUser(req: Request, res: Response) {
@@ -41,38 +35,13 @@ class UserController {
   }
 
   async registerUser(req: Request, res: Response) {
-    const newUser = req.body as Parameters<typeof userService.registerUser>[0];
-    const dbUserEmail = await userService.getUserByEmail(newUser.e_mail);
-    if (dbUserEmail) {
-      throw new ConflictError("El usuario ya existe");
-    }
-
-    const createdUser = await userService.registerUser(newUser);
+    const createdUser = await userService.registerUser(req.body);
     res.status(201).json(createdUser);
   }
 
   async loginUser(req: Request, res: Response) {
-    const userFound: any = await userService.getUserByEmail(req.body.e_mail);
-    if (!userFound) {
-      throw new NotFoundError("Usuario no encontrado");
-    }
-
-    const matchPassword = await comparePassword(
-      req.body.password,
-      userFound.password,
-    );
-    if (!matchPassword) {
-      throw new UnauthorizedError("Contraseña inválida");
-    }
-
-    if (userFound.e_mail_verified === false) {
-      throw new UnauthorizedError(
-        "Correo no verificado, revisa tu correo electrónico",
-      );
-    }
-
     const user = await userService.loginUser(req.body);
-    res.status(201).json(user);
+    res.status(200).json(user);
   }
 
   async verifyToken(req: Request, res: Response) {
@@ -83,7 +52,7 @@ class UserController {
 
     const user = await userService.findByToken(token);
     if (!user) {
-      throw new NotFoundError("Token inválido o expirado.");
+      throw new NotFoundError("Token invÃ¡lido o expirado.");
     }
 
     const message = await userService.verify(token);

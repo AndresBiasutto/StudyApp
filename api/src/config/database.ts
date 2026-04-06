@@ -41,10 +41,32 @@ fs.readdirSync(modelsDir)
 
 modelDefiners.forEach((defineModel) => defineModel(sequelize));
 
-const { User, Subject, Role, Grade, Unit, Chapter, Video, Image, Exam } =
+const {
+  User,
+  Subject,
+  Role,
+  Grade,
+  Unit,
+  Chapter,
+  Video,
+  Image,
+  Exam,
+  ExamResult,
+} =
   sequelize.models;
 
-if (User && Subject && Role && Grade && Unit && Chapter && Video && Image && Exam) {
+if (
+  User &&
+  Subject &&
+  Role &&
+  Grade &&
+  Unit &&
+  Chapter &&
+  Video &&
+  Image &&
+  Exam &&
+  ExamResult
+) {
   User.belongsTo(Role, { foreignKey: "id_role" });
   Subject.belongsTo(Grade, { foreignKey: "id_grade" });
 
@@ -78,6 +100,21 @@ if (User && Subject && Role && Grade && Unit && Chapter && Video && Image && Exa
 
   Chapter.hasOne(Exam, { as: "exam", foreignKey: "id_chapter" });
   Exam.belongsTo(Chapter, { as: "chapter", foreignKey: "id_chapter" });
+
+  User.hasMany(ExamResult, { as: "examResults", foreignKey: "id_user" });
+  ExamResult.belongsTo(User, { as: "student", foreignKey: "id_user" });
+
+  Subject.hasMany(ExamResult, { as: "examResults", foreignKey: "id_subject" });
+  ExamResult.belongsTo(Subject, { as: "subject", foreignKey: "id_subject" });
+
+  Chapter.hasMany(ExamResult, { as: "examResults", foreignKey: "id_chapter" });
+  ExamResult.belongsTo(Chapter, {
+    as: "chapterResult",
+    foreignKey: "id_chapter",
+  });
+
+  Exam.hasMany(ExamResult, { as: "results", foreignKey: "id_exam" });
+  ExamResult.belongsTo(Exam, { as: "exam", foreignKey: "id_exam" });
 } else {
   console.error("ERROR: algun modelo no esta definido.");
 }

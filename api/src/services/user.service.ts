@@ -1,5 +1,3 @@
-import crypto from "crypto";
-
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 
@@ -11,12 +9,13 @@ import {
 } from "../contracts/mappers/response.mapper";
 import userRepository from "../repositories/user.repository";
 import {
+  ConflictError,
   NotFoundError,
   UnauthorizedError,
   ValidationError,
 } from "../utils/errors";
+import comparePassword from "../utils/comparePassword";
 import hashPassword from "../utils/hashPassword";
-import sendVerificationEmail from "../utils/sendVerificationEmail";
 
 const client = new OAuth2Client(env.googleClientId);
 
@@ -32,7 +31,6 @@ interface CreateUserInput {
 
 interface RegisterUserInput extends CreateUserInput {
   password: string;
-  e_mail_verified?: boolean;
 }
 
 interface LoginUserInput {
@@ -65,7 +63,44 @@ const extractUserId = (
   throw new NotFoundError("User not found");
 };
 
+const toPlainUserData = (
+  value: {
+    password?: string | null;
+    e_mail_verified?: boolean;
+    get?: (options: { plain: boolean }) => unknown;
+  },
+) => {
+  if (typeof value.get === "function") {
+    return value.get({ plain: true }) as {
+      password?: string | null;
+      e_mail_verified?: boolean;
+    };
+  }
+
+  return value;
+};
+
 class UserService {
+  private async resolveDefaultPublicRoleId() {
+    const defaultRole =
+      (await userRepository.getRoleByName("student")) ??
+      (await userRepository.getRoleByName("user"));
+
+    if (!defaultRole) {
+      throw new ValidationError(
+        "No se encontro un rol publico por defecto para registrar usuarios",
+      );
+    }
+
+    const roleData = defaultRole.get({ plain: true }) as { id_role?: string };
+
+    if (!roleData.id_role) {
+      throw new ValidationError("El rol por defecto no es valido");
+    }
+
+    return roleData.id_role;
+  }
+
   async authUser(googleToken: string) {
     if (!env.googleClientId) {
       throw new Error("GOOGLE_CLIENT_ID no esta configurado");
@@ -116,45 +151,75 @@ class UserService {
   }
 
   async registerUser(data: RegisterUserInput) {
+    const existingUser = await userRepository.getUserByEmail(data.e_mail);
+
+    if (existingUser) {
+      throw new ConflictError("El usuario ya existe");
+    }
+
     const encriptedPassword = await hashPassword(data.password);
-    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const defaultRoleId = data.id_role ?? (await this.resolveDefaultPublicRoleId());
     const newUser = {
       name: data.name,
       last_name: data.last_name,
       description: data.description,
       e_mail: data.e_mail,
-      e_mail_verified: data.e_mail_verified,
-      verification_token: verificationToken,
+      e_mail_verified: true,
+      verification_token: null,
       password: encriptedPassword,
       contact_number: data.contact_number,
       image: data.image,
-      id_role: data.id_role,
+      provider: "local",
+      id_role: defaultRoleId,
     };
 
-    // El email es best-effort por ahora; no bloquea el alta si falla.
-    void Promise.resolve(sendVerificationEmail(data.e_mail, verificationToken))
-      .catch((error) => {
-        console.error("No se pudo enviar el email de verificacion:", error);
-      });
+    const createdUser = await userRepository.registerUser(newUser);
+    const userId = extractUserId(createdUser);
+    const token = jwt.sign({ id_user: userId }, env.jwtSecret, {
+      expiresIn: "1d",
+    });
+    const fullUser = await userRepository.getUser(userId);
 
-    return userRepository.registerUser(newUser);
+    if (!fullUser) {
+      throw new NotFoundError("Usuario no encontrado");
+    }
+
+    return mapAuthResponse(fullUser, token);
   }
 
   async loginUser(data: LoginUserInput) {
     const user = await userRepository.getUserByEmail(data.e_mail);
 
     if (!user) {
-      throw new NotFoundError("User not found");
+      throw new NotFoundError("Usuario no encontrado");
+    }
+
+    const userData = toPlainUserData(user);
+
+    if (!userData.password) {
+      throw new UnauthorizedError(
+        "Este usuario no tiene acceso por contrasena. Inicia sesion con Google",
+      );
+    }
+
+    const passwordMatches = await comparePassword(data.password, userData.password);
+
+    if (!passwordMatches) {
+      throw new UnauthorizedError("Contrasena invalida");
+    }
+
+    if (userData.e_mail_verified === false) {
+      throw new UnauthorizedError("Correo no verificado");
     }
 
     const userId = extractUserId(user);
     const token = jwt.sign({ id_user: userId }, env.jwtSecret, {
-      expiresIn: 84600,
+      expiresIn: "1d",
     });
     const fullUser = await userRepository.getUser(userId);
 
     if (!fullUser) {
-      throw new NotFoundError("User not found");
+      throw new NotFoundError("Usuario no encontrado");
     }
 
     return mapAuthResponse(fullUser, token);
