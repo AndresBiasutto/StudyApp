@@ -77,8 +77,29 @@ Puntos ya saneados en el proyecto:
 - configuracion de entorno centralizada en backend
 - flags de carga por operacion en slices criticos
 - separacion de responsabilidades entre `auth` y `users`
+- autenticacion local por email/password y autenticacion con Google usando el mismo contrato de sesion
+- generacion de examenes por capitulo con IA
+- resolucion de examenes por alumnos con nota persistida por `usuario + capitulo`
+- cascadas explicitadas para `subject -> units -> chapters`
 - rutina local de validacion en ambos proyectos
 - suite backend ejecutable
+
+## Flujos relevantes
+
+### Auth
+
+- `POST /api/users/authUser`: login con Google
+- `POST /api/users/register`: registro local y login inmediato
+- `POST /api/users/login`: login local
+- `GET /api/users/me`: restauracion de sesion
+
+En frontend todo converge en `auth.slice`, por lo que Google y email/password comparten la misma reconstruccion de sesion y redireccion por rol.
+
+### Examenes
+
+- docente: genera examen por capitulo desde IA
+- alumno: responde el examen del capitulo actual
+- backend: guarda la nota mas reciente por `id_user + id_chapter`, incluyendo `id_subject`
 
 ## Pendientes estructurales
 

@@ -78,6 +78,7 @@ Mejoras ya aplicadas:
 - `users` y `subjects` usan flags de carga por operacion en lugar de un unico `loading`.
 - `updateSubject` ya no fuerza un refetch global innecesario.
 - El flujo de error consume `message` como contrato principal del backend.
+- email/password y Google comparten el mismo contrato de autenticacion y la misma reconstruccion de sesion.
 
 ## Estado global
 
@@ -89,6 +90,8 @@ Slices activos:
 - `subjects`
 - `units`
 - `chapters`
+- `exam`
+- `studentExam`
 - `roles`
 - `grades`
 
@@ -122,15 +125,18 @@ Contrato esperado de error:
 
 ### Autenticacion
 
-1. Login Google o restauracion por token.
+1. Login Google, login local, registro local o restauracion por token.
 2. El thunk llama al use case.
-3. El repositorio consume `/users/authUser` o `/users/me`.
+3. El repositorio consume `/users/authUser`, `/users/login`, `/users/register` o `/users/me`.
 4. `auth.slice` guarda `selected`, `token` e `isAuthenticated`.
+5. `redirectOnAuth.tsx` redirige segun `Role.name`.
 
 Archivos clave:
 
 - [auth.thunk.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/store/slices/authSlice/auth.thunk.ts)
 - [auth.slice.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/store/slices/authSlice/auth.slice.ts)
+- [loginForm.organism.tsx](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/organisms/forms/landingForms/loginForm.organism.tsx)
+- [registerForm.organism.tsx](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/organisms/forms/landingForms/registerForm.organism.tsx)
 
 ### Administracion
 
@@ -142,11 +148,20 @@ Archivos clave:
 
 - Materias asignadas desde `auth.selected.subjects`
 - Gestion de unidades y capitulos por modales y detalle de materia
+- Generacion de examenes con IA desde el editor de capitulo
 
 ### Student
 
 - Materias inscritas desde `auth.selected.enrolledSubjects`
 - Navegacion `subject -> createdUnits -> createdChapters`
+- Resolucion del examen del capitulo actual
+- Visualizacion de nota persistida al final del capitulo
+
+Archivos clave:
+
+- [teacherExamForm.organism.tsx](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/organisms/teacher/teacherExamForm.organism.tsx)
+- [studentExamForm.organism.tsx](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/components/organisms/student/studentExamForm.organism.tsx)
+- [studentDetailSubject.view.tsx](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/client-campus/src/UI/views/student/studentDetailSubject.view.tsx)
 
 ## Rutas protegidas
 

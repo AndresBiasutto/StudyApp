@@ -70,8 +70,17 @@ if (
   User.belongsTo(Role, { foreignKey: "id_role" });
   Subject.belongsTo(Grade, { foreignKey: "id_grade" });
 
-  User.hasMany(Subject, { as: "createdSubjects", foreignKey: "id_user" });
-  Subject.belongsTo(User, { as: "creator", foreignKey: "id_user" });
+  User.hasMany(Subject, {
+    as: "createdSubjects",
+    foreignKey: "id_user",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  Subject.belongsTo(User, {
+    as: "creator",
+    foreignKey: "id_user",
+    onDelete: "CASCADE",
+  });
 
   User.belongsToMany(Subject, {
     through: "SubjectStudents",
@@ -86,20 +95,65 @@ if (
     otherKey: "id_user",
   });
 
-  Subject.hasMany(Unit, { as: "createdUnits", foreignKey: "id_subject" });
-  Unit.belongsTo(Subject, { as: "subjectUnits", foreignKey: "id_subject" });
+  Subject.hasMany(Unit, {
+    as: "createdUnits",
+    foreignKey: "id_subject",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  Unit.belongsTo(Subject, {
+    as: "subjectUnits",
+    foreignKey: "id_subject",
+    onDelete: "CASCADE",
+  });
 
-  Unit.hasMany(Chapter, { as: "createdChapters", foreignKey: "id_unit" });
-  Chapter.belongsTo(Unit, { as: "UnitChapters", foreignKey: "id_unit" });
+  Unit.hasMany(Chapter, {
+    as: "createdChapters",
+    foreignKey: "id_unit",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  Chapter.belongsTo(Unit, {
+    as: "UnitChapters",
+    foreignKey: "id_unit",
+    onDelete: "CASCADE",
+  });
 
-  Chapter.hasMany(Video, { as: "createdVideos", foreignKey: "id_chapter" });
-  Video.belongsTo(Chapter, { as: "ChapterVideos", foreignKey: "id_chapter" });
+  Chapter.hasMany(Video, {
+    as: "createdVideos",
+    foreignKey: "id_chapter",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  Video.belongsTo(Chapter, {
+    as: "ChapterVideos",
+    foreignKey: "id_chapter",
+    onDelete: "SET NULL",
+  });
 
-  Chapter.hasMany(Image, { as: "createdImages", foreignKey: "id_chapter" });
-  Image.belongsTo(Chapter, { as: "ChapterImages", foreignKey: "id_chapter" });
+  Chapter.hasMany(Image, {
+    as: "createdImages",
+    foreignKey: "id_chapter",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  Image.belongsTo(Chapter, {
+    as: "ChapterImages",
+    foreignKey: "id_chapter",
+    onDelete: "SET NULL",
+  });
 
-  Chapter.hasOne(Exam, { as: "exam", foreignKey: "id_chapter" });
-  Exam.belongsTo(Chapter, { as: "chapter", foreignKey: "id_chapter" });
+  Chapter.hasOne(Exam, {
+    as: "exam",
+    foreignKey: "id_chapter",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  Exam.belongsTo(Chapter, {
+    as: "chapter",
+    foreignKey: "id_chapter",
+    onDelete: "CASCADE",
+  });
 
   User.hasMany(ExamResult, { as: "examResults", foreignKey: "id_user" });
   ExamResult.belongsTo(User, { as: "student", foreignKey: "id_user" });
@@ -107,14 +161,29 @@ if (
   Subject.hasMany(ExamResult, { as: "examResults", foreignKey: "id_subject" });
   ExamResult.belongsTo(Subject, { as: "subject", foreignKey: "id_subject" });
 
-  Chapter.hasMany(ExamResult, { as: "examResults", foreignKey: "id_chapter" });
+  Chapter.hasMany(ExamResult, {
+    as: "examResults",
+    foreignKey: "id_chapter",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
   ExamResult.belongsTo(Chapter, {
     as: "chapterResult",
     foreignKey: "id_chapter",
+    onDelete: "CASCADE",
   });
 
-  Exam.hasMany(ExamResult, { as: "results", foreignKey: "id_exam" });
-  ExamResult.belongsTo(Exam, { as: "exam", foreignKey: "id_exam" });
+  Exam.hasMany(ExamResult, {
+    as: "results",
+    foreignKey: "id_exam",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  ExamResult.belongsTo(Exam, {
+    as: "exam",
+    foreignKey: "id_exam",
+    onDelete: "CASCADE",
+  });
 } else {
   console.error("ERROR: algun modelo no esta definido.");
 }

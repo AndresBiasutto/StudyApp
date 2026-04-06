@@ -1,6 +1,6 @@
 # Campus Virtual API
 
-Backend REST para usuarios, materias, unidades, capitulos y autenticacion del campus virtual.
+Backend REST para usuarios, materias, unidades, capitulos, examenes y autenticacion del campus virtual.
 
 ## Stack
 
@@ -35,6 +35,7 @@ api/
 │   ├── contracts/
 │   ├── controllers/
 │   ├── middlewares/
+│   ├── models/
 │   ├── repositories/
 │   ├── routes/
 │   ├── services/
@@ -62,11 +63,13 @@ Variables principales:
 - `GOOGLE_CLIENT_ID`
 - `EMAIL_USER`
 - `EMAIL_PASSWORD`
+- `OPENROUTER_API_KEY`
 - `DB_SYNC_MODE`
 
 Notas:
 
 - `SECRET` es la variable canonica para JWT. `JWT_SECRET` queda solo como alias temporal de compatibilidad.
+- `OPENROUTER_API_KEY` se usa para la generacion de examenes con IA.
 - `DB_SYNC_MODE=none` es el valor recomendado.
 - `DB_SYNC_MODE=alter` existe solo como escape hatch de desarrollo mientras no haya migraciones.
 
@@ -90,6 +93,58 @@ npm run validate
 typecheck -> build -> test
 ```
 
+## Auth
+
+El backend soporta dos entradas que terminan en el mismo contrato de sesion:
+
+- `POST /api/users/authUser`
+  autentica con Google y devuelve `AuthResponseDto`
+- `POST /api/users/register`
+  registra usuario local por email/password y devuelve `AuthResponseDto`
+- `POST /api/users/login`
+  autentica usuario local por email/password y devuelve `AuthResponseDto`
+- `GET /api/users/me`
+  reconstruye la sesion a partir del JWT
+
+Notas de implementacion:
+
+- el registro local crea usuarios `provider=local`
+- el login local valida usuario existente, password y disponibilidad del acceso local
+- el login Google crea o reutiliza usuarios `provider=google`
+- ambos flujos generan JWT y devuelven el mismo shape hacia frontend
+
+Archivos clave:
+
+- [user.route.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/routes/user.route.ts)
+- [user.controller.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/controllers/user.controller.ts)
+- [user.service.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/services/user.service.ts)
+- [user.repository.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/repositories/user.repository.ts)
+
+## Examenes
+
+### Generacion docente
+
+- `GET /api/ai/multiple-choice/:id_chapter`
+- alias legacy: `GET /api/ai/multiple-choise/:id_chapter`
+
+Si el capitulo ya tiene examen guardado, devuelve el existente.
+Si se usa `?force=true`, regenera y reemplaza el examen.
+
+### Resolucion alumno
+
+- `GET /api/exams/chapter/:id_chapter`
+  devuelve las preguntas del examen del capitulo
+- `POST /api/exam-results/chapter/:id_chapter`
+  recibe respuestas y guarda la nota del alumno
+- `GET /api/exam-results/chapter/:id_chapter/me`
+  devuelve la nota persistida del alumno para ese capitulo
+
+Persistencia:
+
+- `Exam` guarda el examen generado por capitulo
+- `ExamResult` guarda la nota mas reciente por `id_user + id_chapter`
+- cada resultado tambien guarda `id_subject`, `id_exam`, `score`, `total_questions` y `submitted_answers`
+
 ## Contratos y errores
 
 Las respuestas se mapean desde:
@@ -97,6 +152,8 @@ Las respuestas se mapean desde:
 - [response.mapper.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/mappers/response.mapper.ts)
 - [user.contract.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/user.contract.ts)
 - [subject.contract.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/subject.contract.ts)
+- [exam.contract.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/exam.contract.ts)
+- [exam-result.contract.ts](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/src/contracts/exam-result.contract.ts)
 
 El contrato de error expuesto al frontend es:
 
@@ -140,6 +197,18 @@ Flujo de arranque:
 2. Sequelize autentica la conexion.
 3. El esquema solo se sincroniza si `DB_SYNC_MODE=alter`.
 4. Express monta rutas y middlewares globales.
+
+Asociaciones importantes:
+
+- `Subject -> Unit -> Chapter` con cascada explicita
+- `Chapter -> Exam` con cascada explicita
+- `Exam -> ExamResult` con cascada explicita
+- `Chapter -> ExamResult` con cascada explicita
+
+Eso deja claro en codigo y en schema que:
+
+- borrar una `subject` elimina tambien sus `units` y `chapters`
+- borrar una `unit` elimina sus `chapters`
 
 ## Testing
 

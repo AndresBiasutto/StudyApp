@@ -12,6 +12,31 @@ interface SubjectInput {
 }
 
 class SubjectService {
+  private sortSubjectHierarchy<T extends {
+    createdUnits?: Array<{
+      order?: number | null;
+      createdChapters?: Array<{ order?: number | null }>;
+    }>;
+  }>(subject: T): T {
+    if (!Array.isArray(subject.createdUnits)) {
+      return subject;
+    }
+
+    subject.createdUnits.sort(
+      (u1, u2) => Number(u1.order ?? 0) - Number(u2.order ?? 0),
+    );
+
+    subject.createdUnits.forEach((unit) => {
+      if (Array.isArray(unit.createdChapters)) {
+        unit.createdChapters.sort(
+          (c1, c2) => Number(c1.order ?? 0) - Number(c2.order ?? 0),
+        );
+      }
+    });
+
+    return subject;
+  }
+
   async createSubject(data: SubjectInput) {
     const subject = await subjectRepository.createSubject(data);
     return mapSubjectResponse(subject);
@@ -21,7 +46,7 @@ class SubjectService {
     const subject = await subjectRepository.getSubject(id);
     if (!subject) throw new NotFoundError("Subject not found");
 
-    return mapSubjectResponse(subject);
+    return this.sortSubjectHierarchy(mapSubjectResponse(subject));
   }
 
   async getAllSubjects() {
@@ -35,17 +60,7 @@ class SubjectService {
       if (na > nb) return 1;
       return 0;
     });
-    // ensure units and chapters are ordered by 'order' ascending
-    mapped.forEach((s) => {
-      if (Array.isArray(s.createdUnits)) {
-        s.createdUnits.sort((u1, u2) => (Number(u1.order ?? 0) - Number(u2.order ?? 0)));
-        s.createdUnits.forEach((u) => {
-          if (Array.isArray(u.createdChapters)) {
-            u.createdChapters.sort((c1, c2) => (Number(c1.order ?? 0) - Number(c2.order ?? 0)));
-          }
-        });
-      }
-    });
+    mapped.forEach((subject) => this.sortSubjectHierarchy(subject));
     return mapped;
   }
 
@@ -57,7 +72,7 @@ class SubjectService {
     const subject = await subjectRepository.updateSubject(id, data);
     if (!subject) throw new NotFoundError("Subject not found");
 
-    return mapSubjectResponse(subject);
+    return this.sortSubjectHierarchy(mapSubjectResponse(subject));
   }
 
   async deleteSubject(id: string) {

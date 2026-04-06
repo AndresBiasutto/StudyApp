@@ -191,10 +191,25 @@ Ownership logic currently matters especially for:
 - unit creation and updates
 - chapter creation and updates
 
+#### Authentication
+
+The platform now supports:
+
+- Google login via `/users/authUser`
+- local register via `/users/register`
+- local login via `/users/login`
+- session restore via `/users/me`
+
+Important rule:
+
+- Google auth and local auth must keep returning the same session shape (`AuthResponseDto`) so the frontend can reuse one auth flow.
+
 #### Database
 
 - Associations are defined in `src/config/database.ts`.
-- `sequelize.sync({ alter: true })` is still present, but agents should prefer changes that move the codebase toward explicit migrations in the future.
+- Cascades for `Subject -> Unit -> Chapter` are now explicit in code.
+- Cascades for chapter exam data are also explicit.
+- `sequelize.sync({ alter: true })` is still available only through `DB_SYNC_MODE=alter`, but agents should prefer changes that move the codebase toward explicit migrations in the future.
 
 ### 3.2 Frontend
 
@@ -220,6 +235,8 @@ Current slices include:
 - `subjects`
 - `units`
 - `chapters`
+- `exam`
+- `studentExam`
 - `roles`
 - `grades`
 - `ui`
@@ -231,6 +248,12 @@ Important caution:
 - Some slices still use shared `loading` flags for multiple operations.
 - Be careful not to trigger list requests from detail screens if the screen also depends on the same slice loading flag.
 - When possible, prefer stable dependencies in `useEffect`, such as IDs or `.length`, rather than whole objects or arrays.
+
+#### Auth UX
+
+- Email/password and Google must converge in `auth.slice`.
+- Do not create parallel auth states for local login vs Google login.
+- The landing forms should only orchestrate form state and dispatch thunks.
 
 #### Admin User Detail
 
@@ -326,6 +349,8 @@ DB_HOST=localhost
 PORT=3000
 SECRET=your_jwt_secret
 GOOGLE_CLIENT_ID=your-client-id
+OPENROUTER_API_KEY=your-openrouter-key
+DB_SYNC_MODE=none
 ```
 
 ### Frontend
@@ -347,6 +372,7 @@ VITE_GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
 4. Keep repositories focused on persistence.
 5. Preserve centralized error handling.
 6. Add or update tests when behavior changes.
+7. If associations or auth fields change, verify whether the real DB schema also needs a temporary `DB_SYNC_MODE=alter` run.
 
 ### Frontend changes
 
@@ -356,6 +382,7 @@ VITE_GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
 4. Avoid request loops caused by shared loading state.
 5. Prefer stable `useEffect` dependencies.
 6. Add or update view logic only after confirming the data contract.
+7. For auth changes, keep `auth.slice` as the single source of truth.
 
 ### Additional notes
 
@@ -395,6 +422,7 @@ Common types:
 - Favor explicit contracts, validation, and safe defaults.
 - Do not reintroduce response-shape logic inside repositories when a contract mapper should own it.
 - Do not rely only on role checks when ownership matters.
+- Prefer explicit cascades in associations when delete behavior matters.
 
 ---
 
