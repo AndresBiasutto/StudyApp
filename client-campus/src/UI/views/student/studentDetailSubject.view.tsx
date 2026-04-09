@@ -116,7 +116,7 @@ const StudentDetailSubject = () => {
         icon={isIndexOpen ? <FiX /> : <FiMenu />}
         action={() => setIsIndexOpen((prev) => !prev)}
         className={`fixed top-20 z-40 ${
-          isIndexOpen ? "left-[15.5rem] lg:left-[17rem]" : "left-4"
+          isIndexOpen ? "left-62 lg:left-64" : "left-4"
         }`}
       />
 
@@ -176,7 +176,7 @@ const StudentDetailSubject = () => {
 
       <main
         className={`min-h-[calc(100vh-4rem)] flex-1 overflow-x-hidden overflow-y-auto bg-lightPrimary p-6 transition-[padding] duration-300 md:p-8 dark:bg-darkPrimary ${
-          isIndexOpen ? "lg:pl-[21rem]" : ""
+          isIndexOpen ? "lg:pl-64" : ""
         }`}
       >
         <div className="mb-4 pr-16 lg:hidden">

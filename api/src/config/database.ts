@@ -1,15 +1,28 @@
 import fs from "fs";
 import path from "path";
 
-import { Sequelize } from "sequelize";
+import { Sequelize, type Options } from "sequelize";
 
 import { env } from "./env";
 
-export const sequelize = new Sequelize(env.db.name, env.db.user, env.db.pass, {
+const sequelizeOptions: Options = {
   host: env.db.host,
   port: env.db.port,
   dialect: "postgres",
-});
+};
+
+if (env.db.sslMode === "require") {
+  sequelizeOptions.dialectOptions = {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  };
+}
+
+export const sequelize = env.db.url
+  ? new Sequelize(env.db.url, sequelizeOptions)
+  : new Sequelize(env.db.name, env.db.user, env.db.pass, sequelizeOptions);
 
 const modelsDir = path.join(__dirname, "../models");
 const modelDefiners: Array<(sequelize: Sequelize) => void> = [];

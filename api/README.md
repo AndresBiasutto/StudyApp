@@ -52,11 +52,13 @@ Usa [`.env.example`](/C:/Users/aquia/OneDrive/Escritorio/algoritmos/campus/api/.
 
 Variables principales:
 
+- `DATABASE_URL`
 - `DB_NAME`
 - `DB_USER`
 - `DB_PASS`
 - `DB_HOST`
 - `DB_PORT`
+- `DB_SSL_MODE`
 - `PORT`
 - `APP_URL`
 - `SECRET`
@@ -70,6 +72,8 @@ Notas:
 
 - `SECRET` es la variable canonica para JWT. `JWT_SECRET` queda solo como alias temporal de compatibilidad.
 - `OPENROUTER_API_KEY` se usa para la generacion de examenes con IA.
+- El backend acepta `DATABASE_URL`, `EXTERNALDATABASEURL` o `INTERNALDATABASEURL` para proveedores como Render.
+- Si usas Postgres administrado con TLS, configura `DB_SSL_MODE=require`.
 - `DB_SYNC_MODE=none` es el valor recomendado.
 - `DB_SYNC_MODE=alter` existe solo como escape hatch de desarrollo mientras no haya migraciones.
 
