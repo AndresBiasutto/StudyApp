@@ -5,10 +5,13 @@ import { Sequelize, type Options } from "sequelize";
 
 import { env } from "./env";
 
+const pg = require("pg");
+
 const sequelizeOptions: Options = {
   host: env.db.host,
   port: env.db.port,
   dialect: "postgres",
+  dialectModule: pg,
 };
 
 if (env.db.sslMode === "require") {
