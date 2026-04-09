@@ -1,5 +1,3 @@
-import { OpenRouter } from "@openrouter/sdk";
-
 import { mapExamQuestionResponse, mapExamResponse } from "../contracts/mappers/response.mapper";
 import { env } from "../config/env";
 import chapterRepository from "../repositories/chapter.repository";
@@ -10,6 +8,22 @@ interface QuizQuestion {
   question: string;
   options: [string, string, string];
   correctAnswer: string;
+}
+
+interface OpenRouterMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+interface OpenRouterChatCompletionResponse {
+  choices?: Array<{
+    message?: {
+      content?: string;
+    };
+  }>;
+  error?: {
+    message?: string;
+  };
 }
 
 const MAX_SOURCE_TEXT_LENGTH = 6000;
@@ -120,9 +134,32 @@ const normalizeQuiz = (payload: unknown): QuizQuestion[] => {
 };
 
 class AiService {
-  private openRouter = new OpenRouter({
-    apiKey: env.openRouterApiKey || "",
-  });
+  private async sendChatCompletion(
+    messages: OpenRouterMessage[],
+  ): Promise<OpenRouterChatCompletionResponse> {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.openRouterApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "deepseek/deepseek-r1",
+        max_tokens: MAX_COMPLETION_TOKENS,
+        messages,
+      }),
+    });
+
+    const payload = (await response.json()) as OpenRouterChatCompletionResponse;
+
+    if (!response.ok) {
+      throw new ValidationError(
+        payload.error?.message || "OpenRouter no pudo generar el examen",
+      );
+    }
+
+    return payload;
+  }
 
   async generateQuiz(id_chapter: string, force = false) {
     const existingExam = await examRepository.getByChapterId(id_chapter);
@@ -196,23 +233,16 @@ Formato exacto:
 ]
 `.trim();
 
-    const completion = await this.openRouter.chat.send({
-      chatRequest: {
-        model: "deepseek/deepseek-r1",
-        maxTokens: MAX_COMPLETION_TOKENS,
-        messages: [
-          {
-            role: "system",
-            content:
-              "Debes responder solo con JSON valido y sin texto extra.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+    const completion = await this.sendChatCompletion([
+      {
+        role: "system",
+        content: "Debes responder solo con JSON valido y sin texto extra.",
       },
-    });
+      {
+        role: "user",
+        content: prompt,
+      },
+    ]);
 
     const content = completion.choices?.[0]?.message?.content;
 

@@ -1,13 +1,3 @@
-const sendMock = jest.fn();
-
-jest.mock("@openrouter/sdk", () => ({
-  OpenRouter: jest.fn().mockImplementation(() => ({
-    chat: {
-      send: sendMock,
-    },
-  })),
-}));
-
 jest.mock("../repositories/chapter.repository", () => ({
   __esModule: true,
   default: {
@@ -28,6 +18,7 @@ import chapterRepository from "../repositories/chapter.repository";
 import examRepository from "../repositories/exam.repository";
 
 describe("AiService", () => {
+  const fetchMock = jest.fn();
   const mockChapterRepository = chapterRepository as jest.Mocked<
     typeof chapterRepository
   >;
@@ -37,6 +28,7 @@ describe("AiService", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    global.fetch = fetchMock as unknown as typeof fetch;
   });
 
   it("should return the stored exam if chapter already has one", async () => {
@@ -72,7 +64,7 @@ describe("AiService", () => {
     const result = await aiService.generateQuiz("chapter-1");
 
     expect(result).toHaveLength(4);
-    expect(sendMock).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("should create and persist an exam from chapter content_html", async () => {
@@ -83,35 +75,38 @@ describe("AiService", () => {
         content_html: "<p>Texto de prueba para el capitulo</p>",
       }),
     } as never);
-    sendMock.mockResolvedValue({
-      choices: [
-        {
-          message: {
-            content: JSON.stringify([
-              {
-                question: "Pregunta 1",
-                options: ["A", "B", "C"],
-                correctAnswer: "B",
-              },
-              {
-                question: "Pregunta 2",
-                options: ["A", "B", "C"],
-                correctAnswer: "C",
-              },
-              {
-                question: "Pregunta 3",
-                options: ["A", "B", "C"],
-                correctAnswer: "A",
-              },
-              {
-                question: "Pregunta 4",
-                options: ["A", "B", "C"],
-                correctAnswer: "B",
-              },
-            ]),
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify([
+                {
+                  question: "Pregunta 1",
+                  options: ["A", "B", "C"],
+                  correctAnswer: "B",
+                },
+                {
+                  question: "Pregunta 2",
+                  options: ["A", "B", "C"],
+                  correctAnswer: "C",
+                },
+                {
+                  question: "Pregunta 3",
+                  options: ["A", "B", "C"],
+                  correctAnswer: "A",
+                },
+                {
+                  question: "Pregunta 4",
+                  options: ["A", "B", "C"],
+                  correctAnswer: "B",
+                },
+              ]),
+            },
           },
-        },
-      ],
+        ],
+      }),
     });
     mockExamRepository.saveByChapterId.mockImplementation(
       async (id_chapter, questions) =>
