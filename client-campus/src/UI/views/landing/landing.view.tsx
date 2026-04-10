@@ -1,5 +1,6 @@
 import Content from "../../components/molecules/content.molecule";
 import Image from "../../components/atoms/image.atom";
+import logo from "../../../assets/monopc.svg"
 import H1 from "../../components/atoms/h1.atom";
 import H2 from "../../components/atoms/h2.atom";
 import Ptxt from "../../components/atoms/P.atom";
@@ -43,7 +44,7 @@ const Landing = () => {
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <Image src="/src/assets/monopc.svg" alt="hero banner" />
+            <Image src={logo} alt="hero banner" />
           </div>
         </div>
       </div>
@@ -90,14 +91,14 @@ const Landing = () => {
 
             {/* dots */}
             <div className="flex justify-center gap-2 mt-4">
-              {subjects.map((_, i) => (
+              {/* {subjects.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setIndex(i)}
                   className={`w-2 h-2 rounded-full ${i === index ? "bg-lightAccent dark:bg-darkAccent" : "bg-lightBorder dark:bg-darkBorder"}`}
                   aria-label={`Ir a slide ${i + 1}`}
                 />
-              ))}
+              ))} */}
             </div>
           </div>
         ) : (
