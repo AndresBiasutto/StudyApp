@@ -34,6 +34,16 @@ class UserController {
     res.status(200).json(user);
   }
 
+  async updateMe(req: AuthRequest, res: Response) {
+    const id_user = req.user?.id_user;
+    if (!id_user) {
+      throw new UnauthorizedError("No autorizado");
+    }
+
+    const updatedUser = await userService.updateMe(id_user, req.body);
+    res.status(200).json(updatedUser);
+  }
+
   async registerUser(req: Request, res: Response) {
     const createdUser = await userService.registerUser(req.body);
     res.status(201).json(createdUser);

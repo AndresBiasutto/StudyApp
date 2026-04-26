@@ -5,6 +5,7 @@ import type {
   LoginCredentials,
   RegisterCredentials,
 } from "../../../BR/domain/entities/authCredentials.interface";
+import type { UpdateProfileData } from "../../../BR/domain/entities/updateProfile.interface";
 
 export const authenticateUser = createAsyncThunk(
   "auth/authenticateUser",
@@ -31,5 +32,12 @@ export const registerWithCredentials = createAsyncThunk(
   "auth/registerWithCredentials",
   async (credentials: RegisterCredentials) => {
     return await getUserUseCases().register.execute(credentials);
+  },
+);
+
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (data: UpdateProfileData) => {
+    return await getUserUseCases().updateProfile.execute(data);
   },
 );

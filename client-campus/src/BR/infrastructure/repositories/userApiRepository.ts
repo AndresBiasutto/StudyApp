@@ -3,12 +3,17 @@ import type {
   LoginCredentials,
   RegisterCredentials,
 } from "../../domain/entities/authCredentials.interface";
+import type { UpdateProfileData } from "../../domain/entities/updateProfile.interface";
 import type { User } from "../../domain/entities/user.interface";
 import type { UserRepository } from "../../domain/services/user.repository";
 import { httpClient } from "../services/httpClient";
 import type { AuthUserDTO } from "../../../UI/interfaces/authUserDTO";
 
 export class UserApiRepository implements UserRepository {
+  async updateMe(data: UpdateProfileData): Promise<User> {
+    const { data: updatedUser } = await httpClient.put<User>("/users/me", data);
+    return updatedUser;
+  }
   async updateRole(id_user: string, id_role: string): Promise<User> {
     const { data } = await httpClient.put<User>(`/users/updateRole/${id_user}`, {
       id_role,

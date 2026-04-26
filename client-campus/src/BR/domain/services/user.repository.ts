@@ -1,4 +1,5 @@
 import type { User } from "../entities/user.interface";
+import type { UpdateProfileData } from "../entities/updateProfile.interface";
 import type {
   LoginCredentials,
   RegisterCredentials,
@@ -7,6 +8,7 @@ import type {
 export interface UserRepository {
   authUser(token: string): Promise<User>;
   authMe(): Promise<User>;
+  updateMe(data: UpdateProfileData): Promise<User>;
   login(credentials: LoginCredentials): Promise<User>;
   register(credentials: RegisterCredentials): Promise<User>;
   getAll(): Promise<User[]>;

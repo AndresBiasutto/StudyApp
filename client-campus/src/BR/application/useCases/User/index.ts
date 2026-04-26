@@ -12,6 +12,7 @@ import { GetUsersUseCase } from "./getUsers.useCase";
 import { LoginUseCase } from "./login.useCase";
 import { RegisterUseCase } from "./register.useCase";
 import { UpdateRoleUseCase } from "./updateRole.useCase";
+import { UpdateProfileUseCase } from "./updateProfile.useCase";
 import { UpdateUserUseCase } from "./updateUser.useCase";
 
 let cachedUserUseCases: {
@@ -27,6 +28,7 @@ let cachedUserUseCases: {
   getUsers: GetUsersUseCase;
   login: LoginUseCase;
   register: RegisterUseCase;
+  updateProfile: UpdateProfileUseCase;
   updateRole: UpdateRoleUseCase;
   updateUser: UpdateUserUseCase;
 } | null = null;
@@ -47,6 +49,7 @@ export const getUserUseCases = () => {
       getUsers: new GetUsersUseCase(repository),
       login: new LoginUseCase(repository),
       register: new RegisterUseCase(repository),
+      updateProfile: new UpdateProfileUseCase(repository),
       updateRole: new UpdateRoleUseCase(repository),
       updateUser: new UpdateUserUseCase(repository),
     };

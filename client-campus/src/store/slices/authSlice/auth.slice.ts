@@ -6,12 +6,14 @@ import {
   authenticateUser,
   loginWithCredentials,
   registerWithCredentials,
+  updateProfile,
 } from "./auth.thunk";
 
 const initialState: AuthState = {
   token: null,
   selected: null,
   loading: false,
+  updatingProfile: false,
   error: null,
   isAuthenticated: false,
 };
@@ -87,6 +89,17 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.error.message ?? "No se pudo registrar la cuenta";
         state.isAuthenticated = false;
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.updatingProfile = true;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.updatingProfile = false;
+        state.selected = action.payload;
+        state.isAuthenticated = true;
+      })
+      .addCase(updateProfile.rejected, (state) => {
+        state.updatingProfile = false;
       });
   },
 });

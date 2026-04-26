@@ -13,6 +13,8 @@ interface FormInputProps {
   className?: string;
   error?: string;
   errorTextStyles?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -24,6 +26,8 @@ const FormInput: React.FC<FormInputProps> = ({
   className,
   error,
   errorTextStyles,
+  disabled,
+  readOnly,
 }) => {
   return (
     <div className="mb-1">
@@ -35,6 +39,8 @@ const FormInput: React.FC<FormInputProps> = ({
         value={value}
         change={onChange}
         className={className}
+        disabled={disabled}
+        readOnly={readOnly}
       />
       {error && <Ptxt text={error} aditionalStyle={errorTextStyles} />}
     </div>

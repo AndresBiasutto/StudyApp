@@ -146,6 +146,67 @@ describe('UserService', () => {
     });
   });
 
+  describe('updateMe', () => {
+    it('should update only allowed profile fields and return the refreshed session shape', async () => {
+      const existingUser = {
+        id_user: 'user-123',
+        name: 'John',
+        last_name: 'Doe',
+        e_mail: 'john@test.com',
+        id_role: 'role-1',
+        contact_number: null,
+        description: null,
+        image: null,
+        Role: { id_role: 'role-1', name: 'student' },
+        createdSubjects: [],
+        enrolledSubjects: [],
+      };
+
+      const refreshedUser = {
+        ...existingUser,
+        name: 'Jane',
+        last_name: 'Smith',
+        description: 'Perfil actualizado',
+        contact_number: '12345678',
+      };
+
+      mockRepository.getUser = jest
+        .fn()
+        .mockResolvedValueOnce(existingUser)
+        .mockResolvedValueOnce(refreshedUser);
+      mockRepository.updateUser = jest.fn().mockResolvedValue(refreshedUser);
+
+      const result = await userService.updateMe('user-123', {
+        name: '  Jane  ',
+        last_name: ' Smith ',
+        description: ' Perfil actualizado ',
+        contact_number: ' 12345678 ',
+        e_mail: 'otro@test.com',
+        id_role: 'admin-role',
+      } as any);
+
+      expect(mockRepository.updateUser).toHaveBeenCalledWith('user-123', {
+        name: 'Jane',
+        last_name: 'Smith',
+        description: 'Perfil actualizado',
+        contact_number: '12345678',
+      });
+      expect(result).toEqual({
+        id_user: 'user-123',
+        name: 'Jane',
+        last_name: 'Smith',
+        e_mail: 'john@test.com',
+        image: null,
+        Role: { id_role: 'role-1', name: 'student' },
+        contact_number: '12345678',
+        description: 'Perfil actualizado',
+        id_role: 'role-1',
+        subjects: [],
+        enrolledSubjects: [],
+      });
+    });
+  });
+
   describe('deleteUser', () => {
     it('should return true if user is deleted', async () => {
       mockRepository.deleteUser = jest.fn().mockResolvedValue(1);

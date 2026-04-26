@@ -79,3 +79,12 @@ export const updateUserSchema = {
     student_ids: { rules: [isArrayOfStrings()] },
   },
 };
+
+export const updateMeSchema = {
+  body: {
+    name: { rules: [isString(), minLength(1)] },
+    last_name: { rules: [isString(), minLength(1)] },
+    description: { rules: [isString()] },
+    contact_number: { rules: [isString()] },
+  },
+};

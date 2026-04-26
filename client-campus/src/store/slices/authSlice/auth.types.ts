@@ -4,6 +4,7 @@ export interface AuthState {
   token: string | null;
   selected: User | null;
   loading: boolean;
+  updatingProfile: boolean;
   error: string | null;
   isAuthenticated: boolean;
 }

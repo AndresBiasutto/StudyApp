@@ -2,6 +2,7 @@ import type React from "react";
 import type { ChangeEvent } from "react";
 
 interface TextareaProps {
+  name?: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   placeholder?: string;
@@ -9,9 +10,17 @@ interface TextareaProps {
   className?: string;
 }
 
-const Textarea: React.FC<TextareaProps> = ({ value, onChange, placeholder, rows = 3, className = "" }) => {
+const Textarea: React.FC<TextareaProps> = ({
+  name,
+  value,
+  onChange,
+  placeholder,
+  rows = 3,
+  className = "",
+}) => {
   return (
     <textarea
+      name={name}
       value={value}
       onChange={onChange}
       rows={rows}

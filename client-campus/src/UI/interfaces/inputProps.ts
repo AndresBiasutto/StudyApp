@@ -7,5 +7,7 @@ export interface inputProps {
   value?: string;
   change?: ChangeEventHandler<HTMLInputElement>;
   className?: string | undefined;
- action? :React.MouseEventHandler<HTMLButtonElement>;
+  action? :React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
+  readOnly?: boolean;
 }

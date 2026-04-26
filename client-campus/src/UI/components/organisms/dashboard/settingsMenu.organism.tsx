@@ -12,7 +12,7 @@ import Navigation from "../../molecules/navigation.molecule";
 import Button from "../../atoms/button.atom";
 import { logout } from "../../../../store/slices/authSlice/auth.slice";
 import { useNavigate } from "react-router-dom";
-const navItems = [{ navLink: "/settings", name: "settings" }];
+const navItems = [{ navLink: "dashboard/settings", name: "settings" }];
 const SettingsMenu = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();

@@ -38,6 +38,13 @@ interface LoginUserInput {
   password: string;
 }
 
+interface UpdateProfileInput {
+  name?: string;
+  last_name?: string;
+  description?: string | null;
+  contact_number?: string | null;
+}
+
 interface GoogleUserInput {
   e_mail: string;
   name?: string;
@@ -81,6 +88,32 @@ const toPlainUserData = (
 };
 
 class UserService {
+  private sanitizeProfileUpdate(data: UpdateProfileInput): UpdateProfileInput {
+    const sanitized: UpdateProfileInput = {};
+
+    if (typeof data.name === "string") {
+      sanitized.name = data.name.trim();
+    }
+
+    if (typeof data.last_name === "string") {
+      sanitized.last_name = data.last_name.trim();
+    }
+
+    if (typeof data.description === "string") {
+      sanitized.description = data.description.trim();
+    } else if (data.description === null) {
+      sanitized.description = null;
+    }
+
+    if (typeof data.contact_number === "string") {
+      sanitized.contact_number = data.contact_number.trim();
+    } else if (data.contact_number === null) {
+      sanitized.contact_number = null;
+    }
+
+    return sanitized;
+  }
+
   private async resolveDefaultPublicRoleId() {
     const defaultRole =
       (await userRepository.getRoleByName("student")) ??
@@ -148,6 +181,30 @@ class UserService {
   async createUser(data: CreateUserInput) {
     const user = await userRepository.createUser(data);
     return mapUserListResponse(user);
+  }
+
+  async updateMe(id_user: string, data: UpdateProfileInput) {
+    const userToUpdate = await userRepository.getUser(id_user);
+
+    if (!userToUpdate) {
+      throw new NotFoundError("User not found");
+    }
+
+    const sanitizedData = this.sanitizeProfileUpdate(data);
+
+    if (Object.keys(sanitizedData).length === 0) {
+      throw new ValidationError("Debes enviar al menos un campo para actualizar");
+    }
+
+    await userRepository.updateUser(id_user, sanitizedData);
+
+    const updatedUser = await userRepository.getUser(id_user);
+
+    if (!updatedUser) {
+      throw new NotFoundError("User not found");
+    }
+
+    return mapUserResponse(updatedUser);
   }
 
   async registerUser(data: RegisterUserInput) {

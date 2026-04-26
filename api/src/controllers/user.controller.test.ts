@@ -100,6 +100,28 @@ describe("UserController", () => {
     });
   });
 
+  describe("updateMe", () => {
+    it("should update the authenticated user profile", async () => {
+      const req = {
+        user: { id_user: "user-123" },
+        body: { name: "Jane", last_name: "Doe" },
+      } as unknown as Request;
+      const res = createResponse();
+      const updatedUser = { id_user: "user-123", name: "Jane", last_name: "Doe" };
+
+      mockService.updateMe = jest.fn().mockResolvedValue(updatedUser as any);
+
+      await userController.updateMe(req as any, res);
+
+      expect(mockService.updateMe).toHaveBeenCalledWith("user-123", {
+        name: "Jane",
+        last_name: "Doe",
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(updatedUser);
+    });
+  });
+
   describe("getAllUsers", () => {
     it("should call userService.getAllUsers", async () => {
       const req = {} as Request;

@@ -9,6 +9,7 @@ import {
   createUserSchema,
   loginUserSchema,
   registerUserSchema,
+  updateMeSchema,
   updateUserRoleSchema,
   userIdParamSchema,
   verifyTokenSchema,
@@ -39,6 +40,12 @@ router.post(
   asyncHandler(userController.loginUser.bind(userController)),
 );
 router.get("/me", authenticateJWT, asyncHandler(userController.getMe.bind(userController)));
+router.put(
+  "/me",
+  authenticateJWT,
+  validate(updateMeSchema),
+  asyncHandler(userController.updateMe.bind(userController)),
+);
 router.get(
   "/verify",
   validate(verifyTokenSchema),

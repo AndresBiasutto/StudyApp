@@ -22,6 +22,7 @@ import TeacherChapterEditor from "./views/teacher/teacherChapterEditor.view";
 import Register from "./views/landing/register.view";
 import Login from "./views/landing/login.view";
 import LandingPageTemplate from "./components/templates/landingPage.template";
+import Settings from "./views/landing/settings.view";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -47,6 +48,12 @@ function App() {
           <Route path="/register" element={<Register />} />
         </Route>
         <Route element={<Dashboard />}>
+          <Route
+            path="dashboard/settings"
+            element={
+                <Settings />
+            }
+          />
           <Route
             path="dashboard/student/home"
             element={
