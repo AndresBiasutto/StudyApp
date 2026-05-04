@@ -146,6 +146,43 @@ describe('UserService', () => {
     });
   });
 
+  describe('getAllLiDataUsers', () => {
+    it('should exclude the authenticated admin from the list query', async () => {
+      const mockUsers = [
+        {
+          id_user: '2',
+          name: 'Zoe',
+          last_name: 'B',
+          e_mail: 'zoe@test.com',
+          contact_number: null,
+          description: null,
+          image: null,
+          id_role: 'role-1',
+          Role: { id_role: 'role-1', name: 'student' },
+          createdSubjects: [],
+          enrolledSubjects: [],
+        },
+      ];
+
+      mockRepository.getAllLiDataUsers = jest.fn().mockResolvedValue(mockUsers);
+
+      const result = await userService.getAllLiDataUsers('admin-123');
+
+      expect(mockRepository.getAllLiDataUsers).toHaveBeenCalledWith('admin-123');
+      expect(result).toEqual([
+        expect.objectContaining({ id_user: '2', name: 'Zoe' }),
+      ]);
+    });
+  });
+
+  describe('getSelectedUser', () => {
+    it('should reject self access through admin detail flow', async () => {
+      await expect(
+        userService.getSelectedUser('admin-123', 'admin-123'),
+      ).rejects.toThrow('No puedes administrarte a ti mismo desde este modulo');
+    });
+  });
+
   describe('updateMe', () => {
     it('should update only allowed profile fields and return the refreshed session shape', async () => {
       const existingUser = {
@@ -168,6 +205,7 @@ describe('UserService', () => {
         last_name: 'Smith',
         description: 'Perfil actualizado',
         contact_number: '12345678',
+        image: 'https://example.com/avatar.png',
       };
 
       mockRepository.getUser = jest
@@ -181,6 +219,7 @@ describe('UserService', () => {
         last_name: ' Smith ',
         description: ' Perfil actualizado ',
         contact_number: ' 12345678 ',
+        image: ' https://example.com/avatar.png ',
         e_mail: 'otro@test.com',
         id_role: 'admin-role',
       } as any);
@@ -190,13 +229,14 @@ describe('UserService', () => {
         last_name: 'Smith',
         description: 'Perfil actualizado',
         contact_number: '12345678',
+        image: 'https://example.com/avatar.png',
       });
       expect(result).toEqual({
         id_user: 'user-123',
         name: 'Jane',
         last_name: 'Smith',
         e_mail: 'john@test.com',
-        image: null,
+        image: 'https://example.com/avatar.png',
         Role: { id_role: 'role-1', name: 'student' },
         contact_number: '12345678',
         description: 'Perfil actualizado',
@@ -208,6 +248,12 @@ describe('UserService', () => {
   });
 
   describe('deleteUser', () => {
+    it('should reject self deletion from admin module', async () => {
+      await expect(
+        userService.deleteUser('admin-123', 'admin-123'),
+      ).rejects.toThrow('No puedes administrarte a ti mismo desde este modulo');
+    });
+
     it('should return true if user is deleted', async () => {
       mockRepository.deleteUser = jest.fn().mockResolvedValue(1);
 
@@ -309,6 +355,14 @@ describe('UserService', () => {
       mockRepository.updateUser = jest.fn().mockResolvedValue(null);
 
       await expect(userService.updateUser('non-existent', { name: 'Jane' })).rejects.toThrow('User not found');
+    });
+  });
+
+  describe('updateUserRole', () => {
+    it('should reject self role changes from admin module', async () => {
+      await expect(
+        userService.updateUserRole('admin-123', 'role-2', 'admin-123'),
+      ).rejects.toThrow('No puedes administrarte a ti mismo desde este modulo');
     });
   });
 });

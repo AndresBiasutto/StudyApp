@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { fetchSelectedUser } from "../../../store/slices/userSlice/user.thunk";
 import AdminUserDetailAside from "../../components/organisms/admin/adminUserDetailAside.organism";
 import type { User } from "../../../BR/domain/entities/user.interface";
@@ -13,6 +13,7 @@ const AdminUserDetail = () => {
   const { id_user } = useParams();
   const appDispatch = useAppDispatch();
   const { selected, loadingSelected, error } = useAppSelector((state) => state.users);
+  const authUserId = useAppSelector((state) => state.auth.selected?.id_user);
   
   useEffect(() => {
     if (id_user) {
@@ -32,6 +33,9 @@ const AdminUserDetail = () => {
   useEffect(() => {
     if (items.length === 0) appDispatch(fetchRoles());
   }, [appDispatch, items]);
+  if (id_user && authUserId && id_user === authUserId) {
+    return <Navigate to="/dashboard/settings" replace />;
+  }
   if (loadingSelected || loadingRoles) return <Spinner />;
   if (error || errorRoles) return <p>{error || errorRoles}</p>;
   return (

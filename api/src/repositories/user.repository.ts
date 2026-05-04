@@ -1,3 +1,5 @@
+import { Op } from "sequelize";
+
 import sequelize from "../config/database";
 import { UserEntity } from "./entities/userEntity.entity";
 import { mapUserModelToEntity } from "./mappers/user.mapper";
@@ -94,8 +96,33 @@ class UserRepository {
       ],
     });
   }
-  async getAllLiDataUsers() {
-    return this.getAllUsers();
+  async getAllLiDataUsers(excludedUserId?: string) {
+    return User.findAll({
+      where: excludedUserId
+        ? {
+            id_user: {
+              [Op.ne]: excludedUserId,
+            },
+          }
+        : undefined,
+      include: [
+        {
+          model: Role,
+          attributes: ["id_role", "name"],
+        },
+        {
+          model: Subject,
+          as: "createdSubjects",
+          attributes: ["id_subject", "name", "description", "imageUrl"],
+          include: [
+            {
+              model: Grade,
+              attributes: ["id_grade", "name"],
+            },
+          ],
+        },
+      ],
+    });
   }
   async getAllUsersByRole(roleName: string) {
     return User.findAll({

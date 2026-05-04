@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../../hooks/UseStore.hook"
 import { updateProfile } from "../../../../store/slices/authSlice/auth.thunk";
 import type { SettingsFormData } from "../../../interfaces/settingsForm";
 import Button from "../../atoms/button.atom";
+import Image from "../../atoms/image.atom";
 import Label from "../../atoms/label.atom";
 import Ptxt from "../../atoms/P.atom";
 import Textarea from "../../atoms/textarea.atom";
@@ -15,11 +16,13 @@ const createInitialState = (selectedUser: {
   last_name?: string;
   description?: string | null;
   contact_number?: string | null;
+  image?: string | null;
 }): SettingsFormData => ({
   name: selectedUser.name ?? "",
   last_name: selectedUser.last_name ?? "",
   description: selectedUser.description ?? "",
   contact_number: selectedUser.contact_number ?? "",
+  image: selectedUser.image ?? "",
 });
 
 const SettingsForm = () => {
@@ -32,6 +35,7 @@ const SettingsForm = () => {
   const [errors, setErrors] = useState<Partial<SettingsFormData>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const previewImage = values.image.trim();
 
   useEffect(() => {
     if (!selected) {
@@ -83,6 +87,7 @@ const SettingsForm = () => {
           last_name: values.last_name.trim(),
           description: values.description.trim() || null,
           contact_number: values.contact_number.trim() || null,
+          image: values.image.trim() || null,
         }),
       ).unwrap();
 
@@ -102,7 +107,7 @@ const SettingsForm = () => {
       className="w-full max-w-2xl bg-lightSecondary dark:bg-darkSecondary p-8 rounded-md shadow-md border border-lightBorder dark:border-darkBorder"
     >
       <div className="mb-6">
-        <Ptxt text="Actualizá tu información personal. Tu rol permanece sin cambios." />
+        <Ptxt text="Actualiza tu informacion personal." />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -154,7 +159,7 @@ const SettingsForm = () => {
       </div>
 
       <FormInput
-        label="Número de contacto"
+        label="Numero de contacto"
         name="contact_number"
         type="text"
         value={values.contact_number}
@@ -164,8 +169,34 @@ const SettingsForm = () => {
         errorTextStyles={errorTextStyles}
       />
 
+      <FormInput
+        label="URL de imagen"
+        name="image"
+        type="url"
+        value={values.image}
+        onChange={handleChange}
+        className={inputBaseStyles}
+        error={errors.image}
+        errorTextStyles={errorTextStyles}
+      />
+
+      <div className="mb-4 rounded-md border border-lightBorder bg-lightPrimary p-4 dark:border-darkBorder dark:bg-darkPrimary">
+        <Label text="Preview de imagen" />
+        {previewImage ? (
+          <Image
+            src={previewImage}
+            alt="Preview de perfil"
+            className="max-h-28 max-w-28 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-40 items-center justify-center rounded-md border border-dashed border-lightBorder dark:border-darkBorder">
+            <Ptxt text="Todavia no cargaste una imagen de perfil" />
+          </div>
+        )}
+      </div>
+
       <div className="mb-1">
-        <Label text="Descripción" />
+        <Label text="Descripcion" />
         <Textarea
           value={values.description}
           onChange={handleChange}

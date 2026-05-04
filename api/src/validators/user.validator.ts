@@ -2,6 +2,7 @@ import {
   isArrayOfStrings,
   isEmail,
   isString,
+  isUrl,
   minLength,
 } from "../middlewares/validation.middleware";
 
@@ -86,5 +87,6 @@ export const updateMeSchema = {
     last_name: { rules: [isString(), minLength(1)] },
     description: { rules: [isString()] },
     contact_number: { rules: [isString()] },
+    image: { rules: [isString(), isUrl()] },
   },
 };

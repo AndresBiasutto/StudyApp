@@ -120,3 +120,21 @@ export const isNumber =
   (message = "Debe ser un numero"): ValidationRule =>
   (value) =>
     typeof value === "number" && !Number.isNaN(value) ? null : message;
+
+export const isUrl =
+  (message = "Debe ser una URL valida"): ValidationRule =>
+  (value) => {
+    if (typeof value !== "string") {
+      return message;
+    }
+
+    try {
+      const url = new URL(value);
+
+      return url.protocol === "http:" || url.protocol === "https:"
+        ? null
+        : message;
+    } catch {
+      return message;
+    }
+  };

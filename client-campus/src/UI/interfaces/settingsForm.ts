@@ -3,5 +3,6 @@ export interface SettingsFormData {
   last_name: string;
   description: string;
   contact_number: string;
+  image: string;
   [key: string]: string;
 }

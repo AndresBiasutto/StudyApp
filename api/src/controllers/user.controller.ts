@@ -79,13 +79,16 @@ class UserController {
     res.json(user);
   }
 
-  async getSelectedUser(req: Request, res: Response) {
-    const user = await userService.getSelectedUser(req.params.id_user);
+  async getSelectedUser(req: AuthRequest, res: Response) {
+    const user = await userService.getSelectedUser(
+      req.params.id_user,
+      req.user?.id_user,
+    );
     res.json(user);
   }
 
-  async getAllLiDataUsers(_req: Request, res: Response) {
-    const liData = await userService.getAllLiDataUsers();
+  async getAllLiDataUsers(req: AuthRequest, res: Response) {
+    const liData = await userService.getAllLiDataUsers(req.user?.id_user);
     res.json(liData);
   }
 
@@ -113,7 +116,7 @@ class UserController {
     res.json(updated);
   }
 
-  async updateUserRole(req: Request, res: Response) {
+  async updateUserRole(req: AuthRequest, res: Response) {
     const { id_user } = req.params;
     const { id_role } = req.body;
 
@@ -124,12 +127,16 @@ class UserController {
       throw new ValidationError("id_user es necesario");
     }
 
-    const updatedRole = await userService.updateUserRole(id_user, id_role);
+    const updatedRole = await userService.updateUserRole(
+      id_user,
+      id_role,
+      req.user?.id_user,
+    );
     res.json(updatedRole);
   }
 
-  async deleteUser(req: Request, res: Response) {
-    await userService.deleteUser(req.params.id_user);
+  async deleteUser(req: AuthRequest, res: Response) {
+    await userService.deleteUser(req.params.id_user, req.user?.id_user);
     res.json({ message: "User deleted" });
   }
 }

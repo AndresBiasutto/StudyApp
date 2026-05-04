@@ -10,6 +10,7 @@ import {
 import userRepository from "../repositories/user.repository";
 import {
   ConflictError,
+  ForbiddenError,
   NotFoundError,
   UnauthorizedError,
   ValidationError,
@@ -43,6 +44,7 @@ interface UpdateProfileInput {
   last_name?: string;
   description?: string | null;
   contact_number?: string | null;
+  image?: string | null;
 }
 
 interface GoogleUserInput {
@@ -88,6 +90,14 @@ const toPlainUserData = (
 };
 
 class UserService {
+  private ensureNotSelfManaged(targetUserId: string, currentUserId?: string) {
+    if (currentUserId && currentUserId === targetUserId) {
+      throw new ForbiddenError(
+        "No puedes administrarte a ti mismo desde este modulo",
+      );
+    }
+  }
+
   private sanitizeProfileUpdate(data: UpdateProfileInput): UpdateProfileInput {
     const sanitized: UpdateProfileInput = {};
 
@@ -109,6 +119,12 @@ class UserService {
       sanitized.contact_number = data.contact_number.trim();
     } else if (data.contact_number === null) {
       sanitized.contact_number = null;
+    }
+
+    if (typeof data.image === "string") {
+      sanitized.image = data.image.trim();
+    } else if (data.image === null) {
+      sanitized.image = null;
     }
 
     return sanitized;
@@ -310,7 +326,9 @@ class UserService {
     return mapUserResponse(user);
   }
 
-  async getSelectedUser(id_user: string) {
+  async getSelectedUser(id_user: string, currentUserId?: string) {
+    this.ensureNotSelfManaged(id_user, currentUserId);
+
     const user = await userRepository.getSelectedUser(id_user);
     if (!user) throw new NotFoundError("User not found");
     return mapUserResponse(user);
@@ -335,8 +353,8 @@ class UserService {
     return mapped;
   }
 
-  async getAllLiDataUsers() {
-    const users = await userRepository.getAllLiDataUsers();
+  async getAllLiDataUsers(currentUserId?: string) {
+    const users = await userRepository.getAllLiDataUsers(currentUserId);
     const mapped = users.map(mapUserListResponse);
 
     mapped.sort((a, b) => {
@@ -400,10 +418,12 @@ class UserService {
     return mapUserListResponse(user);
   }
 
-  async updateUserRole(id_user: string, id_role: string) {
+  async updateUserRole(id_user: string, id_role: string, currentUserId?: string) {
     if (!id_role) {
       throw new ValidationError("id_role es necesario");
     }
+
+    this.ensureNotSelfManaged(id_user, currentUserId);
 
     const userToUpdateRole = await userRepository.getUser(id_user);
 
@@ -422,7 +442,9 @@ class UserService {
     return mapUserResponse(updatedUser);
   }
 
-  async deleteUser(id_user: string) {
+  async deleteUser(id_user: string, currentUserId?: string) {
+    this.ensureNotSelfManaged(id_user, currentUserId);
+
     const deleted = await userRepository.deleteUser(id_user);
     if (!deleted) throw new NotFoundError("User not found");
     return true;

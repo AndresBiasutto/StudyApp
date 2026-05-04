@@ -137,6 +137,23 @@ describe("UserController", () => {
     });
   });
 
+  describe("getAllLiDataUsers", () => {
+    it("should pass the authenticated user id to liData service", async () => {
+      const req = {
+        user: { id_user: "admin-123" },
+      } as unknown as Request;
+      const res = createResponse();
+      const mockUsers = [{ id_user: "1" }, { id_user: "2" }];
+
+      mockService.getAllLiDataUsers = jest.fn().mockResolvedValue(mockUsers as any);
+
+      await userController.getAllLiDataUsers(req as any, res);
+
+      expect(mockService.getAllLiDataUsers).toHaveBeenCalledWith("admin-123");
+      expect(res.json).toHaveBeenCalledWith(mockUsers);
+    });
+  });
+
   describe("updateUser", () => {
     it("should call userService.updateUser with id and data", async () => {
       const req = {
@@ -160,15 +177,19 @@ describe("UserController", () => {
   describe("deleteUser", () => {
     it("should call userService.deleteUser", async () => {
       const req = {
+        user: { id_user: "admin-123" },
         params: { id_user: "user-123" },
       } as unknown as Request;
       const res = createResponse();
 
       mockService.deleteUser = jest.fn().mockResolvedValue(true);
 
-      await userController.deleteUser(req, res);
+      await userController.deleteUser(req as any, res);
 
-      expect(mockService.deleteUser).toHaveBeenCalledWith("user-123");
+      expect(mockService.deleteUser).toHaveBeenCalledWith(
+        "user-123",
+        "admin-123",
+      );
       expect(res.json).toHaveBeenCalledWith({ message: "User deleted" });
     });
   });
@@ -176,6 +197,7 @@ describe("UserController", () => {
   describe("updateUserRole", () => {
     it("should call userService.updateUserRole when id_role is provided", async () => {
       const req = {
+        user: { id_user: "admin-999" },
         params: { id_user: "user-123" },
         body: { id_role: "role-1" },
       } as unknown as Request;
@@ -186,13 +208,35 @@ describe("UserController", () => {
         .fn()
         .mockResolvedValue(updatedUser as any);
 
-      await userController.updateUserRole(req, res);
+      await userController.updateUserRole(req as any, res);
 
       expect(mockService.updateUserRole).toHaveBeenCalledWith(
         "user-123",
         "role-1",
+        "admin-999",
       );
       expect(res.json).toHaveBeenCalledWith(updatedUser);
+    });
+  });
+
+  describe("getSelectedUser", () => {
+    it("should pass both selected and authenticated user ids", async () => {
+      const req = {
+        user: { id_user: "admin-123" },
+        params: { id_user: "user-123" },
+      } as unknown as Request;
+      const res = createResponse();
+      const selectedUser = { id_user: "user-123", name: "Jane" };
+
+      mockService.getSelectedUser = jest.fn().mockResolvedValue(selectedUser as any);
+
+      await userController.getSelectedUser(req as any, res);
+
+      expect(mockService.getSelectedUser).toHaveBeenCalledWith(
+        "user-123",
+        "admin-123",
+      );
+      expect(res.json).toHaveBeenCalledWith(selectedUser);
     });
   });
 });
