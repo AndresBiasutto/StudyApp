@@ -4,7 +4,9 @@ import { logout } from "../../../store/slices/authSlice/auth.slice";
 import type { ApiError } from "../errors/apiError";
 
 const httpClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api/",
+  baseURL: 
+   import.meta.env.VITE_API_URL ||
+   "http://localhost:3000/api/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
