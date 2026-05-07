@@ -102,6 +102,10 @@ export const ensureTeacherOwnsSubjectFromBody =
   (fieldName = "id_subject") =>
   async (req: AuthRequest, _res: Response, next: NextFunction) => {
     try {
+      if (req.user?.role === "admin" && req.user.is_demo_user) {
+        return next();
+      }
+
       const id_subject = req.body?.[fieldName];
       if (!id_subject || typeof id_subject !== "string") {
         throw new ValidationError(`${fieldName} es necesario`);
@@ -120,6 +124,10 @@ export const ensureTeacherOwnsUnitFromBody =
   (fieldName = "id_unit") =>
   async (req: AuthRequest, _res: Response, next: NextFunction) => {
     try {
+      if (req.user?.role === "admin" && req.user.is_demo_user) {
+        return next();
+      }
+
       const id_unit = req.body?.[fieldName];
       if (!id_unit || typeof id_unit !== "string") {
         throw new ValidationError(`${fieldName} es necesario`);

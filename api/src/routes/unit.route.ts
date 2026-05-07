@@ -1,7 +1,11 @@
 import { Router } from "express";
 import unitController from "../controllers/unit.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+import {
+  authorizeRoles,
+  authorizeTeacherOrDemoAdmin,
+  forbidDemoUserMutation,
+} from "../middlewares/role.middleware";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
@@ -19,7 +23,7 @@ const router = Router();
 router.post(
   "/",
   authenticateJWT,
-  authorizeRoles("teacher"),
+  authorizeTeacherOrDemoAdmin,
   validate(createUnitSchema),
   ensureTeacherOwnsSubjectFromBody(),
   asyncHandler(unitController.create.bind(unitController)),
@@ -34,6 +38,7 @@ router.put(
   "/:id",
   authenticateJWT,
   authorizeRoles("teacher"),
+  forbidDemoUserMutation,
   validate(updateUnitSchema),
   ensureTeacherOwnsUnitByParam(),
   asyncHandler(unitController.update.bind(unitController)),
@@ -42,6 +47,7 @@ router.delete(
   "/:id",
   authenticateJWT,
   authorizeRoles("teacher"),
+  forbidDemoUserMutation,
   validate(unitIdParamSchema),
   ensureTeacherOwnsUnitByParam(),
   asyncHandler(unitController.delete.bind(unitController)),

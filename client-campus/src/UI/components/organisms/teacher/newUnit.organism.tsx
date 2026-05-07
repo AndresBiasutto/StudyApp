@@ -1,20 +1,22 @@
-import { SiBookstack } from "react-icons/si";
-import Button from "../../atoms/button.atom";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { BsFillPostcardFill } from "react-icons/bs";
-import type { creatorCard } from "../../../interfaces/creatorCard";
-import UnitCardHeader from "../../molecules/cards/unitCardHeader";
-import NewChapter from "./NewChapter.organism";
-import ButtonRounded from "../../atoms/buttonRounded.atom";
 import {
   FaChevronDown,
   FaChevronUp,
   FaRegEdit,
   FaRegTrashAlt,
 } from "react-icons/fa";
-import { useState } from "react";
-import ButtonSquare from "../../atoms/buttonSquare.atom";
-import { useDispatch } from "react-redux";
+import { SiBookstack } from "react-icons/si";
+
+import { useAppSelector } from "../../../../hooks/UseStore.hook";
 import { setModalContent, toggleModal } from "../../../../store/slices/uiSlice";
+import type { creatorCard } from "../../../interfaces/creatorCard";
+import Button from "../../atoms/button.atom";
+import ButtonRounded from "../../atoms/buttonRounded.atom";
+import ButtonSquare from "../../atoms/buttonSquare.atom";
+import UnitCardHeader from "../../molecules/cards/unitCardHeader";
+import NewChapter from "./NewChapter.organism";
 
 const NewUnit: React.FC<creatorCard> = ({
   id,
@@ -25,16 +27,19 @@ const NewUnit: React.FC<creatorCard> = ({
 }) => {
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
+  const isDemoUser = useAppSelector((state) => state.auth.selected?.is_demo_user);
+
   const handleCreateChapter = () => {
     dispatch(toggleModal());
     dispatch(
       setModalContent({
         type: "CREATE_CHAPTER",
         data: { id_unit: id },
-        title: `Nuevo capitulo`,
+        title: "Nuevo capitulo",
       }),
     );
   };
+
   const handleEditUnit = () => {
     dispatch(toggleModal());
     dispatch(
@@ -44,12 +49,13 @@ const NewUnit: React.FC<creatorCard> = ({
           id_unit: id,
           name: title,
           description: text,
-          unitOrder: unitOrder,
+          unitOrder,
         },
         title: `Editar ${title}`,
       }),
     );
   };
+
   const handleDeleteUnit = () => {
     dispatch(toggleModal());
     dispatch(
@@ -60,9 +66,10 @@ const NewUnit: React.FC<creatorCard> = ({
       }),
     );
   };
+
   return (
-    <div className="w-full flex flex-col justify-start items-end gap-2 p-2 bg-lightSecondary dark:bg-darkSecondary rounded">
-      <div className="w-full flex items-start justify-between">
+    <div className="flex w-full flex-col items-end justify-start gap-2 rounded bg-lightSecondary p-2 dark:bg-darkSecondary">
+      <div className="flex w-full items-start justify-between">
         <UnitCardHeader
           id=""
           title={title}
@@ -70,27 +77,29 @@ const NewUnit: React.FC<creatorCard> = ({
           order={unitOrder}
           icon={<SiBookstack />}
         />
-        <div className="flex gap-2">
-          <ButtonSquare
-            btnName="editar unidad"
-            action={handleEditUnit}
-            icon={<FaRegEdit />}
-            bgLight="bg-lightAccent"
-            bgDark="dark:bg-darkAccent"
-          />
-          <ButtonSquare
-            btnName="eliminar unidad"
-            action={handleDeleteUnit}
-            icon={<FaRegTrashAlt />}
-            bgLight="bg-lightAccent"
-            bgDark="dark:bg-darkAccent"
-          />
-        </div>
+        {!isDemoUser && (
+          <div className="flex gap-2">
+            <ButtonSquare
+              btnName="editar unidad"
+              action={handleEditUnit}
+              icon={<FaRegEdit />}
+              bgLight="bg-lightAccent"
+              bgDark="dark:bg-darkAccent"
+            />
+            <ButtonSquare
+              btnName="eliminar unidad"
+              action={handleDeleteUnit}
+              icon={<FaRegTrashAlt />}
+              bgLight="bg-lightAccent"
+              bgDark="dark:bg-darkAccent"
+            />
+          </div>
+        )}
       </div>
 
-      <div className="w-full flex justify-center items-center">
+      <div className="flex w-full items-center justify-center">
         <ButtonRounded
-          btnName={show ? "ver menos" : "ver más"}
+          btnName={show ? "ver menos" : "ver mas"}
           action={() => setShow(!show)}
           icon={show ? <FaChevronUp /> : <FaChevronDown />}
           bgLight="bg-lightAccent"
@@ -98,7 +107,7 @@ const NewUnit: React.FC<creatorCard> = ({
         />
       </div>
       {show ? (
-        <div className="w-full flex flex-col items-start justify-start gap-4 p-2">
+        <div className="flex w-full flex-col items-start justify-start gap-4 p-2">
           {chapters
             ? chapters.map((chap) => (
                 <NewChapter
@@ -111,16 +120,14 @@ const NewUnit: React.FC<creatorCard> = ({
               ))
             : []}
           <Button
-            btnName="nuevo capítulo"
+            btnName="nuevo capitulo"
             action={handleCreateChapter}
             icon={<BsFillPostcardFill />}
             bgLight="bg-lightAccent"
             bgDark="dark:bg-darkAccent"
           />
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   );
 };

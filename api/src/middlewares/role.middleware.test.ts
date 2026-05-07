@@ -35,7 +35,10 @@ describe("Role Middleware", () => {
 
   it("should forward ForbiddenError when role is not allowed", async () => {
     mockRequest.user = { id_user: "user-123" };
-    mockUserService.getUserRoleName = jest.fn().mockResolvedValue("student");
+    mockUserService.getUserAccessProfile = jest.fn().mockResolvedValue({
+      role: "student",
+      is_demo_user: false,
+    });
 
     await authorizeRoles("admin")(
       mockRequest as AuthRequest,
@@ -53,7 +56,10 @@ describe("Role Middleware", () => {
 
   it("should call next when role is allowed", async () => {
     mockRequest.user = { id_user: "user-123" };
-    mockUserService.getUserRoleName = jest.fn().mockResolvedValue("admin");
+    mockUserService.getUserAccessProfile = jest.fn().mockResolvedValue({
+      role: "admin",
+      is_demo_user: true,
+    });
 
     await authorizeRoles("admin", "teacher")(
       mockRequest as AuthRequest,
@@ -64,6 +70,7 @@ describe("Role Middleware", () => {
     expect(mockRequest.user).toEqual({
       id_user: "user-123",
       role: "admin",
+      is_demo_user: true,
     });
     expect(nextFunction).toHaveBeenCalledWith();
   });

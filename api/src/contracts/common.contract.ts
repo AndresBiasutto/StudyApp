@@ -14,5 +14,6 @@ export interface BasicUserResponseDto {
   last_name: string;
   e_mail?: string | null;
   image?: string | null;
+  is_demo_user?: boolean;
   Role?: RoleResponseDto | null;
 }

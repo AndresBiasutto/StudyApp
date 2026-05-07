@@ -6,6 +6,18 @@ import { mapUserModelToEntity } from "./mappers/user.mapper";
 const { User, Role, Subject, Grade } = sequelize.models;
 
 class UserRepository {
+  async getUserAccessProfile(id_user: string) {
+    return User.findByPk(id_user, {
+      include: [
+        {
+          model: Role,
+          attributes: ["id_role", "name"],
+        },
+      ],
+      attributes: ["id_user", "is_demo_user"],
+    });
+  }
+
   async getRoleByName(name: string) {
     return Role.findOne({ where: { name } });
   }

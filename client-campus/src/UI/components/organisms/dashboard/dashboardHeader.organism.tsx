@@ -1,23 +1,25 @@
-import { toggleSidebar } from "../../../../store/slices/uiSlice";
-import ButtonRounded from "../../atoms/buttonRounded.atom";
-import { useDispatch } from "react-redux";
-import image from "../../../../assets/monopc.svg";
-import { toggleSettingsMenu } from "../../../../store/slices/uiSlice";
-import { useAppSelector } from "../../../../hooks/UseStore.hook";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { RiMenuFold4Fill } from "react-icons/ri";
+
+import image from "../../../../assets/monopc.svg";
+import { useAppSelector } from "../../../../hooks/UseStore.hook";
+import { toggleSettingsMenu, toggleSidebar } from "../../../../store/slices/uiSlice";
+import ButtonRounded from "../../atoms/buttonRounded.atom";
 import Ptxt from "../../atoms/P.atom";
 import Span from "../../atoms/span.atom";
-import { RiMenuFold4Fill } from "react-icons/ri";
 
 const DashboardHeader = () => {
   const dispatch = useDispatch();
   const { selected, loading, error } = useAppSelector((state) => state.auth);
+
   useEffect(() => {}, [selected]);
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>{error}</p>;
+
   return (
-    <div className="fixed py-2 px-6 transition-all w-full flex items-center justify-between bg-lightSecondary dark:bg-darkSecondary border-b border-lightBorder dark:border-darkBorder z-20">
+    <div className="fixed z-20 flex w-full items-center justify-between border-b border-lightBorder bg-lightSecondary px-6 py-2 transition-all dark:border-darkBorder dark:bg-darkSecondary">
       <ButtonRounded
         btnName="mostrar menu"
         action={() => dispatch(toggleSidebar())}
@@ -25,19 +27,24 @@ const DashboardHeader = () => {
         bgLight="bg-lightAccent"
         bgDark="dark:bg-darkAccent"
       />
-      <div className="w-auto flex flex-row justify-end items-center gap-2">
-        <div className="w-auto flex justify-center items-center gap-1 ">
+      <div className="flex w-auto flex-row items-center justify-end gap-2">
+        <div className="flex w-auto items-center justify-center gap-1">
           <Span text={`${selected?.Role?.name}:`} />
           <Ptxt text={`${selected?.name} ${selected?.last_name}`} />
         </div>
+        {selected?.is_demo_user && (
+          <span className="rounded-full border border-lightBorder bg-lightAccent/20 px-3 py-1 text-xs font-pixelify text-lightText dark:border-darkBorder dark:bg-darkAccent/20 dark:text-darkText">
+            modo demo
+          </span>
+        )}
         <button
-          className="group hover:scale-110 hover:border-lightText dark:hover:border-darkText transition-all duration-200"
+          className="group transition-all duration-200 hover:scale-110 hover:border-lightText dark:hover:border-darkText"
           onClick={() => dispatch(toggleSettingsMenu())}
         >
           <img
             src={selected?.image || image}
             alt="avatar"
-            className="md:w-8 w-12 md:h-8 h-12 rounded-full cursor-pointer border border-lightBorder dark:border-darkBorder"
+            className="h-12 w-12 cursor-pointer rounded-full border border-lightBorder dark:border-darkBorder md:h-8 md:w-8"
           />
         </button>
       </div>

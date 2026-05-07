@@ -31,5 +31,10 @@ export default (sequelize: Sequelize) => {
     },
     contact_number: DataTypes.STRING,
     image: DataTypes.STRING,
+    is_demo_user: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   });
 };

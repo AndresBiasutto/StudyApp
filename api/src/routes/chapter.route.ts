@@ -1,7 +1,11 @@
 import { Router } from "express";
 import chapterController from "../controllers/chapter.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+import {
+  authorizeRoles,
+  authorizeTeacherOrDemoAdmin,
+  forbidDemoUserMutation,
+} from "../middlewares/role.middleware";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
@@ -21,7 +25,7 @@ const router = Router();
 router.post(
   "/",
   authenticateJWT,
-  authorizeRoles("teacher"),
+  authorizeTeacherOrDemoAdmin,
   validate(createChapterSchema),
   ensureTeacherOwnsUnitFromBody(),
   asyncHandler(chapterController.create.bind(chapterController)),
@@ -36,6 +40,7 @@ router.put(
   "/:id/draft",
   authenticateJWT,
   authorizeRoles("teacher"),
+  forbidDemoUserMutation,
   validate(saveChapterDraftSchema),
   ensureTeacherOwnsChapterByParam(),
   asyncHandler(chapterController.saveDraft.bind(chapterController)),
@@ -44,6 +49,7 @@ router.put(
   "/:id/publish",
   authenticateJWT,
   authorizeRoles("teacher"),
+  forbidDemoUserMutation,
   validate(publishChapterSchema),
   ensureTeacherOwnsChapterByParam(),
   asyncHandler(chapterController.publish.bind(chapterController)),
@@ -52,6 +58,7 @@ router.put(
   "/:id",
   authenticateJWT,
   authorizeRoles("teacher"),
+  forbidDemoUserMutation,
   validate(updateChapterSchema),
   ensureTeacherOwnsChapterByParam(),
   asyncHandler(chapterController.update.bind(chapterController)),
@@ -60,6 +67,7 @@ router.delete(
   "/:id",
   authenticateJWT,
   authorizeRoles("teacher"),
+  forbidDemoUserMutation,
   validate(chapterIdParamSchema),
   ensureTeacherOwnsChapterByParam(),
   asyncHandler(chapterController.delete.bind(chapterController)),

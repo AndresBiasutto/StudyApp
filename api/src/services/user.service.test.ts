@@ -136,6 +136,7 @@ describe('UserService', () => {
         last_name: 'Doe',
         e_mail: 'john@test.com',
         image: null,
+        is_demo_user: false,
         Role: { id_role: 'role-1', name: 'student' },
         contact_number: null,
         description: null,
@@ -237,6 +238,7 @@ describe('UserService', () => {
         last_name: 'Smith',
         e_mail: 'john@test.com',
         image: 'https://example.com/avatar.png',
+        is_demo_user: false,
         Role: { id_role: 'role-1', name: 'student' },
         contact_number: '12345678',
         description: 'Perfil actualizado',
@@ -346,6 +348,7 @@ describe('UserService', () => {
         last_name: 'Doe',
         e_mail: 'jane@test.com',
         image: null,
+        is_demo_user: false,
         Role: { id_role: 'role-1', name: 'student' },
         contact_number: null,
       });

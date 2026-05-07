@@ -9,6 +9,7 @@ export interface User{
     contact_number?: string | null;
     description?: string | null;
     image?: string | null;
+    is_demo_user?: boolean;
     Role?: Role | null;
     subjects: Subject[];
     enrolledSubjects: Subject[];

@@ -54,6 +54,11 @@ interface GoogleUserInput {
   image?: string;
 }
 
+interface UserAccessProfile {
+  role: string | null;
+  is_demo_user: boolean;
+}
+
 const extractUserId = (
   value: { id_user?: string; get?: (options: { plain: boolean }) => unknown },
 ): string => {
@@ -410,6 +415,31 @@ class UserService {
 
   async getUserRoleName(id_user: string) {
     return userRepository.getUserRoleName(id_user);
+  }
+
+  async getUserAccessProfile(id_user: string): Promise<UserAccessProfile> {
+    const user = await userRepository.getUserAccessProfile(id_user);
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    const userData =
+      typeof (user as { get?: unknown }).get === "function"
+        ? (user as { get: (options: { plain: boolean }) => unknown }).get({
+            plain: true,
+          })
+        : user;
+
+    const plain = userData as {
+      Role?: { name?: string | null } | null;
+      is_demo_user?: boolean;
+    };
+
+    return {
+      role: plain.Role?.name ?? null,
+      is_demo_user: Boolean(plain.is_demo_user),
+    };
   }
 
   async updateUser(id_user: string, data: Partial<CreateUserInput>) {

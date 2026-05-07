@@ -1,7 +1,10 @@
 import { Router } from "express";
 import subjectController from "../controllers/subject.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+import {
+  authorizeRoles,
+  forbidDemoUserMutation,
+} from "../middlewares/role.middleware";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
@@ -29,6 +32,7 @@ router.put(
   "/:id",
   authenticateJWT,
   authorizeRoles("admin"),
+  forbidDemoUserMutation,
   validate(updateSubjectSchema),
   asyncHandler(subjectController.update.bind(subjectController)),
 );
@@ -36,6 +40,7 @@ router.delete(
   "/:id",
   authenticateJWT,
   authorizeRoles("admin"),
+  forbidDemoUserMutation,
   validate(subjectIdParamSchema),
   asyncHandler(subjectController.delete.bind(subjectController)),
 );

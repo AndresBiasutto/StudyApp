@@ -1,21 +1,19 @@
-import H2 from "../../atoms/h2.atom";
-import H3 from "../../atoms/h3.atom";
-import Span from "../../atoms/span.atom";
-import Ptxt from "../../atoms/P.atom";
-import ButtonSquare from "../../atoms/buttonSquare.atom";
-import { FaRegEdit } from "react-icons/fa";
-import Modal from "../common/modal.organism";
-import { toggleModal } from "../../../../store/slices/uiSlice";
-import { useDispatch } from "react-redux";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../../hooks/UseStore.hook";
 import { useState } from "react";
-import { deleteUser } from "../../../../store/slices/userSlice/user.thunk";
-import Button from "../../atoms/button.atom";
+import { useDispatch } from "react-redux";
+import { FaRegEdit } from "react-icons/fa";
 import { FaUserXmark } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+
+import { useAppDispatch, useAppSelector } from "../../../../hooks/UseStore.hook";
+import { deleteUser } from "../../../../store/slices/userSlice/user.thunk";
+import { toggleModal } from "../../../../store/slices/uiSlice";
+import Button from "../../atoms/button.atom";
+import ButtonSquare from "../../atoms/buttonSquare.atom";
+import H2 from "../../atoms/h2.atom";
+import H3 from "../../atoms/h3.atom";
+import Ptxt from "../../atoms/P.atom";
+import Span from "../../atoms/span.atom";
+import Modal from "../common/modal.organism";
 import UpdateUserRoleForm from "../forms/adminForms/updateUserRoleForm.organism";
 
 const AdminUserDetailAside = () => {
@@ -26,6 +24,9 @@ const AdminUserDetailAside = () => {
     null,
   );
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const { selected } = useAppSelector((state) => state.users);
+  const isDemoUser = useAppSelector((state) => state.auth.selected?.is_demo_user);
+
   const handleConfirmDelete = async () => {
     if (!selected?.id_user) return;
     try {
@@ -60,47 +61,52 @@ const AdminUserDetailAside = () => {
       : modalType === "updateRole"
         ? "Cambiar Rol"
         : "";
-  const { selected } = useAppSelector((state) => state.users);
 
   return (
-    <div className=" w-full md:w-64 md:h-screen p-2 flex flex-col items-center justify-start gap-4 border rounded border-lightBorder dark:border-darkBorder">
-      <img className=" w-32 h-32 rounded-full" src={selected?.image ?? undefined} />
+    <div className="flex w-full flex-col items-center justify-start gap-4 rounded border border-lightBorder p-2 dark:border-darkBorder md:h-screen md:w-64">
+      <img className="h-32 w-32 rounded-full" src={selected?.image ?? undefined} />
       <H2 text={`${selected?.name} ${selected?.last_name}`} />
-      <div className="flex justify-start items-center gap-2">
+      <div className="flex items-center justify-start gap-2">
         <H3 text={`${selected?.Role?.name ?? "-"}`} />
-        <ButtonSquare
-          btnName={"cambiar Rol"}
-          icon={<FaRegEdit />}
-          action={() => handleUpdateRole()}
-          bgLight="bg-lightDetail"
-          bgDark="dark:bg-darkDetail"
-        />
+        {!isDemoUser && (
+          <ButtonSquare
+            btnName={"cambiar Rol"}
+            icon={<FaRegEdit />}
+            action={handleUpdateRole}
+            bgLight="bg-lightDetail"
+            bgDark="dark:bg-darkDetail"
+          />
+        )}
       </div>
-      <div className="w-full flex flex-col justify-start items-center">
-        <div className="w-full flex flex-col justify-center items-start overflow-clip py-2">
+      <div className="flex w-full flex-col items-center justify-start">
+        <div className="flex w-full flex-col items-start justify-center overflow-clip py-2">
           <Span text={"E-mail:"} />
           <Ptxt text={`${selected?.e_mail}`} />
         </div>
-        <div className="w-full flex flex-col justify-center items-start overflow-clip py-2">
+        <div className="flex w-full flex-col items-start justify-center overflow-clip py-2">
           <Span text={"contacto:"} />
           <Ptxt text={`${selected?.contact_number}`} />
         </div>
       </div>
-      <Button
-        btnName={"Eliminar Usuario"}
-        icon={<FaUserXmark />}
-        bgLight="bg-lightWarning"
-        bgDark="dark:bg-darkWarning"
-        action={() => handleDeleteUser()}
-      />
+      {isDemoUser ? (
+        <Ptxt text="La cuenta demo admin solo puede consultar usuarios." />
+      ) : (
+        <Button
+          btnName={"Eliminar Usuario"}
+          icon={<FaUserXmark />}
+          bgLight="bg-lightWarning"
+          bgDark="dark:bg-darkWarning"
+          action={handleDeleteUser}
+        />
+      )}
       {modalType && (
         <Modal text={selectedModalTitle}>
           {modalType === "delete" && (
-            <div className="w-full flex flex-col justify-center items-center gap-4">
+            <div className="flex w-full flex-col items-center justify-center gap-4">
               {!deleteSuccess ? (
                 <>
                   <Ptxt
-                    text={`¿Estás seguro que deseas eliminar a ${selected?.name} ${selected?.last_name}?`}
+                    text={`Estas seguro que deseas eliminar a ${selected?.name} ${selected?.last_name}?`}
                   />
                   <Button
                     btnName={"Eliminar Usuario"}

@@ -5,7 +5,7 @@ import { env } from "../config/env";
 import { UnauthorizedError } from "../utils/errors";
 
 export interface AuthRequest extends Request {
-  user?: { id_user: string; role?: string };
+  user?: { id_user: string; role?: string; is_demo_user?: boolean };
 }
 
 export const authenticateJWT = (

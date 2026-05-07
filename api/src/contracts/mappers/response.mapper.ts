@@ -67,6 +67,7 @@ export const mapBasicUserResponse = (
     last_name: data.last_name,
     e_mail: data.e_mail ?? null,
     image: data.image ?? null,
+    is_demo_user: Boolean(data.is_demo_user),
     Role: mapRoleResponse(data.Role),
   };
 };
