@@ -13,7 +13,7 @@ const REQUIRED_TABLES = [
   "ExamResults",
 ];
 
-const DEFAULT_ROLES = ["student", "teacher", "admin"] as const;
+const DEFAULT_ROLES = ["c-level", "student", "teacher", "admin"] as const;
 const DEFAULT_GRADES = [
   "1º año",
   "2º año",
@@ -28,6 +28,30 @@ const DEFAULT_ADMIN = {
   name: "Andres",
   lastName: "Admin",
 } as const;
+const DEMO_PASSWORD = "demo123456" as const;
+const DEMO_USERS = [
+  {
+    email: "demo.student@monosapiens.app",
+    role: "student",
+    name: "Demo",
+    lastName: "Student",
+    description: "Cuenta demo de alumno para entrevistas",
+  },
+  {
+    email: "demo.teacher@monosapiens.app",
+    role: "teacher",
+    name: "Demo",
+    lastName: "Teacher",
+    description: "Cuenta demo de profesor para entrevistas",
+  },
+  {
+    email: "demo.admin@monosapiens.app",
+    role: "admin",
+    name: "Demo",
+    lastName: "Admin",
+    description: "Cuenta demo administrativa para entrevistas",
+  },
+] as const;
 
 const normalizeTableName = (table: unknown): string | null => {
   if (typeof table === "string") {
@@ -152,10 +176,59 @@ const ensureDefaultGrades = async (): Promise<void> => {
   console.log(`Bootstrap grades created: ${DEFAULT_GRADES.join(", ")}`);
 };
 
+const ensureDemoUsers = async (): Promise<void> => {
+  const { Role, User } = sequelize.models;
+
+  if (!Role || !User) {
+    console.warn("Roles or Users model unavailable for demo bootstrap seeding.");
+    return;
+  }
+
+  const passwordHash = await hashPassword(DEMO_PASSWORD);
+
+  for (const demoUser of DEMO_USERS) {
+    const existingUser = await User.findOne({
+      where: { e_mail: demoUser.email },
+    });
+
+    if (existingUser) {
+      continue;
+    }
+
+    const role = await Role.findOne({ where: { name: demoUser.role } });
+
+    if (!role) {
+      throw new Error(`Missing role for demo user bootstrap: ${demoUser.role}`);
+    }
+
+    const roleData = role.get({ plain: true }) as { id_role?: string };
+
+    if (!roleData.id_role) {
+      throw new Error(`Invalid role ID for demo user bootstrap: ${demoUser.role}`);
+    }
+
+    await User.create({
+      name: demoUser.name,
+      last_name: demoUser.lastName,
+      description: demoUser.description,
+      e_mail: demoUser.email,
+      password: passwordHash,
+      e_mail_verified: true,
+      verification_token: null,
+      provider: "local",
+      is_demo_user: true,
+      id_role: roleData.id_role,
+    });
+
+    console.log(`Bootstrap demo user created: ${demoUser.email}`);
+  }
+};
+
 export const initDb = async (): Promise<void> => {
   await sequelize.authenticate();
   console.log("Database connected");
-  await ensureSchema();
-  await ensureDefaultGrades();
-  await ensureDefaultRolesAndAdmin();
+  // await ensureSchema();
+  // await ensureDefaultGrades();
+  // await ensureDefaultRolesAndAdmin();
+  // await ensureDemoUsers();
 };
