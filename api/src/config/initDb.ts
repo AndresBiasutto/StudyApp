@@ -93,18 +93,32 @@ const ensureSchema = async (): Promise<void> => {
     return;
   }
 
+  if (env.db.syncMode === "init") {
+    if (missingTables.length === 0) {
+      console.log("Database schema already initialized");
+      return;
+    }
+
+    console.warn(
+      `Missing tables detected (${missingTables.join(", ")}). Creating base schema with sequelize.sync().`,
+    );
+    await sequelize.sync();
+    console.log("Base schema created");
+    return;
+  }
+
   if (missingTables.length === 0) {
     console.log(
-      "Automatic schema sync disabled. Apply migrations manually before starting the app.",
+      "Automatic schema sync disabled. Existing schema detected.",
     );
     return;
   }
 
-  console.warn(
-    `Missing tables detected (${missingTables.join(", ")}). Creating base schema with sequelize.sync().`,
+  throw new Error(
+    `Missing tables detected (${missingTables.join(
+      ", ",
+    )}). Set DB_SYNC_MODE=init for a one-time bootstrap or import an existing database before starting the app.`,
   );
-  await sequelize.sync();
-  console.log("Base schema created");
 };
 
 const ensureDefaultRolesAndAdmin = async (): Promise<void> => {
@@ -227,8 +241,8 @@ const ensureDemoUsers = async (): Promise<void> => {
 export const initDb = async (): Promise<void> => {
   await sequelize.authenticate();
   console.log("Database connected");
-  // await ensureSchema();
-  // await ensureDefaultGrades();
-  // await ensureDefaultRolesAndAdmin();
-  // await ensureDemoUsers();
+  await ensureSchema();
+  await ensureDefaultGrades();
+  await ensureDefaultRolesAndAdmin();
+  await ensureDemoUsers();
 };

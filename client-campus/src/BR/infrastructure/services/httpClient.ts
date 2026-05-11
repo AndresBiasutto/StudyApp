@@ -3,10 +3,13 @@ import { store } from "../../../store/store";
 import { logout } from "../../../store/slices/authSlice/auth.slice";
 import type { ApiError } from "../errors/apiError";
 
+const configuredBaseUrl = import.meta.env.VITE_API_URL?.trim();
+const fallbackBaseUrl = import.meta.env.DEV
+  ? "http://localhost:3000/api/"
+  : "/api/";
+
 const httpClient: AxiosInstance = axios.create({
-  baseURL: 
-   import.meta.env.VITE_API_URL ||
-   "http://localhost:3000/api/",
+  baseURL: configuredBaseUrl || fallbackBaseUrl,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

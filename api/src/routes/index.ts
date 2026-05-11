@@ -12,9 +12,9 @@ import examRoutes from "./exam.route";
 import examResultRoutes from "./exam-result.route";
 
 const router = Router();
+router.get("/health", healthCheck);
 router.use("/users", userRoutes);
 router.use("/ai", aiRouter);
-// router.get("/health", healthCheck);
 router.use("/subjects", subjectRoutes);
 router.use("/units", UnitRoutes);
 router.use("/chapters", ChapterRoutes);

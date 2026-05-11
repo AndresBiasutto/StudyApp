@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-type DbSyncMode = "none" | "alter";
+type DbSyncMode = "none" | "init" | "alter";
 type DbSslMode = "disable" | "require";
 
 const requireEnv = (name: string): string => {
@@ -38,11 +38,13 @@ const parseDbSyncMode = (value: string | undefined): DbSyncMode => {
     return "none";
   }
 
-  if (value === "none" || value === "alter") {
+  if (value === "none" || value === "init" || value === "alter") {
     return value;
   }
 
-  throw new Error("Environment variable DB_SYNC_MODE must be 'none' or 'alter'");
+  throw new Error(
+    "Environment variable DB_SYNC_MODE must be 'none', 'init' or 'alter'",
+  );
 };
 
 const parseDbSslMode = (value: string | undefined): DbSslMode => {
@@ -93,6 +95,17 @@ const parseDatabaseUrl = (
   };
 };
 
+const parseCsvList = (value: string | undefined): string[] => {
+  if (!value) {
+    return [];
+  }
+
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
 const port = parseNumber(process.env.PORT, 3000, "PORT");
 const jwtSecret = process.env.SECRET?.trim() || process.env.JWT_SECRET?.trim();
 const databaseConfig = parseDatabaseUrl(
@@ -109,6 +122,7 @@ export const env = {
   nodeEnv: process.env.NODE_ENV?.trim() || "development",
   port,
   appUrl: process.env.APP_URL?.trim() || `http://localhost:${port}`,
+  corsOrigins: parseCsvList(process.env.CORS_ORIGINS),
   jwtSecret,
   openRouterApiKey:
     process.env.OPENROUTER_API_KEY?.trim() ||

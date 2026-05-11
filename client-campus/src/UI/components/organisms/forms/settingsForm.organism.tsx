@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 
 import { validateSettings } from "../../../../BR/domain/services/validators/settings.validator";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/UseStore.hook";
@@ -36,14 +36,6 @@ const SettingsForm = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const previewImage = values.image.trim();
-
-  useEffect(() => {
-    if (!selected) {
-      return;
-    }
-
-    setValues(createInitialState(selected));
-  }, [selected]);
 
   const inputBaseStyles =
     "w-full px-3 py-2 rounded-md bg-lightPrimary dark:bg-darkPrimary " +

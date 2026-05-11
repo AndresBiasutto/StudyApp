@@ -59,6 +59,7 @@ Variables principales:
 - `DB_HOST`
 - `DB_PORT`
 - `DB_SSL_MODE`
+- `CORS_ORIGINS`
 - `PORT`
 - `APP_URL`
 - `SECRET`
@@ -74,7 +75,9 @@ Notas:
 - `OPENROUTER_API_KEY` se usa para la generacion de examenes con IA.
 - El backend acepta `DATABASE_URL`, `EXTERNALDATABASEURL` o `INTERNALDATABASEURL` para proveedores como Render.
 - Si usas Postgres administrado con TLS, configura `DB_SSL_MODE=require`.
-- `DB_SYNC_MODE=none` es el valor recomendado.
+- `CORS_ORIGINS` acepta una lista separada por comas con los origins permitidos.
+- `DB_SYNC_MODE=init` crea schema base solo si faltan tablas. Es ideal para una base vacia.
+- `DB_SYNC_MODE=none` es el valor recomendado para una base ya creada o importada.
 - `DB_SYNC_MODE=alter` existe solo como escape hatch de desarrollo mientras no haya migraciones.
 
 ## Scripts
@@ -199,8 +202,22 @@ Flujo de arranque:
 
 1. Se cargan y validan variables de entorno.
 2. Sequelize autentica la conexion.
-3. El esquema solo se sincroniza si `DB_SYNC_MODE=alter`.
+3. El esquema se crea solo si `DB_SYNC_MODE=init` y faltan tablas.
+4. El esquema se altera solo si `DB_SYNC_MODE=alter`.
+5. Si la base ya existe o fue importada, usa `DB_SYNC_MODE=none`.
 4. Express monta rutas y middlewares globales.
+
+### Migracion a Render o Postgres administrado
+
+Opciones recomendadas:
+
+- Base existente local:
+  exporta con `pg_dump`, importa en la base remota y despliega con `DATABASE_URL`, `DB_SSL_MODE=require` y `DB_SYNC_MODE=none`
+- Base remota vacia:
+  despliega una vez con `DB_SYNC_MODE=init` para crear schema y seeds, y luego vuelve a `DB_SYNC_MODE=none`
+
+Las cuentas demo y la cuenta admin se preservan como parte del bootstrap funcional del proyecto.
+Solo se crean cuando no existen, por lo que no duplican datos si migras una base ya poblada.
 
 Asociaciones importantes:
 

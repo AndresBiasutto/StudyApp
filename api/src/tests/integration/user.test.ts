@@ -136,7 +136,10 @@ describe("User API Integration Tests", () => {
   describe("GET /api/users", () => {
     it("should return all users for admin", async () => {
       (jwt.verify as jest.Mock).mockReturnValue({ id_user: "admin-123" });
-      mockUserService.getUserRoleName.mockResolvedValue("admin");
+      mockUserService.getUserAccessProfile.mockResolvedValue({
+        role: "admin",
+        is_demo_user: false,
+      });
       mockUserService.getAllUsers.mockResolvedValue([
         { id_user: "1", name: "Ana" },
       ] as never);
@@ -155,7 +158,10 @@ describe("User API Integration Tests", () => {
   describe("GET /api/users/allteachers", () => {
     it("should return teachers for admin", async () => {
       (jwt.verify as jest.Mock).mockReturnValue({ id_user: "admin-123" });
-      mockUserService.getUserRoleName.mockResolvedValue("admin");
+      mockUserService.getUserAccessProfile.mockResolvedValue({
+        role: "admin",
+        is_demo_user: false,
+      });
       mockUserService.getAllTeachers.mockResolvedValue([
         { id_user: "teacher-1", name: "Maria" },
       ] as never);
@@ -174,7 +180,10 @@ describe("User API Integration Tests", () => {
   describe("DELETE /api/users/:id_user", () => {
     it("should delete a user for admin", async () => {
       (jwt.verify as jest.Mock).mockReturnValue({ id_user: "admin-123" });
-      mockUserService.getUserRoleName.mockResolvedValue("admin");
+      mockUserService.getUserAccessProfile.mockResolvedValue({
+        role: "admin",
+        is_demo_user: false,
+      });
       mockUserService.deleteUser.mockResolvedValue(true);
 
       const response = await request(app)
