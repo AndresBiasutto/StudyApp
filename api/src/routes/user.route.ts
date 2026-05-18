@@ -3,6 +3,7 @@ import userController from "../controllers/user.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 import {
   authorizeRoles,
+  authorizeNonDemoRoles,
   forbidDemoUserMutation,
 } from "../middlewares/role.middleware";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
@@ -23,7 +24,7 @@ const router = Router();
 router.post(
   "/",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   validate(createUserSchema),
   asyncHandler(userController.createUser.bind(userController)),
 );
@@ -57,32 +58,32 @@ router.get(
 router.get(
   "/allteachers",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   asyncHandler(userController.getAllTeachers.bind(userController)),
 );
 router.get(
   "/allStudents",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   asyncHandler(userController.getAllStudents.bind(userController)),
 );
 router.get(
   "/liData",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   asyncHandler(userController.getAllLiDataUsers.bind(userController)),
 );
 router.get(
   "/liData/:id_user",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   validate(userIdParamSchema),
   asyncHandler(userController.getSelectedUser.bind(userController)),
 );
 router.get(
   "/",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   asyncHandler(userController.getAllUsers.bind(userController)),
 );
 // router.get("/:id_user", userController.getUserById);
@@ -90,7 +91,7 @@ router.get(
 router.put(
   "/updateRole/:id_user",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   forbidDemoUserMutation,
   validate(updateUserRoleSchema),
   asyncHandler(userController.updateUserRole.bind(userController)),
@@ -99,7 +100,7 @@ router.put(
 router.delete(
   "/:id_user",
   authenticateJWT,
-  authorizeRoles("admin"),
+  authorizeNonDemoRoles("admin"),
   forbidDemoUserMutation,
   validate(userIdParamSchema),
   asyncHandler(userController.deleteUser.bind(userController)),

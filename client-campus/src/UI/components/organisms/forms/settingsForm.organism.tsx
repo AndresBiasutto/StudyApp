@@ -1,7 +1,10 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
 import { validateSettings } from "../../../../BR/domain/services/validators/settings.validator";
-import { useAppDispatch, useAppSelector } from "../../../../hooks/UseStore.hook";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../hooks/UseStore.hook";
 import { updateProfile } from "../../../../store/slices/authSlice/auth.thunk";
 import type { SettingsFormData } from "../../../interfaces/settingsForm";
 import Button from "../../atoms/button.atom";
@@ -28,7 +31,9 @@ const createInitialState = (selectedUser: {
 const SettingsForm = () => {
   const dispatch = useAppDispatch();
   const { selected, updatingProfile } = useAppSelector((state) => state.auth);
-
+  const isDemoUser = useAppSelector(
+    (state) => state.auth.selected?.is_demo_user,
+  );
   const [values, setValues] = useState<SettingsFormData>(
     createInitialState(selected ?? {}),
   );
@@ -43,7 +48,8 @@ const SettingsForm = () => {
     "dark:border-darkBorder focus:outline-none focus:ring-2 " +
     "focus:ring-lightAccent dark:focus:ring-darkAccent";
 
-  const errorTextStyles = "mt-1 text-sm text-lightWarning dark:text-darkWarning";
+  const errorTextStyles =
+    "mt-1 text-sm text-lightWarning dark:text-darkWarning";
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
@@ -92,7 +98,9 @@ const SettingsForm = () => {
       );
     }
   };
-
+  const handleDemo = () => {
+    alert("las cuentas demo no pueden modificar su informacion personal");
+  };
   return (
     <form
       onSubmit={handleSubmit}
@@ -109,7 +117,7 @@ const SettingsForm = () => {
           type="text"
           value={values.name}
           onChange={handleChange}
-          className={inputBaseStyles}
+          className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
           error={errors.name}
           errorTextStyles={errorTextStyles}
         />
@@ -120,7 +128,7 @@ const SettingsForm = () => {
           type="text"
           value={values.last_name}
           onChange={handleChange}
-          className={inputBaseStyles}
+          className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
           error={errors.last_name}
           errorTextStyles={errorTextStyles}
         />
@@ -156,7 +164,7 @@ const SettingsForm = () => {
         type="text"
         value={values.contact_number}
         onChange={handleChange}
-        className={inputBaseStyles}
+        className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
         error={errors.contact_number}
         errorTextStyles={errorTextStyles}
       />
@@ -167,7 +175,7 @@ const SettingsForm = () => {
         type="url"
         value={values.image}
         onChange={handleChange}
-        className={inputBaseStyles}
+        className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
         error={errors.image}
         errorTextStyles={errorTextStyles}
       />
@@ -193,7 +201,7 @@ const SettingsForm = () => {
           value={values.description}
           onChange={handleChange}
           rows={5}
-          className="font-sharetech"
+          className={`${"font-sharetech"} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
           placeholder="Contanos algo sobre vos"
           name="description"
         />
@@ -202,20 +210,36 @@ const SettingsForm = () => {
         )}
       </div>
 
-      {submitError && <Ptxt text={submitError} aditionalStyle={errorTextStyles} />}
+      {submitError && (
+        <Ptxt text={submitError} aditionalStyle={errorTextStyles} />
+      )}
       {submitSuccess && (
         <Ptxt
           text={submitSuccess}
           aditionalStyle="mt-2 text-sm text-lightLink dark:text-darkLink"
         />
       )}
-
-      <Button
-        btnName={updatingProfile ? "Guardando..." : "Guardar cambios"}
-        type="submit"
-        bgLight="bg-lightLink"
-        bgDark="dark:bg-darkLink"
-      />
+      {isDemoUser ? (
+        <div
+          onClick={handleDemo}
+          className={`w-full h-12 md:h-auto shadowDN group cursor-pointer rounded flex items-center gap-2 justify-start px-4 text-nowrap py-1 my-4 bg-lightLink dark:bg-darkLink transition-all font-pixelify text-lightText dark:text-darkText`}
+        >
+          Guardar cambios
+        </div>
+      ) : (
+        <Button
+          btnName={updatingProfile ? "Guardando..." : "Guardar cambios"}
+          type="submit"
+          bgLight="bg-lightLink"
+          bgDark="dark:bg-darkLink"
+        />
+      )}
+      {isDemoUser && (
+        <Ptxt
+          text="En modo demo no se puede modificar nada, pero puedes ver cómo funciona la plataforma"
+          aditionalStyle="mt-2 text-sm"
+        />
+      )}
     </form>
   );
 };

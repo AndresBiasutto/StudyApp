@@ -4,7 +4,10 @@ import { FaRegEdit } from "react-icons/fa";
 import { FaUserXmark } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
-import { useAppDispatch, useAppSelector } from "../../../../hooks/UseStore.hook";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../hooks/UseStore.hook";
 import { deleteUser } from "../../../../store/slices/userSlice/user.thunk";
 import { toggleModal } from "../../../../store/slices/uiSlice";
 import Button from "../../atoms/button.atom";
@@ -25,7 +28,9 @@ const AdminUserDetailAside = () => {
   );
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const { selected } = useAppSelector((state) => state.users);
-  const isDemoUser = useAppSelector((state) => state.auth.selected?.is_demo_user);
+  const isDemoUser = useAppSelector(
+    (state) => state.auth.selected?.is_demo_user,
+  );
 
   const handleConfirmDelete = async () => {
     if (!selected?.id_user) return;
@@ -49,7 +54,9 @@ const AdminUserDetailAside = () => {
     dispatch(toggleModal());
     setModalType("delete");
   };
-
+  const handleDemoUser = () => {
+    alert("las cuentas demo no pueden modificar datos de usuarios");
+  };
   const handleUpdateRole = () => {
     dispatch(toggleModal());
     setModalType("updateRole");
@@ -64,11 +71,22 @@ const AdminUserDetailAside = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-start gap-4 rounded border border-lightBorder p-2 dark:border-darkBorder md:h-screen md:w-64">
-      <img className="h-32 w-32 rounded-full" src={selected?.image ?? undefined} />
+      <img
+        className="h-32 w-32 rounded-full"
+        src={selected?.image ?? undefined}
+      />
       <H2 text={`${selected?.name} ${selected?.last_name}`} />
       <div className="flex items-center justify-start gap-2">
         <H3 text={`${selected?.Role?.name ?? "-"}`} />
-        {!isDemoUser && (
+        {isDemoUser ? (
+          <ButtonSquare
+            btnName={"cambiar Rol"}
+            icon={<FaRegEdit />}
+            action={handleDemoUser}
+            bgLight="bg-lightDetail"
+            bgDark="dark:bg-darkDetail"
+          />
+        ) : (
           <ButtonSquare
             btnName={"cambiar Rol"}
             icon={<FaRegEdit />}
@@ -89,7 +107,13 @@ const AdminUserDetailAside = () => {
         </div>
       </div>
       {isDemoUser ? (
-        <Ptxt text="La cuenta demo admin solo puede consultar usuarios." />
+        <Button
+          btnName={"Eliminar Usuario"}
+          icon={<FaUserXmark />}
+          bgLight="bg-lightWarning"
+          bgDark="dark:bg-darkWarning"
+          action={handleDemoUser}
+        />
       ) : (
         <Button
           btnName={"Eliminar Usuario"}

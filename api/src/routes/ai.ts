@@ -2,6 +2,8 @@ import { Router } from "express";
 
 import aiController from "../controllers/ai.controller";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
+import { authenticateJWT } from "../middlewares/auth.middleware";
+import { authorizeRoles } from "../middlewares/role.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import { chapterExamParamSchema } from "../validators/ai.validator";
 
@@ -9,12 +11,16 @@ export const aiRouter = Router();
 
 aiRouter.get(
   "/multiple-choice/:id_chapter",
+  authenticateJWT,
+  authorizeRoles("teacher"),
   validate(chapterExamParamSchema),
   asyncHandler(aiController.getQuiz.bind(aiController)),
 );
 
 aiRouter.get(
   "/multiple-choise/:id_chapter",
+  authenticateJWT,
+  authorizeRoles("teacher"),
   validate(chapterExamParamSchema),
   asyncHandler(aiController.getQuiz.bind(aiController)),
 );

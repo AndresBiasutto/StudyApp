@@ -10,7 +10,6 @@ import { generateChapterExam } from "../../../store/slices/examSlice/exam.thunk"
 import { openModal, setModalContent } from "../../../store/slices/uiSlice";
 import Button from "../../components/atoms/button.atom";
 import EditorCard from "../../components/atoms/editorCard.atom";
-import Ptxt from "../../components/atoms/P.atom";
 import Content from "../../components/molecules/content.molecule";
 import Spinner from "../../components/molecules/spinner.molecule";
 import ChapterBasicInfo from "../../components/organisms/teacher/chapterEditor/chapterBasicInfo.organism";
@@ -26,7 +25,6 @@ const TeacherChapterEditorForm: React.FC<TeacherChapterEditorFormProps> = ({
   chapter,
 }) => {
   const dispatch = useAppDispatch();
-  const isDemoUser = useAppSelector((state) => state.auth.selected?.is_demo_user);
   const editorRef = useRef<HTMLDivElement>(null);
   const [chapterTitle, setChapterTitle] = useState(chapter.name ?? "");
   const [summary, setSummary] = useState(chapter.description ?? "");
@@ -121,11 +119,7 @@ const TeacherChapterEditorForm: React.FC<TeacherChapterEditorFormProps> = ({
         setLinks={setLinks}
       />
 
-      {isDemoUser ? (
-        <EditorCard>
-          <Ptxt text="La cuenta demo puede revisar este capitulo, pero no modificar contenido existente." />
-        </EditorCard>
-      ) : (
+
         <>
           <EditorCard>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -156,7 +150,6 @@ const TeacherChapterEditorForm: React.FC<TeacherChapterEditorFormProps> = ({
             />
           </EditorCard>
         </>
-      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { MdDeleteOutline, MdModeEdit } from "react-icons/md";
@@ -18,8 +17,9 @@ interface SubjectUlProps {
 
 const SubjectUl: React.FC<SubjectUlProps> = ({ item }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const isDemoUser = useAppSelector((state) => state.auth.selected?.is_demo_user);
+  const isDemoUser = useAppSelector(
+    (state) => state.auth.selected?.is_demo_user,
+  );
 
   const handleDeleteSubject = () => {
     dispatch(toggleModal());
@@ -65,41 +65,61 @@ const SubjectUl: React.FC<SubjectUlProps> = ({ item }) => {
     );
   };
 
-  const handleManageContent = () => {
-    navigate(`/dashboard/teacher/subject/${item.id_subject}`);
+  const handleDemo = () => {
+    alert("las cuentas demo no pueden modificar las materias exitentes");
   };
 
   return (
     <li className="w-full flex-col items-center justify-start gap-2 rounded bg-lightDetail p-2 dark:bg-darkDetail">
-      {!isDemoUser && (
-        <div className="flex w-full items-center justify-end gap-2">
-          <ButtonSquare
-            btnName={"editar materia"}
-            bgLight="bg-lightLink"
-            bgDark="dark:bg-darkLink"
-            icon={<MdModeEdit />}
-            action={handleEditSubject}
-          />
-          <ButtonSquare
-            btnName={"eliminar materia"}
-            bgLight="bg-lightWarning"
-            bgDark="dark:bg-darkWarning"
-            icon={<MdDeleteOutline />}
-            action={handleDeleteSubject}
-          />
-        </div>
-      )}
+      <div className="flex w-full items-center justify-end gap-2">
+        {isDemoUser ? (
+          <div className="flex w-full items-center justify-end gap-2">
+            <ButtonSquare
+              btnName={"editar materia"}
+              bgLight="bg-lightLink"
+              bgDark="dark:bg-darkLink"
+              icon={<MdModeEdit />}
+              action={handleDemo}
+            />
+            <ButtonSquare
+              btnName={"eliminar materia"}
+              bgLight="bg-lightWarning"
+              bgDark="dark:bg-darkWarning"
+              icon={<MdDeleteOutline />}
+              action={handleDemo}
+            />
+          </div>
+        ) : (
+          <div className="flex w-full items-center justify-end gap-2">
+            <ButtonSquare
+              btnName={"editar materia"}
+              bgLight="bg-lightLink"
+              bgDark="dark:bg-darkLink"
+              icon={<MdModeEdit />}
+              action={handleEditSubject}
+            />
+            <ButtonSquare
+              btnName={"eliminar materia"}
+              bgLight="bg-lightWarning"
+              bgDark="dark:bg-darkWarning"
+              icon={<MdDeleteOutline />}
+              action={handleDeleteSubject}
+            />
+          </div>
+        )}
+      </div>
+
       <div className="flex items-end justify-start gap-2">
         <div className="flex w-1/2 flex-col items-start justify-end gap-2 rounded">
           <Ptxt text={item.Grade?.name || "sin ano"} />
           <H3 text={item.name} />
           {isDemoUser ? (
             <Button
-              btnName={"gestionar contenido"}
+              btnName={"asignar estudiantes"}
               bgLight="bg-lightAccent"
               bgDark="dark:bg-darkAccent"
               icon={<PiUsersFourBold />}
-              action={handleManageContent}
+              action={handleDemo}
             />
           ) : (
             <Button
@@ -113,7 +133,15 @@ const SubjectUl: React.FC<SubjectUlProps> = ({ item }) => {
         </div>
         <div className="flex w-1/2 flex-col items-end justify-end gap-2">
           <Ptxt text={item?.creator?.name || "no hay un profesor asignado"} />
-          {!isDemoUser && (
+          {isDemoUser ? (
+            <Button
+              btnName={"asignar Profesor"}
+              bgLight="bg-lightAccent"
+              bgDark="dark:bg-darkAccent"
+              icon={<LiaChalkboardTeacherSolid />}
+              action={handleDemo}
+            />
+          ) : (
             <Button
               btnName={"asignar Profesor"}
               bgLight="bg-lightAccent"
@@ -124,12 +152,7 @@ const SubjectUl: React.FC<SubjectUlProps> = ({ item }) => {
           )}
         </div>
       </div>
-      {isDemoUser && (
-        <Ptxt
-          text="En modo demo solo se permite crear contenido nuevo."
-          aditionalStyle="mt-2 text-sm"
-        />
-      )}
+
     </li>
   );
 };

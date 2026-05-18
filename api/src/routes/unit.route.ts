@@ -3,7 +3,6 @@ import unitController from "../controllers/unit.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 import {
   authorizeRoles,
-  authorizeTeacherOrDemoAdmin,
   forbidDemoUserMutation,
 } from "../middlewares/role.middleware";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
@@ -23,7 +22,7 @@ const router = Router();
 router.post(
   "/",
   authenticateJWT,
-  authorizeTeacherOrDemoAdmin,
+  authorizeRoles("teacher"),
   validate(createUnitSchema),
   ensureTeacherOwnsSubjectFromBody(),
   asyncHandler(unitController.create.bind(unitController)),

@@ -1,18 +1,18 @@
 // import SearchBar from "../../components/molecules/searchBar.molecule";
 import LiHeader from "../../components/molecules/cards/liHeader.molecule";
 import LiItem from "../../components/molecules/cards/liItem.molecule";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../hooks/UseStore.hook";
+import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
 import { useEffect } from "react";
 import { fetchListedUsers } from "../../../store/slices/userSlice/user.thunk";
 import { userToLiItem } from "../../../BR/application/mappers/userToLiItem.mapper";
 import Spinner from "../../components/molecules/spinner.molecule";
 import Content from "../../components/molecules/content.molecule";
+import Ptxt from "../../components/atoms/P.atom";
 
 const AdminUsersTab = () => {
-  
+  const isDemoUser = useAppSelector(
+    (state) => state.auth.selected?.is_demo_user,
+  );
   const appDispatch = useAppDispatch();
   const { items, loadingList, error } = useAppSelector((state) => state.users);
   useEffect(() => {
@@ -35,8 +35,13 @@ const AdminUsersTab = () => {
           ))}
         </ul>
       </div>
+      {isDemoUser && (
+        <Ptxt
+          text="En modo demo no se puede modificar nada, pero puedes ver cómo funciona la plataforma"
+          aditionalStyle="mt-2 text-sm"
+        />
+      )}
     </Content>
-
   );
 };
 

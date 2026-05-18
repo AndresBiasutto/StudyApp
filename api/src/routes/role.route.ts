@@ -1,6 +1,8 @@
 import { Router } from "express";
 import roleController from "../controllers/role.controller";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
+import { authenticateJWT } from "../middlewares/auth.middleware";
+import { authorizeNonDemoRoles } from "../middlewares/role.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
   createRoleSchema,
@@ -12,6 +14,8 @@ const router = Router();
 
 router.post(
   "/",
+  authenticateJWT,
+  authorizeNonDemoRoles("admin"),
   validate(createRoleSchema),
   asyncHandler(roleController.create.bind(roleController)),
 );
@@ -23,11 +27,15 @@ router.get(
 );
 router.put(
   "/:id",
+  authenticateJWT,
+  authorizeNonDemoRoles("admin"),
   validate(updateRoleSchema),
   asyncHandler(roleController.update.bind(roleController)),
 );
 router.delete(
   "/:id",
+  authenticateJWT,
+  authorizeNonDemoRoles("admin"),
   validate(roleIdParamSchema),
   asyncHandler(roleController.delete.bind(roleController)),
 );

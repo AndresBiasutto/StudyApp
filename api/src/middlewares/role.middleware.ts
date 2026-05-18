@@ -36,6 +36,39 @@ export const authorizeRoles =
     }
   };
 
+export const authorizeNonDemoRoles =
+  (...allowedRoles: string[]) =>
+  async (req: AuthRequest, _res: Response, next: NextFunction) => {
+    try {
+      const id_user = req.user?.id_user;
+
+      if (!id_user) {
+        return next(new UnauthorizedError("No autorizado"));
+      }
+
+      const accessProfile = await userService.getUserAccessProfile(id_user);
+      const roleName = accessProfile.role;
+
+      if (!roleName) {
+        return next(new ForbiddenError("Rol no autorizado"));
+      }
+
+      if (!allowedRoles.includes(roleName) || accessProfile.is_demo_user) {
+        return next(new ForbiddenError("Acceso denegado"));
+      }
+
+      req.user = {
+        id_user,
+        role: roleName,
+        is_demo_user: accessProfile.is_demo_user,
+      };
+
+      return next();
+    } catch (err) {
+      return next(err);
+    }
+  };
+
 export const authorizeTeacherOrDemoAdmin = async (
   req: AuthRequest,
   _res: Response,
@@ -89,7 +122,7 @@ export const forbidDemoUserMutation = async (
       is_demo_user: accessProfile.is_demo_user,
     };
 
-    if (accessProfile.is_demo_user) {
+    if (accessProfile.role === "admin" && accessProfile.is_demo_user) {
       return next(
         new ForbiddenError(
           "Esta accion no esta disponible en la cuenta demo",

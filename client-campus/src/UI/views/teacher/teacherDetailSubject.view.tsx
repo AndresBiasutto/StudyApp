@@ -9,12 +9,16 @@ import { useAppDispatch, useAppSelector } from "../../../hooks/UseStore.hook";
 import { useEffect } from "react";
 import { fetchSubjectById } from "../../../store/slices/subjectSlice/subject.thunk";
 import Spinner from "../../components/molecules/spinner.molecule";
+import Ptxt from "../../components/atoms/P.atom";
 
 const TeacherDetailSubject = () => {
   const { id_subject } = useParams();
   const appDispatch = useAppDispatch();
   const { selected, loadingSelected, error } = useAppSelector(
     (state) => state.subjects,
+  );
+  const isDemoUser = useAppSelector(
+    (state) => state.auth.selected?.is_demo_user,
   );
   const dispatch = useDispatch();
   const handleCreateUnit = () => {
@@ -61,6 +65,12 @@ const TeacherDetailSubject = () => {
           bgDark="dark:bg-darkAccent"
         />
       </div>
+      {isDemoUser && (
+        <Ptxt
+          text="En modo demo"
+          aditionalStyle="mt-2 text-sm"
+        />
+      )}
     </div>
   );
 };

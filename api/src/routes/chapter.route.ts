@@ -3,7 +3,6 @@ import chapterController from "../controllers/chapter.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 import {
   authorizeRoles,
-  authorizeTeacherOrDemoAdmin,
   forbidDemoUserMutation,
 } from "../middlewares/role.middleware";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
@@ -25,7 +24,7 @@ const router = Router();
 router.post(
   "/",
   authenticateJWT,
-  authorizeTeacherOrDemoAdmin,
+  authorizeRoles("teacher"),
   validate(createChapterSchema),
   ensureTeacherOwnsUnitFromBody(),
   asyncHandler(chapterController.create.bind(chapterController)),

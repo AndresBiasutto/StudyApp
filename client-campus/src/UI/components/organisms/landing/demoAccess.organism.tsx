@@ -3,13 +3,16 @@ import { FaChalkboardTeacher } from "react-icons/fa";
 import { RiAdminLine } from "react-icons/ri";
 import { TbSchool } from "react-icons/tb";
 
-import { useAppDispatch, useAppSelector } from "../../../../hooks/UseStore.hook";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../hooks/UseStore.hook";
 import { loginWithCredentials } from "../../../../store/slices/authSlice/auth.thunk";
 import type { DemoAccount } from "../../../interfaces/demoAccount";
-import Button from "../../atoms/button.atom";
+// import Button from "../../atoms/button.atom";
 import H2 from "../../atoms/h2.atom";
 import Ptxt from "../../atoms/P.atom";
-import Span from "../../atoms/span.atom";
+import ButtonRounded from "../../atoms/buttonRounded.atom";
 
 const demoAccounts: DemoAccount[] = [
   {
@@ -17,7 +20,8 @@ const demoAccounts: DemoAccount[] = [
     title: "Alumno demo",
     email: "demo.student@monosapiens.app",
     password: "demo123456",
-    description: "Recorre materias, capitulos publicados y experiencia de examen.",
+    description:
+      "Recorre materias, capitulos publicados y experiencia de examen.",
     highlights: [
       "Materias ya asignadas",
       "Capitulos con contenido cargado",
@@ -86,7 +90,9 @@ const roleMeta: Record<
 const DemoAccess = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.auth);
-  const [activeRole, setActiveRole] = useState<DemoAccount["role"] | null>(null);
+  const [activeRole, setActiveRole] = useState<DemoAccount["role"] | null>(
+    null,
+  );
 
   const handleDemoLogin = async (account: DemoAccount) => {
     setActiveRole(account.role);
@@ -104,13 +110,10 @@ const DemoAccess = () => {
   };
 
   return (
-    <section className="w-full rounded-md border border-lightBorder bg-lightSecondary p-6 shadow-md dark:border-darkBorder dark:bg-darkSecondary">
+    <section className="w-full h-full rounded-md border border-lightBorder bg-lightSecondary p-6 shadow-md dark:border-darkBorder dark:bg-darkSecondary">
       <div className="mb-6 text-center">
         <H2 text="Acceso demo" />
-        <Ptxt
-          text="Mostra la plataforma en entrevistas con cuentas listas para alumno, profesor y admin."
-          aditionalStyle="mt-2"
-        />
+        <Ptxt text="Visita la plataforma en modo demo" aditionalStyle="mt-2" />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
@@ -123,20 +126,30 @@ const DemoAccess = () => {
               className="flex h-full flex-col rounded-md border border-lightBorder bg-lightPrimary p-5 dark:border-darkBorder dark:bg-darkPrimary"
             >
               <div className="mb-4 flex items-center gap-3">
-                <div
-                  className={`flex h-11 w-11 items-center justify-center rounded-full text-xl text-lightText dark:text-darkText ${meta.chipLight} ${meta.chipDark}`}
-                >
-                  {meta.icon}
-                </div>
                 <div>
+                  <div className="w-full flex items-center justify-between">
                   <h3 className="font-pixelify text-lg text-lightText dark:text-darkText">
                     {account.title}
                   </h3>
+                  <ButtonRounded
+                    btnName={
+                      loading && activeRole === account.role
+                        ? "Ingresando..."
+                        : `Entrar como ${account.title.toLowerCase()}`
+                    }
+                    action={() => handleDemoLogin(account)}
+                    bgLight={meta.bgLight}
+                    bgDark={meta.bgDark}
+                    icon={meta.icon}
+                    type="button"
+                  />                    
+                  </div>
+
                   <Ptxt text={account.description} aditionalStyle="text-sm" />
                 </div>
               </div>
 
-              <div className="mb-4 space-y-2 rounded-md border border-lightBorder/60 bg-lightSecondary/70 p-3 dark:border-darkBorder/60 dark:bg-darkSecondary/70">
+              {/* <div className="mb-4 space-y-2 rounded-md border border-lightBorder/60 bg-lightSecondary/70 p-3 dark:border-darkBorder/60 dark:bg-darkSecondary/70">
                 <div>
                   <Span text="Email" />
                   <Ptxt text={account.email} aditionalStyle="break-all text-sm" />
@@ -145,9 +158,9 @@ const DemoAccess = () => {
                   <Span text="Password" />
                   <Ptxt text={account.password} aditionalStyle="text-sm" />
                 </div>
-              </div>
+              </div> */}
 
-              <div className="mb-4 flex-1">
+              {/* <div className="mb-4 flex-1">
                 <Span text="Que puede probar" />
                 <ul className="mt-2 space-y-2">
                   {account.highlights.map((highlight) => (
@@ -159,9 +172,9 @@ const DemoAccess = () => {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </div> */}
 
-              <Button
+              {/* <Button
                 btnName={
                   loading && activeRole === account.role
                     ? "Ingresando..."
@@ -171,7 +184,7 @@ const DemoAccess = () => {
                 bgLight={meta.bgLight}
                 bgDark={meta.bgDark}
                 type="button"
-              />
+              /> */}
             </article>
           );
         })}

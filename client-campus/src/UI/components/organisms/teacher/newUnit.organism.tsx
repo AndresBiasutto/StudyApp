@@ -9,7 +9,6 @@ import {
 } from "react-icons/fa";
 import { SiBookstack } from "react-icons/si";
 
-import { useAppSelector } from "../../../../hooks/UseStore.hook";
 import { setModalContent, toggleModal } from "../../../../store/slices/uiSlice";
 import type { creatorCard } from "../../../interfaces/creatorCard";
 import Button from "../../atoms/button.atom";
@@ -27,7 +26,7 @@ const NewUnit: React.FC<creatorCard> = ({
 }) => {
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
-  const isDemoUser = useAppSelector((state) => state.auth.selected?.is_demo_user);
+
 
   const handleCreateChapter = () => {
     dispatch(toggleModal());
@@ -77,24 +76,23 @@ const NewUnit: React.FC<creatorCard> = ({
           order={unitOrder}
           icon={<SiBookstack />}
         />
-        {!isDemoUser && (
-          <div className="flex gap-2">
-            <ButtonSquare
-              btnName="editar unidad"
-              action={handleEditUnit}
-              icon={<FaRegEdit />}
-              bgLight="bg-lightAccent"
-              bgDark="dark:bg-darkAccent"
-            />
-            <ButtonSquare
-              btnName="eliminar unidad"
-              action={handleDeleteUnit}
-              icon={<FaRegTrashAlt />}
-              bgLight="bg-lightAccent"
-              bgDark="dark:bg-darkAccent"
-            />
-          </div>
-        )}
+
+        <div className="flex gap-2">
+          <ButtonSquare
+            btnName="editar unidad"
+            action={handleEditUnit}
+            icon={<FaRegEdit />}
+            bgLight="bg-lightAccent"
+            bgDark="dark:bg-darkAccent"
+          />
+          <ButtonSquare
+            btnName="eliminar unidad"
+            action={handleDeleteUnit}
+            icon={<FaRegTrashAlt />}
+            bgLight="bg-lightAccent"
+            bgDark="dark:bg-darkAccent"
+          />
+        </div>
       </div>
 
       <div className="flex w-full items-center justify-center">
