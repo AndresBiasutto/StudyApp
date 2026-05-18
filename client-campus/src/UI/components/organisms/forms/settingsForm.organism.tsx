@@ -116,7 +116,7 @@ const SettingsForm = () => {
           name="name"
           type="text"
           value={values.name}
-          onChange={handleChange}
+          onChange={isDemoUser? () => undefined : handleChange}
           className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
           error={errors.name}
           errorTextStyles={errorTextStyles}
@@ -127,7 +127,7 @@ const SettingsForm = () => {
           name="last_name"
           type="text"
           value={values.last_name}
-          onChange={handleChange}
+          onChange={isDemoUser? () => undefined : handleChange}
           className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
           error={errors.last_name}
           errorTextStyles={errorTextStyles}
@@ -163,10 +163,11 @@ const SettingsForm = () => {
         name="contact_number"
         type="text"
         value={values.contact_number}
-        onChange={handleChange}
+        onChange={isDemoUser? () => undefined : handleChange}
         className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
         error={errors.contact_number}
         errorTextStyles={errorTextStyles}
+        
       />
 
       <FormInput
@@ -174,7 +175,7 @@ const SettingsForm = () => {
         name="image"
         type="url"
         value={values.image}
-        onChange={handleChange}
+        onChange={isDemoUser? () => undefined : handleChange}
         className={`${inputBaseStyles} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
         error={errors.image}
         errorTextStyles={errorTextStyles}
@@ -199,7 +200,7 @@ const SettingsForm = () => {
         <Label text="Descripcion" />
         <Textarea
           value={values.description}
-          onChange={handleChange}
+          onChange={isDemoUser? () => undefined : handleChange}
           rows={5}
           className={`${"font-sharetech"} ${isDemoUser && "opacity-70 cursor-not-allowed"} `}
           placeholder="Contanos algo sobre vos"
