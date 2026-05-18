@@ -10,9 +10,9 @@ const Dashboard = () => {
     const { sidebarOpen } = useAppSelector((state: RootState) => state.ui);
   
   return (
-    <div className="flex flex-row items-start justify-start">
+    <div className="flex flex-row items-start justify-start h-full">
       <SidebarMenu />
-      <div className=" bg-lightPrimary dark:bg-darkPrimary flex flex-col justify-start items-center w-full min-h-screen overflow-y-auto">
+      <div className=" bg-lightPrimary dark:bg-darkPrimary flex flex-col justify-start items-center w-full min-h-screen overflow-y-clip">
         <DashboardHeader />
         <FormInModal />
         <div className={`min-h-screen w-full md:w-2/3 transition-all mt-12 ${sidebarOpen ? "md:ml-64" : "md:ml-0"}`}>
