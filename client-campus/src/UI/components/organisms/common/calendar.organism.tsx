@@ -1,10 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FiCalendar,
   FiChevronLeft,
   FiChevronRight,
   FiClock,
 } from "react-icons/fi";
+
+import { useAppDispatch } from "../../../../hooks/UseStore.hook";
+import { openModal, setModalContent } from "../../../../store/slices/uiSlice";
+import {
+  CALENDAR_EVENTS_UPDATED,
+  getCalendarEventStore,
+  getCalendarEventTitles,
+} from "./calendar-events.storage";
 
 type CalendarView = "day" | "week" | "month" | "year";
 
@@ -90,6 +98,19 @@ const toIsoDate = (date: Date): string => {
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
   const day = `${date.getDate()}`.padStart(2, "0");
   return `${year}-${month}-${day}`;
+};
+
+const mergeEventMaps = (
+  baseMap: CalendarEventMap,
+  persistedMap: CalendarEventMap,
+): CalendarEventMap => {
+  const mergedMap: CalendarEventMap = { ...baseMap };
+
+  Object.entries(persistedMap).forEach(([date, events]) => {
+    mergedMap[date] = [...(mergedMap[date] ?? []), ...events];
+  });
+
+  return mergedMap;
 };
 
 const getMonthGridStart = (date: Date): Date => {
@@ -237,10 +258,33 @@ const getDaySlotEvents = (slot: string, events: string[]) =>
   );
 
 export default function Calendar() {
+  const dispatch = useAppDispatch();
   const today = useMemo(() => startOfDay(new Date()), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedView, setSelectedView] = useState<CalendarView>("month");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [storedEvents, setStoredEvents] = useState<CalendarEventMap>(() =>
+    getCalendarEventTitles(),
+  );
+
+  useEffect(() => {
+    const updateStoredEvents = () => {
+      setStoredEvents(getCalendarEventTitles());
+    };
+
+    window.addEventListener(CALENDAR_EVENTS_UPDATED, updateStoredEvents);
+    window.addEventListener("storage", updateStoredEvents);
+
+    return () => {
+      window.removeEventListener(CALENDAR_EVENTS_UPDATED, updateStoredEvents);
+      window.removeEventListener("storage", updateStoredEvents);
+    };
+  }, []);
+
+  const mergedEvents = useMemo(
+    () => mergeEventMaps(SAMPLE_EVENTS, storedEvents),
+    [storedEvents],
+  );
 
   const visibleReferenceDate = useMemo(() => {
     switch (selectedView) {
@@ -256,23 +300,39 @@ export default function Calendar() {
   }, [selectedDate, selectedView]);
 
   const monthCells = useMemo(
-    () => buildMonthCells(visibleReferenceDate, selectedDate, SAMPLE_EVENTS),
-    [selectedDate, visibleReferenceDate],
+    () => buildMonthCells(visibleReferenceDate, selectedDate, mergedEvents),
+    [mergedEvents, selectedDate, visibleReferenceDate],
   );
 
   const weekDays = useMemo(
-    () => buildWeekDays(selectedDate, SAMPLE_EVENTS),
-    [selectedDate],
+    () => buildWeekDays(selectedDate, mergedEvents),
+    [mergedEvents, selectedDate],
   );
 
   const yearSummary = useMemo(
-    () => buildYearSummary(visibleReferenceDate, today, SAMPLE_EVENTS),
-    [today, visibleReferenceDate],
+    () => buildYearSummary(visibleReferenceDate, today, mergedEvents),
+    [mergedEvents, today, visibleReferenceDate],
   );
 
-  const selectedEvents = SAMPLE_EVENTS[toIsoDate(selectedDate)] ?? [];
+  const selectedEvents = mergedEvents[toIsoDate(selectedDate)] ?? [];
   const selectedDateLabel = formatSelectedDate(selectedDate);
   const headerTitle = getHeaderTitle(selectedView, visibleReferenceDate);
+  const selectedDateDescriptions = getCalendarEventStore()[toIsoDate(selectedDate)] ?? [];
+
+  const openCalendarModal = (isoDate: string) => {
+    const [year, month, day] = isoDate.split("-").map(Number);
+    const nextDate = new Date(year, month - 1, day);
+
+    setSelectedDate(nextDate);
+    dispatch(
+      setModalContent({
+        type: "CALENDAR_EVENT",
+        data: { selectedDate: isoDate },
+        title: "Nuevo evento de calendario",
+      }),
+    );
+    dispatch(openModal());
+  };
 
   const handleGoToToday = () => {
     setSelectedDate(today);
@@ -299,11 +359,6 @@ export default function Calendar() {
     setMenuOpen(false);
   };
 
-  const handleSelectDate = (isoDate: string) => {
-    const [year, month, day] = isoDate.split("-").map(Number);
-    setSelectedDate(new Date(year, month - 1, day));
-  };
-
   const renderMonthView = () => (
     <div className="overflow-hidden h-full rounded-2xl border border-lightBorder bg-lightPrimary shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
       <div className="grid grid-cols-7 border-b border-lightBorder bg-lightDetail/40 dark:border-darkBorder dark:bg-darkAccent/15">
@@ -322,7 +377,7 @@ export default function Calendar() {
           <button
             key={cell.isoDate}
             type="button"
-            onClick={() => handleSelectDate(cell.isoDate)}
+            onClick={() => openCalendarModal(cell.isoDate)}
             className={`min-h-32 px-3 py-3 text-left transition ${
               cell.isCurrentMonth
                 ? "bg-lightPrimary hover:bg-lightDetail/25 dark:bg-darkPrimary dark:hover:bg-darkAccent/20"
@@ -366,7 +421,7 @@ export default function Calendar() {
           <button
             key={cell.isoDate}
             type="button"
-            onClick={() => handleSelectDate(cell.isoDate)}
+            onClick={() => openCalendarModal(cell.isoDate)}
             className={`flex h-16 flex-col px-2 py-2 transition ${
               cell.isCurrentMonth
                 ? "bg-lightPrimary hover:bg-lightDetail/25 dark:bg-darkPrimary dark:hover:bg-darkAccent/20"
@@ -406,7 +461,7 @@ export default function Calendar() {
           <button
             key={day.isoDate}
             type="button"
-            onClick={() => handleSelectDate(day.isoDate)}
+            onClick={() => openCalendarModal(day.isoDate)}
             className={`rounded-xl px-2 py-3 text-center transition ${
               day.isSelected
                 ? "bg-lightLink text-lightPrimary dark:bg-darkLink dark:text-darkPrimary"
@@ -428,9 +483,11 @@ export default function Calendar() {
 
       <div className="grid gap-3 p-4 lg:grid-cols-7">
         {weekDays.map((day) => (
-          <div
+          <button
             key={day.isoDate}
-            className={`rounded-2xl border p-3 ${
+            type="button"
+            onClick={() => openCalendarModal(day.isoDate)}
+            className={`rounded-2xl border p-3 text-left ${
               day.isSelected
                 ? "border-lightLink bg-lightLink/10 dark:border-darkLink dark:bg-darkLink/10"
                 : "border-lightBorder bg-lightSecondary/20 dark:border-darkBorder dark:bg-darkSecondary/20"
@@ -456,69 +513,69 @@ export default function Calendar() {
                 Sin eventos.
               </p>
             )}
-          </div>
+          </button>
         ))}
       </div>
     </div>
   );
 
-  const renderDayView = () => {
-    return (
-      <div className="overflow-hidden rounded-2xl border border-lightBorder bg-lightPrimary shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
-        <div className="border-b border-lightBorder px-5 py-4 dark:border-darkBorder">
-          <p className="font-sharetech text-xs uppercase tracking-[0.18em] text-lightText/70 dark:text-darkText/70">
-            Jornada seleccionada
-          </p>
-          <h4 className="mt-1 font-pixelify text-2xl text-lightText dark:text-darkText">
-            {formatDayTitle(selectedDate)}
-          </h4>
-        </div>
-
-        <div className="divide-y divide-lightBorder dark:divide-darkBorder">
-          {DAY_SLOTS.map((slot) => {
-            const slotEvents = getDaySlotEvents(slot, selectedEvents);
-
-            return (
-              <div
-                key={slot}
-                className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-4 px-4 py-4"
-              >
-                <div className="flex items-start gap-2">
-                  <FiClock className="mt-0.5 text-lightLink dark:text-darkLink" />
-                  <span className="font-sharetech text-sm text-lightText dark:text-darkText">
-                    {slot}
-                  </span>
-                </div>
-
-                <div>
-                  {slotEvents.length > 0 ? (
-                    <div className="space-y-2">
-                      {slotEvents.map((event) => (
-                        <div
-                          key={`${slot}-${event}`}
-                          className="rounded-xl border border-lightBorder bg-lightSecondary/25 px-3 py-3 dark:border-darkBorder dark:bg-darkSecondary/25"
-                        >
-                          <p className="font-sharetech text-sm text-lightText dark:text-darkText">
-                            {event}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border border-dashed border-lightBorder px-3 py-3 dark:border-darkBorder">
-                      <p className="font-sharetech text-sm text-lightText/60 dark:text-darkText/60">
-                        Sin actividades programadas.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+  const renderDayView = () => (
+    <div className="overflow-hidden rounded-2xl border border-lightBorder bg-lightPrimary shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
+      <div className="border-b border-lightBorder px-5 py-4 dark:border-darkBorder">
+        <p className="font-sharetech text-xs uppercase tracking-[0.18em] text-lightText/70 dark:text-darkText/70">
+          Jornada seleccionada
+        </p>
+        <h4 className="mt-1 font-pixelify text-2xl text-lightText dark:text-darkText">
+          {formatDayTitle(selectedDate)}
+        </h4>
       </div>
-    );
-  };
+
+      <div className="divide-y divide-lightBorder dark:divide-darkBorder">
+        {DAY_SLOTS.map((slot) => {
+          const slotEvents = getDaySlotEvents(slot, selectedEvents);
+
+          return (
+            <button
+              key={slot}
+              type="button"
+              onClick={() => openCalendarModal(toIsoDate(selectedDate))}
+              className="grid w-full grid-cols-[5.5rem_minmax(0,1fr)] gap-4 px-4 py-4 text-left transition hover:bg-lightDetail/20 dark:hover:bg-darkAccent/10"
+            >
+              <div className="flex items-start gap-2">
+                <FiClock className="mt-0.5 text-lightLink dark:text-darkLink" />
+                <span className="font-sharetech text-sm text-lightText dark:text-darkText">
+                  {slot}
+                </span>
+              </div>
+
+              <div>
+                {slotEvents.length > 0 ? (
+                  <div className="space-y-2">
+                    {slotEvents.map((event) => (
+                      <div
+                        key={`${slot}-${event}`}
+                        className="rounded-xl border border-lightBorder bg-lightSecondary/25 px-3 py-3 dark:border-darkBorder dark:bg-darkSecondary/25"
+                      >
+                        <p className="font-sharetech text-sm text-lightText dark:text-darkText">
+                          {event}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-dashed border-lightBorder px-3 py-3 dark:border-darkBorder">
+                    <p className="font-sharetech text-sm text-lightText/60 dark:text-darkText/60">
+                      Sin actividades programadas.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   const renderYearView = () => (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -526,10 +583,7 @@ export default function Calendar() {
         <button
           key={month.monthDate.toISOString()}
           type="button"
-          onClick={() => {
-            setSelectedDate(month.monthDate);
-            setSelectedView("month");
-          }}
+          onClick={() => openCalendarModal(toIsoDate(month.monthDate))}
           className={`rounded-2xl border p-4 text-left shadow-sm transition ${
             month.isCurrentMonth
               ? "border-lightLink bg-lightPrimary dark:border-darkLink dark:bg-darkPrimary"
@@ -664,7 +718,7 @@ export default function Calendar() {
       </header>
 
       <div
-        className={`grid gap-4 p-4  h-full  ${
+        className={`grid gap-4 p-4 h-full ${
           selectedView === "year" ? "" : "xl:flex flex-col items-start justify-center"
         }`}
       >
@@ -687,14 +741,19 @@ export default function Calendar() {
             <div className="mt-5">
               {selectedEvents.length > 0 ? (
                 <ul className="space-y-3">
-                  {selectedEvents.map((event) => (
+                  {selectedEvents.map((event, index) => (
                     <li
-                      key={`${toIsoDate(selectedDate)}-${event}`}
+                      key={`${toIsoDate(selectedDate)}-${event}-${index}`}
                       className="rounded-xl border border-lightBorder bg-lightSecondary/35 px-3 py-3 dark:border-darkBorder dark:bg-darkSecondary/35"
                     >
                       <p className="font-sharetech text-sm text-lightText dark:text-darkText">
                         {event}
                       </p>
+                      {selectedDateDescriptions[index]?.description && (
+                        <p className="mt-2 font-sharetech text-xs text-lightText/70 dark:text-darkText/70">
+                          {selectedDateDescriptions[index].description}
+                        </p>
+                      )}
                     </li>
                   ))}
                 </ul>

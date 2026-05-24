@@ -20,6 +20,7 @@ import EditChapterForm from "../forms/teacherForms/editChapterForm.organism";
 import EditUnitForm from "../forms/teacherForms/editUnitForm.organism";
 import StudentExamForm from "../student/studentExamForm.organism";
 import TeacherExamForm from "../teacher/teacherExamForm.organism";
+import CalendarEventForm from "../forms/calendarEventForm.organism";
 
 
 const FormInModal = () => {
@@ -69,6 +70,8 @@ const FormInModal = () => {
         return <TeacherExamForm item={modalContent.data as Chapter | null} />;
       case "STUDENT_EXAM":
         return <StudentExamForm item={modalContent.data as Chapter | null} />;
+      case "CALENDAR_EVENT":
+        return <CalendarEventForm />;
       default:
         return null;
     }

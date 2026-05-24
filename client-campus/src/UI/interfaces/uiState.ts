@@ -3,13 +3,15 @@ import type { ExamQuestion } from "../../BR/domain/entities/exam.interface";
 import type { Subject } from "../../BR/domain/entities/subject.interface";
 import type { Unit } from "../../BR/domain/entities/unit.interface";
 import type { User } from "../../BR/domain/entities/user.interface";
+import type { CalendarModalData } from "../components/organisms/common/calendar-events.storage";
 
 type ModalEntity =
   | Subject
   | Unit
   | Chapter
   | User
-  | { id_chapter: string; questions?: ExamQuestion[] };
+  | { id_chapter: string; questions?: ExamQuestion[] }
+  | CalendarModalData;
 
 export interface UiState {
   sidebarOpen: boolean;
