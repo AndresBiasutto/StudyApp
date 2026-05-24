@@ -39,6 +39,8 @@ export const useForm = <T extends FormValues>(
   return {
     values,
     errors,
+    setValues,
+    setErrors,
     handleChange,
     handleSubmit,
   };

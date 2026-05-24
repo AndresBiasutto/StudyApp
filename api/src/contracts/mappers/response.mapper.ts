@@ -4,6 +4,7 @@ import {
   GradeResponseDto,
   RoleResponseDto,
 } from "../common.contract";
+import { CalendarResponseDto } from "../calendar.contract";
 import {
   ChapterResponseDto,
   SubjectResponseDto,
@@ -83,6 +84,25 @@ export const mapSubjectSummaryResponse = (
     description: data.description ?? null,
     imageUrl: data.imageUrl ?? null,
     Grade: mapGradeResponse(data.Grade),
+  };
+};
+
+export const mapCalendarResponse = (
+  calendarEntry: unknown,
+): CalendarResponseDto => {
+  const data = toPlain(calendarEntry);
+
+  return {
+    id: String(data.id),
+    title: data.title,
+    text: data.text,
+    date: String(data.date),
+    emisor: String(data.emisor),
+    receptor: Array.isArray(data.receptor)
+      ? data.receptor.map((item: unknown) => String(item))
+      : [],
+    role: data.role ?? null,
+    hour: data.hour ?? null,
   };
 };
 

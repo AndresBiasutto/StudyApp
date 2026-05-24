@@ -5,6 +5,7 @@ import { GradeApiRepository } from '../repositories/grade.repository';
 import { UnitApiRepository } from '../repositories/unitApiRepository';
 import { ChapterApiRepository } from '../repositories/chapterApiRepository';
 import { ExamApiRepository } from '../repositories/examApiRepository';
+import { CalendarApiRepository } from '../repositories/calendarApiRepository';
 import type { UserRepository } from '../../domain/services/user.repository';
 import type { SubjectRepository } from '../../domain/services/subjectRepository';
 import type { RoleRepository } from '../../domain/services/role.repository';
@@ -12,6 +13,7 @@ import type { GradeRepository as GradeRepoInterface } from '../../domain/service
 import type { UnitRepository } from '../../domain/services/unit.repository';
 import type { ChapterRepository } from '../../domain/services/chapter.repository';
 import type { ExamRepository } from '../../domain/services/exam.repository';
+import type { CalendarRepository } from '../../domain/services/calendar.repository';
 
 export const RepositoryType = {
   USER: 'USER',
@@ -21,6 +23,7 @@ export const RepositoryType = {
   UNIT: 'UNIT',
   CHAPTER: 'CHAPTER',
   EXAM: 'EXAM',
+  CALENDAR: 'CALENDAR',
 } as const;
 
 export type RepositoryType = (typeof RepositoryType)[keyof typeof RepositoryType];
@@ -34,6 +37,7 @@ class RepositoryFactory {
   private unitRepository: UnitApiRepository | null = null;
   private chapterRepository: ChapterApiRepository | null = null;
   private examRepository: ExamApiRepository | null = null;
+  private calendarRepository: CalendarApiRepository | null = null;
 
   private constructor() {}
 
@@ -93,6 +97,13 @@ class RepositoryFactory {
     return this.examRepository;
   }
 
+  public getCalendarRepository(): CalendarRepository {
+    if (!this.calendarRepository) {
+      this.calendarRepository = new CalendarApiRepository();
+    }
+    return this.calendarRepository;
+  }
+
   public get<T>(type: RepositoryType): T {
     switch (type) {
       case RepositoryType.USER:
@@ -109,6 +120,8 @@ class RepositoryFactory {
         return this.getChapterRepository() as T;
       case RepositoryType.EXAM:
         return this.getExamRepository() as T;
+      case RepositoryType.CALENDAR:
+        return this.getCalendarRepository() as T;
       default:
         throw new Error(`Unknown repository type: ${type}`);
     }

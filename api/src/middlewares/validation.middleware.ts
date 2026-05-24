@@ -8,7 +8,7 @@ interface ValidationIssue {
   message: string;
 }
 
-type ValidationRule = (value: unknown) => string | null;
+export type ValidationRule = (value: unknown) => string | null;
 
 interface FieldSchema {
   required?: boolean;

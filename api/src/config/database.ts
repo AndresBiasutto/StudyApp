@@ -68,6 +68,7 @@ const {
   Image,
   Exam,
   ExamResult,
+  Calendar,
 } = sequelize.models;
 
 if (
@@ -80,7 +81,8 @@ if (
   Video &&
   Image &&
   Exam &&
-  ExamResult
+  ExamResult &&
+  Calendar
 ) {
   User.belongsTo(Role, { foreignKey: "id_role" });
   Subject.belongsTo(Grade, { foreignKey: "id_grade" });
@@ -197,6 +199,18 @@ if (
   ExamResult.belongsTo(Exam, {
     as: "exam",
     foreignKey: "id_exam",
+    onDelete: "CASCADE",
+  });
+
+  User.hasMany(Calendar, {
+    as: "createdCalendarEntries",
+    foreignKey: "emisor",
+    onDelete: "CASCADE",
+    hooks: true,
+  });
+  Calendar.belongsTo(User, {
+    as: "emisorUser",
+    foreignKey: "emisor",
     onDelete: "CASCADE",
   });
 } else {

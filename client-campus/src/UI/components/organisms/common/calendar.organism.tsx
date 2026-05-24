@@ -6,19 +6,13 @@ import {
   FiClock,
 } from "react-icons/fi";
 
-import { useAppDispatch } from "../../../../hooks/UseStore.hook";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/UseStore.hook";
+import { fetchCalendarEntries } from "../../../../store/slices/calendarSlice/calendar.thunk";
+import type { CalendarEntry } from "../../../../BR/domain/entities/calendar.interface";
+import type { CalendarModalData } from "../../../../store/slices/calendarSlice/calendar.type";
 import { openModal, setModalContent } from "../../../../store/slices/uiSlice";
-import {
-  CALENDAR_EVENTS_UPDATED,
-  getCalendarEventStore,
-  getCalendarEventTitles,
-} from "./calendar-events.storage";
 
 type CalendarView = "day" | "week" | "month" | "year";
-
-interface CalendarEventMap {
-  [isoDate: string]: string[];
-}
 
 interface CalendarCell {
   isoDate: string;
@@ -26,7 +20,7 @@ interface CalendarCell {
   isCurrentMonth: boolean;
   isToday: boolean;
   isSelected: boolean;
-  events: string[];
+  events: CalendarEntry[];
 }
 
 interface YearMonthSummary {
@@ -37,7 +31,11 @@ interface YearMonthSummary {
   isCurrentMonth: boolean;
 }
 
-const WEEK_DAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"] as const;
+interface CalendarEventMap {
+  [isoDate: string]: CalendarEntry[];
+}
+
+const WEEK_DAYS = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"] as const;
 const VIEW_LABELS: Record<CalendarView, string> = {
   day: "Vista diaria",
   week: "Vista semanal",
@@ -58,20 +56,6 @@ const DAY_SLOTS = [
   "17:00",
   "18:00",
 ] as const;
-
-const SAMPLE_EVENTS: CalendarEventMap = {
-  "2026-05-05": ["Clase de repaso", "Corrección de trabajos"],
-  "2026-05-12": ["Actualizar capítulo 3"],
-  "2026-05-18": ["Preparar examen", "Publicar recursos"],
-  "2026-05-19": ["Llamado con coordinación"],
-  "2026-05-20": ["Revisar parciales"],
-  "2026-05-22": ["Revisión con alumnos"],
-  "2026-05-27": ["Planificación de unidad nueva"],
-  "2026-06-03": ["Entrega de calificaciones"],
-  "2026-07-11": ["Cierre de trimestre"],
-  "2026-09-02": ["Diseño de cronograma"],
-  "2026-11-15": ["Subir recursos finales"],
-};
 
 const startOfDay = (date: Date): Date =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -100,17 +84,34 @@ const toIsoDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-const mergeEventMaps = (
-  baseMap: CalendarEventMap,
-  persistedMap: CalendarEventMap,
-): CalendarEventMap => {
-  const mergedMap: CalendarEventMap = { ...baseMap };
+const sortEntries = (entries: CalendarEntry[]): CalendarEntry[] =>
+  [...entries].sort((entryA, entryB) => {
+    const hourA = entryA.hour ?? "99:99";
+    const hourB = entryB.hour ?? "99:99";
 
-  Object.entries(persistedMap).forEach(([date, events]) => {
-    mergedMap[date] = [...(mergedMap[date] ?? []), ...events];
+    if (hourA !== hourB) {
+      return hourA.localeCompare(hourB);
+    }
+
+    return entryA.title.localeCompare(entryB.title);
   });
 
-  return mergedMap;
+const buildEventMap = (entries: CalendarEntry[]): CalendarEventMap => {
+  const groupedMap: CalendarEventMap = {};
+
+  entries.forEach((entry) => {
+    if (!groupedMap[entry.date]) {
+      groupedMap[entry.date] = [];
+    }
+
+    groupedMap[entry.date].push(entry);
+  });
+
+  Object.keys(groupedMap).forEach((dateKey) => {
+    groupedMap[dateKey] = sortEntries(groupedMap[dateKey]);
+  });
+
+  return groupedMap;
 };
 
 const getMonthGridStart = (date: Date): Date => {
@@ -192,7 +193,7 @@ const buildYearSummary = (
         monthDate,
       ),
       eventCount: eventEntries.reduce(
-        (total, [, events]) => total + events.length,
+        (total, [, entries]) => total + entries.length,
         0,
       ),
       highlightedDays: eventEntries
@@ -238,6 +239,9 @@ const formatSelectedDate = (date: Date): string =>
     month: "long",
   }).format(date);
 
+const formatEventPreview = (entry: CalendarEntry): string =>
+  entry.hour ? `${entry.hour} ${entry.title}` : entry.title;
+
 const getHeaderTitle = (view: CalendarView, date: Date): string => {
   switch (view) {
     case "day":
@@ -252,38 +256,24 @@ const getHeaderTitle = (view: CalendarView, date: Date): string => {
   }
 };
 
-const getDaySlotEvents = (slot: string, events: string[]) =>
-  events.filter(
-    (_event, index) => DAY_SLOTS[index % DAY_SLOTS.length] === slot,
-  );
-
 export default function Calendar() {
   const dispatch = useAppDispatch();
   const today = useMemo(() => startOfDay(new Date()), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [selectedView, setSelectedView] = useState<CalendarView>("month");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [storedEvents, setStoredEvents] = useState<CalendarEventMap>(() =>
-    getCalendarEventTitles(),
-  );
+  const calendarState = useAppSelector((state) => state.calendar);
+  const currentUserId = useAppSelector((state) => state.auth.selected?.id_user);
 
   useEffect(() => {
-    const updateStoredEvents = () => {
-      setStoredEvents(getCalendarEventTitles());
-    };
+    if (currentUserId) {
+      void dispatch(fetchCalendarEntries());
+    }
+  }, [currentUserId, dispatch]);
 
-    window.addEventListener(CALENDAR_EVENTS_UPDATED, updateStoredEvents);
-    window.addEventListener("storage", updateStoredEvents);
-
-    return () => {
-      window.removeEventListener(CALENDAR_EVENTS_UPDATED, updateStoredEvents);
-      window.removeEventListener("storage", updateStoredEvents);
-    };
-  }, []);
-
-  const mergedEvents = useMemo(
-    () => mergeEventMaps(SAMPLE_EVENTS, storedEvents),
-    [storedEvents],
+  const eventsMap = useMemo(
+    () => buildEventMap(calendarState.items),
+    [calendarState.items],
   );
 
   const visibleReferenceDate = useMemo(() => {
@@ -300,35 +290,61 @@ export default function Calendar() {
   }, [selectedDate, selectedView]);
 
   const monthCells = useMemo(
-    () => buildMonthCells(visibleReferenceDate, selectedDate, mergedEvents),
-    [mergedEvents, selectedDate, visibleReferenceDate],
+    () => buildMonthCells(visibleReferenceDate, selectedDate, eventsMap),
+    [eventsMap, selectedDate, visibleReferenceDate],
   );
 
   const weekDays = useMemo(
-    () => buildWeekDays(selectedDate, mergedEvents),
-    [mergedEvents, selectedDate],
+    () => buildWeekDays(selectedDate, eventsMap),
+    [eventsMap, selectedDate],
   );
 
   const yearSummary = useMemo(
-    () => buildYearSummary(visibleReferenceDate, today, mergedEvents),
-    [mergedEvents, today, visibleReferenceDate],
+    () => buildYearSummary(visibleReferenceDate, today, eventsMap),
+    [eventsMap, today, visibleReferenceDate],
   );
 
-  const selectedEvents = mergedEvents[toIsoDate(selectedDate)] ?? [];
+  const selectedEvents = eventsMap[toIsoDate(selectedDate)] ?? [];
+  const selectedScheduledEvents = selectedEvents.filter((event) => event.hour);
+  const selectedUnscheduledEvents = selectedEvents.filter((event) => !event.hour);
   const selectedDateLabel = formatSelectedDate(selectedDate);
   const headerTitle = getHeaderTitle(selectedView, visibleReferenceDate);
-  const selectedDateDescriptions = getCalendarEventStore()[toIsoDate(selectedDate)] ?? [];
 
-  const openCalendarModal = (isoDate: string) => {
+  const openCalendarModal = (isoDate: string, selectedHour?: string) => {
     const [year, month, day] = isoDate.split("-").map(Number);
     const nextDate = new Date(year, month - 1, day);
+    const modalData: CalendarModalData = {
+      selectedDate: isoDate,
+      selectedHour,
+      item: null,
+    };
 
     setSelectedDate(nextDate);
     dispatch(
       setModalContent({
         type: "CALENDAR_EVENT",
-        data: { selectedDate: isoDate },
+        data: modalData,
         title: "Nuevo evento de calendario",
+      }),
+    );
+    dispatch(openModal());
+  };
+
+  const openCalendarEventModal = (item: CalendarEntry) => {
+    const [year, month, day] = item.date.split("-").map(Number);
+    const nextDate = new Date(year, month - 1, day);
+    const modalData: CalendarModalData = {
+      selectedDate: item.date,
+      selectedHour: item.hour ?? undefined,
+      item,
+    };
+
+    setSelectedDate(nextDate);
+    dispatch(
+      setModalContent({
+        type: "CALENDAR_EVENT",
+        data: modalData,
+        title: "Editar evento del calendario",
       }),
     );
     dispatch(openModal());
@@ -360,7 +376,7 @@ export default function Calendar() {
   };
 
   const renderMonthView = () => (
-    <div className="overflow-hidden h-full rounded-2xl border border-lightBorder bg-lightPrimary shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
+    <div className="h-full overflow-hidden rounded-2xl border border-lightBorder bg-lightPrimary shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
       <div className="grid grid-cols-7 border-b border-lightBorder bg-lightDetail/40 dark:border-darkBorder dark:bg-darkAccent/15">
         {WEEK_DAYS.map((day) => (
           <div
@@ -399,16 +415,16 @@ export default function Calendar() {
             <ol className="mt-3 space-y-1.5">
               {cell.events.slice(0, 2).map((event) => (
                 <li
-                  key={`${cell.isoDate}-${event}`}
+                  key={event.id}
                   className="truncate rounded-md bg-lightAccent/20 px-2 py-1 font-sharetech text-xs text-lightText dark:bg-darkAccent/20 dark:text-darkText"
                 >
-                  {event}
+                  {formatEventPreview(event)}
                 </li>
               ))}
 
               {cell.events.length > 2 && (
                 <li className="font-sharetech text-xs text-lightLink dark:text-darkLink">
-                  +{cell.events.length - 2} más
+                  +{cell.events.length - 2} mas
                 </li>
               )}
             </ol>
@@ -443,7 +459,7 @@ export default function Calendar() {
             <span className="mt-auto flex flex-wrap justify-start gap-1">
               {cell.events.slice(0, 3).map((event) => (
                 <span
-                  key={`${cell.isoDate}-${event}`}
+                  key={event.id}
                   className="h-1.5 w-1.5 rounded-full bg-lightLink dark:bg-darkLink"
                 />
               ))}
@@ -455,7 +471,7 @@ export default function Calendar() {
   );
 
   const renderWeekView = () => (
-    <div className="overflow-y-clip h-full rounded-2xl border border-lightBorder bg-lightPrimary shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
+    <div className="h-full overflow-y-clip rounded-2xl border border-lightBorder bg-lightPrimary shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
       <div className="grid grid-cols-7 gap-px border-b border-lightBorder bg-lightDetail/40 px-4 py-4 dark:border-darkBorder dark:bg-darkAccent/15">
         {weekDays.map((day) => (
           <button
@@ -501,10 +517,10 @@ export default function Calendar() {
               <ul className="mt-3 space-y-2">
                 {day.events.map((event) => (
                   <li
-                    key={`${day.isoDate}-${event}`}
+                    key={event.id}
                     className="rounded-lg bg-lightPrimary px-3 py-2 font-sharetech text-sm text-lightText dark:bg-darkPrimary dark:text-darkText"
                   >
-                    {event}
+                    {formatEventPreview(event)}
                   </li>
                 ))}
               </ul>
@@ -530,15 +546,37 @@ export default function Calendar() {
         </h4>
       </div>
 
+      {selectedUnscheduledEvents.length > 0 && (
+        <div className="border-b border-lightBorder px-4 py-4 dark:border-darkBorder">
+          <p className="font-sharetech text-xs uppercase tracking-[0.18em] text-lightText/70 dark:text-darkText/70">
+            Sin horario asignado
+          </p>
+          <div className="mt-3 space-y-2">
+            {selectedUnscheduledEvents.map((event) => (
+              <div
+                key={event.id}
+                className="rounded-xl border border-lightBorder bg-lightSecondary/25 px-3 py-3 dark:border-darkBorder dark:bg-darkSecondary/25"
+              >
+                <p className="font-sharetech text-sm text-lightText dark:text-darkText">
+                  {event.title}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="divide-y divide-lightBorder dark:divide-darkBorder">
         {DAY_SLOTS.map((slot) => {
-          const slotEvents = getDaySlotEvents(slot, selectedEvents);
+          const slotEvents = selectedScheduledEvents.filter(
+            (event) => event.hour === slot,
+          );
 
           return (
             <button
               key={slot}
               type="button"
-              onClick={() => openCalendarModal(toIsoDate(selectedDate))}
+              onClick={() => openCalendarModal(toIsoDate(selectedDate), slot)}
               className="grid w-full grid-cols-[5.5rem_minmax(0,1fr)] gap-4 px-4 py-4 text-left transition hover:bg-lightDetail/20 dark:hover:bg-darkAccent/10"
             >
               <div className="flex items-start gap-2">
@@ -553,12 +591,17 @@ export default function Calendar() {
                   <div className="space-y-2">
                     {slotEvents.map((event) => (
                       <div
-                        key={`${slot}-${event}`}
+                        key={event.id}
                         className="rounded-xl border border-lightBorder bg-lightSecondary/25 px-3 py-3 dark:border-darkBorder dark:bg-darkSecondary/25"
                       >
                         <p className="font-sharetech text-sm text-lightText dark:text-darkText">
-                          {event}
+                          {event.title}
                         </p>
+                        {event.text && (
+                          <p className="mt-2 font-sharetech text-xs text-lightText/70 dark:text-darkText/70">
+                            {event.text}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -647,6 +690,16 @@ export default function Calendar() {
           <p className="mt-1 font-sharetech text-sm text-lightText/75 dark:text-darkText/75">
             {selectedDateLabel}
           </p>
+          {calendarState.loadingList && (
+            <p className="mt-2 font-sharetech text-xs text-lightText/70 dark:text-darkText/70">
+              Cargando eventos...
+            </p>
+          )}
+          {calendarState.error && (
+            <p className="mt-2 font-sharetech text-xs text-lightWarning dark:text-darkWarning">
+              {calendarState.error}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -686,7 +739,7 @@ export default function Calendar() {
             >
               <span>{VIEW_LABELS[selectedView]}</span>
               <span className={`transition ${menuOpen ? "rotate-180" : ""}`}>
-                ▼
+                v
               </span>
             </button>
 
@@ -718,10 +771,12 @@ export default function Calendar() {
       </header>
 
       <div
-        className={`grid gap-4 p-4 h-full ${
-          selectedView === "year" ? "" : "xl:flex flex-col items-start justify-center"
+        className={`grid gap-4 p-4 ${
+          selectedView === "year" ? "" : "xl:grid-cols-[minmax(0,1fr)_320px]"
         }`}
       >
+        <div>{renderMainView()}</div>
+
         {selectedView !== "year" && (
           <aside className="rounded-2xl border border-lightBorder bg-lightPrimary p-4 shadow-sm dark:border-darkBorder dark:bg-darkPrimary">
             <div className="flex items-center gap-3">
@@ -730,7 +785,7 @@ export default function Calendar() {
               </div>
               <div>
                 <h4 className="font-pixelify text-xl text-lightText dark:text-darkText">
-                  Eventos del día
+                  Eventos del dia
                 </h4>
                 <p className="font-sharetech text-xs uppercase tracking-[0.2em] text-lightText/70 dark:text-darkText/70">
                   {selectedDateLabel}
@@ -738,22 +793,40 @@ export default function Calendar() {
               </div>
             </div>
 
+            <button
+              type="button"
+              onClick={() => openCalendarModal(toIsoDate(selectedDate))}
+              className="mt-4 w-full rounded-xl border border-dashed border-lightBorder px-4 py-3 text-left font-sharetech text-sm text-lightText transition hover:bg-lightAccent/15 dark:border-darkBorder dark:text-darkText dark:hover:bg-darkAccent/15"
+            >
+              Crear evento para esta fecha
+            </button>
+
             <div className="mt-5">
               {selectedEvents.length > 0 ? (
                 <ul className="space-y-3">
-                  {selectedEvents.map((event, index) => (
-                    <li
-                      key={`${toIsoDate(selectedDate)}-${event}-${index}`}
-                      className="rounded-xl border border-lightBorder bg-lightSecondary/35 px-3 py-3 dark:border-darkBorder dark:bg-darkSecondary/35"
-                    >
-                      <p className="font-sharetech text-sm text-lightText dark:text-darkText">
-                        {event}
-                      </p>
-                      {selectedDateDescriptions[index]?.description && (
-                        <p className="mt-2 font-sharetech text-xs text-lightText/70 dark:text-darkText/70">
-                          {selectedDateDescriptions[index].description}
-                        </p>
-                      )}
+                  {selectedEvents.map((event) => (
+                    <li key={event.id}>
+                      <button
+                        type="button"
+                        onClick={() => openCalendarEventModal(event)}
+                        className="w-full rounded-xl border border-lightBorder bg-lightSecondary/35 px-3 py-3 text-left transition hover:bg-lightAccent/15 dark:border-darkBorder dark:bg-darkSecondary/35 dark:hover:bg-darkAccent/15"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="font-sharetech text-sm text-lightText dark:text-darkText">
+                            {event.title}
+                          </p>
+                          {event.hour && (
+                            <span className="rounded-full bg-lightLink/15 px-2 py-1 font-sharetech text-[11px] text-lightLink dark:bg-darkLink/15 dark:text-darkLink">
+                              {event.hour}
+                            </span>
+                          )}
+                        </div>
+                        {event.text && (
+                          <p className="mt-2 font-sharetech text-xs text-lightText/70 dark:text-darkText/70">
+                            {event.text}
+                          </p>
+                        )}
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -767,7 +840,6 @@ export default function Calendar() {
             </div>
           </aside>
         )}
-        <div>{renderMainView()}</div>
       </div>
     </section>
   );

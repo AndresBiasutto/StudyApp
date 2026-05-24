@@ -10,6 +10,7 @@ import gradeRoutes from "./grade.route";
 import { aiRouter } from "./ai";
 import examRoutes from "./exam.route";
 import examResultRoutes from "./exam-result.route";
+import calendarRoutes from "./calendar.route";
 
 const router = Router();
 router.get("/health", healthCheck);
@@ -20,6 +21,7 @@ router.use("/units", UnitRoutes);
 router.use("/chapters", ChapterRoutes);
 router.use("/exams", examRoutes);
 router.use("/exam-results", examResultRoutes);
+router.use("/calendar", calendarRoutes);
 router.use("/media", MediaRoutes);
 router.use("/roles", roleRoutes);
 router.use("/grades", gradeRoutes);
