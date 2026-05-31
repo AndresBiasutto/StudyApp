@@ -260,6 +260,7 @@ export default function Calendar() {
   const dispatch = useAppDispatch();
   const today = useMemo(() => startOfDay(new Date()), []);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
+  const [selectedHour, setSelectedHour] = useState<string | undefined>(undefined);
   const [selectedView, setSelectedView] = useState<CalendarView>("month");
   const [menuOpen, setMenuOpen] = useState(false);
   const calendarState = useAppSelector((state) => state.calendar);
@@ -310,16 +311,29 @@ export default function Calendar() {
   const selectedDateLabel = formatSelectedDate(selectedDate);
   const headerTitle = getHeaderTitle(selectedView, visibleReferenceDate);
 
-  const openCalendarModal = (isoDate: string, selectedHour?: string) => {
+  const selectDate = (isoDate: string) => {
     const [year, month, day] = isoDate.split("-").map(Number);
     const nextDate = new Date(year, month - 1, day);
+
+    setSelectedDate(nextDate);
+    setSelectedHour(undefined);
+  };
+
+  const selectTimeSlot = (isoDate: string, hour: string) => {
+    const [year, month, day] = isoDate.split("-").map(Number);
+    const nextDate = new Date(year, month - 1, day);
+
+    setSelectedDate(nextDate);
+    setSelectedHour(hour);
+  };
+
+  const openCalendarModal = () => {
     const modalData: CalendarModalData = {
-      selectedDate: isoDate,
+      selectedDate: toIsoDate(selectedDate),
       selectedHour,
       item: null,
     };
 
-    setSelectedDate(nextDate);
     dispatch(
       setModalContent({
         type: "CALENDAR_EVENT",
@@ -352,6 +366,7 @@ export default function Calendar() {
 
   const handleGoToToday = () => {
     setSelectedDate(today);
+    setSelectedHour(undefined);
     setMenuOpen(false);
   };
 
@@ -371,6 +386,7 @@ export default function Calendar() {
           return addMonths(currentDate, delta);
       }
     });
+    setSelectedHour(undefined);
 
     setMenuOpen(false);
   };
@@ -393,7 +409,7 @@ export default function Calendar() {
           <button
             key={cell.isoDate}
             type="button"
-            onClick={() => openCalendarModal(cell.isoDate)}
+            onClick={() => selectDate(cell.isoDate)}
             className={`min-h-32 px-3 py-3 text-left transition ${
               cell.isCurrentMonth
                 ? "bg-lightPrimary hover:bg-lightDetail/25 dark:bg-darkPrimary dark:hover:bg-darkAccent/20"
@@ -437,7 +453,7 @@ export default function Calendar() {
           <button
             key={cell.isoDate}
             type="button"
-            onClick={() => openCalendarModal(cell.isoDate)}
+            onClick={() => selectDate(cell.isoDate)}
             className={`flex h-16 flex-col px-2 py-2 transition ${
               cell.isCurrentMonth
                 ? "bg-lightPrimary hover:bg-lightDetail/25 dark:bg-darkPrimary dark:hover:bg-darkAccent/20"
@@ -477,7 +493,7 @@ export default function Calendar() {
           <button
             key={day.isoDate}
             type="button"
-            onClick={() => openCalendarModal(day.isoDate)}
+            onClick={() => selectDate(day.isoDate)}
             className={`rounded-xl px-2 py-3 text-center transition ${
               day.isSelected
                 ? "bg-lightLink text-lightPrimary dark:bg-darkLink dark:text-darkPrimary"
@@ -502,7 +518,7 @@ export default function Calendar() {
           <button
             key={day.isoDate}
             type="button"
-            onClick={() => openCalendarModal(day.isoDate)}
+            onClick={() => selectDate(day.isoDate)}
             className={`rounded-2xl border p-3 text-left ${
               day.isSelected
                 ? "border-lightLink bg-lightLink/10 dark:border-darkLink dark:bg-darkLink/10"
@@ -544,6 +560,11 @@ export default function Calendar() {
         <h4 className="mt-1 font-pixelify text-2xl text-lightText dark:text-darkText">
           {formatDayTitle(selectedDate)}
         </h4>
+        {selectedHour && (
+          <p className="mt-2 font-sharetech text-sm text-lightLink dark:text-darkLink">
+            Hora seleccionada: {selectedHour}
+          </p>
+        )}
       </div>
 
       {selectedUnscheduledEvents.length > 0 && (
@@ -573,11 +594,15 @@ export default function Calendar() {
           );
 
           return (
-            <button
+              <button
               key={slot}
               type="button"
-              onClick={() => openCalendarModal(toIsoDate(selectedDate), slot)}
-              className="grid w-full grid-cols-[5.5rem_minmax(0,1fr)] gap-4 px-4 py-4 text-left transition hover:bg-lightDetail/20 dark:hover:bg-darkAccent/10"
+              onClick={() => selectTimeSlot(toIsoDate(selectedDate), slot)}
+              className={`grid w-full grid-cols-[5.5rem_minmax(0,1fr)] gap-4 px-4 py-4 text-left transition hover:bg-lightDetail/20 dark:hover:bg-darkAccent/10 ${
+                selectedHour === slot
+                  ? "bg-lightLink/10 dark:bg-darkLink/10"
+                  : ""
+              }`}
             >
               <div className="flex items-start gap-2">
                 <FiClock className="mt-0.5 text-lightLink dark:text-darkLink" />
@@ -624,12 +649,12 @@ export default function Calendar() {
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {yearSummary.map((month) => (
         <button
-          key={month.monthDate.toISOString()}
-          type="button"
-          onClick={() => openCalendarModal(toIsoDate(month.monthDate))}
-          className={`rounded-2xl border p-4 text-left shadow-sm transition ${
-            month.isCurrentMonth
-              ? "border-lightLink bg-lightPrimary dark:border-darkLink dark:bg-darkPrimary"
+            key={month.monthDate.toISOString()}
+            type="button"
+          onClick={() => selectDate(toIsoDate(month.monthDate))}
+            className={`rounded-2xl border p-4 text-left shadow-sm transition ${
+              month.isCurrentMonth
+                ? "border-lightLink bg-lightPrimary dark:border-darkLink dark:bg-darkPrimary"
               : "border-lightBorder bg-lightPrimary hover:bg-lightDetail/30 dark:border-darkBorder dark:bg-darkPrimary dark:hover:bg-darkAccent/15"
           }`}
         >
@@ -795,7 +820,7 @@ export default function Calendar() {
 
             <button
               type="button"
-              onClick={() => openCalendarModal(toIsoDate(selectedDate))}
+              onClick={openCalendarModal}
               className="mt-4 w-full rounded-xl border border-dashed border-lightBorder px-4 py-3 text-left font-sharetech text-sm text-lightText transition hover:bg-lightAccent/15 dark:border-darkBorder dark:text-darkText dark:hover:bg-darkAccent/15"
             >
               Crear evento para esta fecha
