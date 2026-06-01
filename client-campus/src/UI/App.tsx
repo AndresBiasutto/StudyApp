@@ -24,6 +24,8 @@ import Login from "./views/landing/login.view";
 import LandingPageTemplate from "./components/templates/landingPage.template";
 import Settings from "./views/landing/settings.view";
 import StudentCalendar from "./views/student/studentCalendar.view";
+import TeacherCalendar from "./views/teacher/teacherCalendar.view";
+import AdminCalendar from "./views/admin/adminCalendar.view";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -49,12 +51,7 @@ function App() {
           <Route path="/register" element={<Register />} />
         </Route>
         <Route element={<Dashboard />}>
-          <Route
-            path="dashboard/settings"
-            element={
-                <Settings />
-            }
-          />
+          <Route path="dashboard/settings" element={<Settings />} />
           <Route
             path="dashboard/student/home"
             element={
@@ -88,6 +85,14 @@ function App() {
             }
           />
           <Route
+            path="dashboard/teacher/calendar"
+            element={
+              <ProtectedRoutes role={"teacher"}>
+                <TeacherCalendar />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
             path="dashboard/teacher/subject/:id_subject"
             element={
               <ProtectedRoutes role={"teacher"}>
@@ -108,6 +113,14 @@ function App() {
             element={
               <ProtectedRoutes role={"admin"}>
                 <AdminHome />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="dashboard/admin/calendar"
+            element={
+              <ProtectedRoutes role={"admin"}>
+                <AdminCalendar />
               </ProtectedRoutes>
             }
           />

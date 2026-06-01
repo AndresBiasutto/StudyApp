@@ -16,6 +16,7 @@ const user = [
 ];
 const teacher = [
   { name: "home", navLink: "/dashboard/teacher/home" },
+  { name: "calendario", navLink: "/dashboard/teacher/calendar" },
 ];
 const student = [
   { name: "mi aula", navLink: "/dashboard/student/home" },
@@ -25,6 +26,7 @@ const admin = [
   { name: "home", navLink: "/dashboard/admin/home" },
   { name: "administrar usuarios", navLink: "/dashboard/admin/users" },
   { name: "administrar materias", navLink: "/dashboard/admin/subjects" },
+  { name: "calendario", navLink: "/dashboard/admin/calendar" },
 ];
 const Sidebar = () => {
   const dispatch = useDispatch();
