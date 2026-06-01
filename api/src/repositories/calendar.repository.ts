@@ -26,11 +26,8 @@ class CalendarRepository {
     return await Calendar.findByPk(id);
   }
 
-  async getCalendarEntriesByUserId(id_user: string) {
+  async getAllCalendarEntries() {
     return await Calendar.findAll({
-      where: {
-        emisor: id_user,
-      },
       order: [
         ["date", "ASC"],
         ["hour", "ASC"],

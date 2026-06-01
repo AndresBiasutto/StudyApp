@@ -8,6 +8,8 @@ interface TextareaProps {
   placeholder?: string;
   rows?: number;
   className?: string;
+  readOnly?: boolean;
+  disabled?: boolean;
 }
 
 const Textarea: React.FC<TextareaProps> = ({
@@ -17,6 +19,8 @@ const Textarea: React.FC<TextareaProps> = ({
   placeholder,
   rows = 3,
   className = "",
+  readOnly,
+  disabled,
 }) => {
   return (
     <textarea
@@ -25,6 +29,8 @@ const Textarea: React.FC<TextareaProps> = ({
       onChange={onChange}
       rows={rows}
       placeholder={placeholder}
+      readOnly={readOnly}
+      disabled={disabled}
       className={`w-full rounded border border-lightBorder dark:border-darkBorder bg-lightPrimary dark:bg-darkPrimary px-3 py-2 font-sharetech text-lightText dark:text-darkText outline-none focus:ring-2 focus:ring-lightAccent dark:focus:ring-darkAccent resize-none ${className}`}
     />
   );

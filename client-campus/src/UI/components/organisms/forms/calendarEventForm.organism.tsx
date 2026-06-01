@@ -73,6 +73,7 @@ const CalendarEventForm = () => {
   ) as CalendarModalData | null;
   const calendarState = useAppSelector((state: RootState) => state.calendar);
   const authUser = useAppSelector((state: RootState) => state.auth.selected);
+  const currentRole = authUser?.Role?.name ?? null;
 
   const {
     values,
@@ -84,6 +85,9 @@ const CalendarEventForm = () => {
 
   const selectedDate = modalData?.selectedDate ?? "";
   const selectedItem = modalData?.item ?? null;
+  const canCreateEvents = currentRole === "teacher" || currentRole === "admin";
+  const canEditSelectedEvent = selectedItem?.emisor === authUser?.id_user;
+  const canSubmit = selectedItem ? canEditSelectedEvent : canCreateEvents;
 
   useEffect(() => {
     setValues({
@@ -105,6 +109,11 @@ const CalendarEventForm = () => {
   };
 
   const onSubmit = async (data: CalendarEventFormData) => {
+    if (!canSubmit) {
+      setSubmitError("No tienes permisos para realizar esta accion");
+      return;
+    }
+
     if (!selectedDate) {
       setSubmitError("No se encontro una fecha seleccionada");
       return;
@@ -192,6 +201,7 @@ const CalendarEventForm = () => {
         className={inputBaseStyles}
         error={errors.title}
         errorTextStyles={errorTextStyles}
+        readOnly={!canSubmit}
       />
 
       <div className="mb-2">
@@ -202,6 +212,7 @@ const CalendarEventForm = () => {
           onChange={handleChange}
           rows={4}
           placeholder="Escribe una breve descripcion del evento"
+          readOnly={!canSubmit}
         />
         {errors.text && (
           <Ptxt text={errors.text} aditionalStyle={errorTextStyles} />
@@ -217,28 +228,41 @@ const CalendarEventForm = () => {
         className={inputBaseStyles}
         error={errors.hour}
         errorTextStyles={errorTextStyles}
+        readOnly={!canSubmit}
       />
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-        <Button
-          btnName={selectedItem?.id ? "Actualizar evento" : "Guardar evento"}
-          type="submit"
-          bgLight="bg-lightDetail"
-          bgDark="dark:bg-darkDetail"
-          icon={<FaCheck />}
-        />
-
-        {selectedItem?.id && (
+      {canSubmit ? (
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Button
-            btnName="Eliminar evento"
-            type="button"
-            action={handleDelete}
-            bgLight="bg-lightWarning"
-            bgDark="dark:bg-darkWarning"
-            icon={<FaTrash />}
+            btnName={selectedItem?.id ? "Actualizar evento" : "Guardar evento"}
+            type="submit"
+            bgLight="bg-lightDetail"
+            bgDark="dark:bg-darkDetail"
+            icon={<FaCheck />}
           />
-        )}
-      </div>
+
+          {selectedItem?.id && (
+            <Button
+              btnName="Eliminar evento"
+              type="button"
+              action={handleDelete}
+              bgLight="bg-lightWarning"
+              bgDark="dark:bg-darkWarning"
+              icon={<FaTrash />}
+            />
+          )}
+        </div>
+      ) : (
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <Button
+            btnName="Cerrar"
+            type="button"
+            action={closeCalendarModal}
+            bgLight="bg-lightDetail"
+            bgDark="dark:bg-darkDetail"
+          />
+        </div>
+      )}
 
       {submitError && (
         <Ptxt

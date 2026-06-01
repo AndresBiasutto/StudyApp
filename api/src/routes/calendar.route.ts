@@ -2,6 +2,7 @@ import { Router } from "express";
 import calendarController from "../controllers/calendar.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 import { asyncHandler } from "../middlewares/async-handler.middleware";
+import { authorizeRoles } from "../middlewares/role.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import {
   calendarIdParamSchema,
@@ -14,6 +15,7 @@ const router = Router();
 router.post(
   "/",
   authenticateJWT,
+  authorizeRoles("teacher", "admin"),
   validate(createCalendarSchema),
   asyncHandler(calendarController.create.bind(calendarController)),
 );
@@ -34,6 +36,7 @@ router.get(
 router.put(
   "/:id",
   authenticateJWT,
+  authorizeRoles("teacher", "admin"),
   validate(updateCalendarSchema),
   asyncHandler(calendarController.update.bind(calendarController)),
 );
@@ -41,6 +44,7 @@ router.put(
 router.delete(
   "/:id",
   authenticateJWT,
+  authorizeRoles("teacher", "admin"),
   validate(calendarIdParamSchema),
   asyncHandler(calendarController.delete.bind(calendarController)),
 );

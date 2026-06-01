@@ -265,6 +265,7 @@ export default function Calendar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const calendarState = useAppSelector((state) => state.calendar);
   const currentUserId = useAppSelector((state) => state.auth.selected?.id_user);
+  const currentUserRole = useAppSelector((state) => state.auth.selected?.Role?.name);
 
   useEffect(() => {
     if (currentUserId) {
@@ -818,13 +819,15 @@ export default function Calendar() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={openCalendarModal}
-              className="mt-4 w-full rounded-xl border border-dashed border-lightBorder px-4 py-3 text-left font-sharetech text-sm text-lightText transition hover:bg-lightAccent/15 dark:border-darkBorder dark:text-darkText dark:hover:bg-darkAccent/15"
-            >
-              Crear evento para esta fecha
-            </button>
+            {(currentUserRole === "teacher" || currentUserRole === "admin") && (
+              <button
+                type="button"
+                onClick={openCalendarModal}
+                className="mt-4 w-full rounded-xl border border-dashed border-lightBorder px-4 py-3 text-left font-sharetech text-sm text-lightText transition hover:bg-lightAccent/15 dark:border-darkBorder dark:text-darkText dark:hover:bg-darkAccent/15"
+              >
+                Crear evento para esta fecha
+              </button>
+            )}
 
             <div className="mt-5">
               {selectedEvents.length > 0 ? (
