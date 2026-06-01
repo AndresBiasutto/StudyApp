@@ -23,6 +23,7 @@ import Register from "./views/landing/register.view";
 import Login from "./views/landing/login.view";
 import LandingPageTemplate from "./components/templates/landingPage.template";
 import Settings from "./views/landing/settings.view";
+import StudentCalendar from "./views/student/studentCalendar.view";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -59,6 +60,14 @@ function App() {
             element={
               <ProtectedRoutes role={"student"}>
                 <StudentHome />
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="dashboard/student/calendar"
+            element={
+              <ProtectedRoutes role={"student"}>
+                <StudentCalendar />
               </ProtectedRoutes>
             }
           />

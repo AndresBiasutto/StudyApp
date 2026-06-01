@@ -19,6 +19,7 @@ const teacher = [
 ];
 const student = [
   { name: "mi aula", navLink: "/dashboard/student/home" },
+  { name: "calendario", navLink: "/dashboard/student/calendar" },
 ];
 const admin = [
   { name: "home", navLink: "/dashboard/admin/home" },
