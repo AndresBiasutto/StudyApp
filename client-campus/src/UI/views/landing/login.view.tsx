@@ -10,6 +10,8 @@ const Login = () => {
     <Content title="Iniciar sesion">
       <div className="flex w-full max-w-6xl flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:items-start">
         <div className="rounded-md bg-lightSecondary p-6 dark:bg-darkSecondary">
+                  <Ptxt aditionalStyle=" text-lightWarning dark:text-darkWarning " text="ADVERTENCIA: modo beta, las conexion puede tardar hasta 50 segundos al iniciar sesion por primera vez." />
+
           <LoginForm />
           <span className="mx-auto my-4 block h-0.5 w-1/4 bg-lightSecondary dark:bg-darkSecondary" />
           <div className="mt-4 flex justify-center">
